@@ -1,0 +1,450 @@
+<html>
+<script type="text/javascript">
+
+
+function addRowToTable()
+{
+
+  var tbl = document.getElementById('tblComponent');
+  var lastRow = tbl.rows.length; 
+
+  // if there's no header row in the table, then iteration = lastRow + 1
+  var iteration = lastRow-2;
+  var row = tbl.insertRow(lastRow-1);
+
+  document.getElementById('iteration').value = iteration
+
+  // left cell
+  
+  var min_mark = row.insertCell(0);
+  var cw = document.createElement('input');
+  cw.type = 'text';
+  cw.name = 'ordercomponent' + iteration ;
+  cw.id = 'ordercomponent'+ iteration;
+  cw.value=iteration;
+  cw.size = 5;
+  min_mark.appendChild(cw);
+  // left cell
+  var cellLeft = row.insertCell(1);
+  var textNode1 = document.createTextNode('');
+  cellLeft.appendChild(textNode1);
+
+  
+  // select cell component name
+  var component_id = row.insertCell(2);
+  var ci = document.createElement('select');
+  ci.name = 'component_id' + iteration;
+  ci.id = 'component_id' + iteration;
+  
+  ci.options[0] = new Option('-- Sila Pilih --', '0');
+     
+  <?php $i=1; foreach ($this->components as $component){ ?> 
+  ci.options[<?php echo $i;?>] = new Option('<?php echo $component["value"]?>', '<?php echo $component["key"]?>');
+  <?php $i++; } ?>
+
+  component_id.appendChild(ci);
+  
+
+
+  //component_total_mark
+  var component_total_mark = row.insertCell(3);
+  var ctm = document.createElement('input');
+  ctm.type = 'text';
+  ctm.name = 'component_total_mark' + iteration;
+  ctm.id = 'component_total_mark'+ iteration;
+  ctm.size = 20;
+  
+ // ctm.onkeypress = keyPressTest;
+  ctm.onblur = onGetTotalMark;  
+  component_total_mark.appendChild(ctm);
+
+
+
+  //component_percentage
+  var component_percentage = row.insertCell(4);
+  var cw = document.createElement('input');
+  cw.type = 'text';
+  cw.name = 'component_percentage' + iteration ;
+  cw.id = 'component_percentage'+ iteration;
+  cw.size = 20;
+
+  cw.onblur = onGetTotalPercentage;  
+  component_percentage.appendChild(cw);
+
+  //minimum mark
+  var min_mark = row.insertCell(5);
+  var cw = document.createElement('input');
+  cw.type = 'text';
+  cw.name = 'min_mark' + iteration ;
+  cw.id = 'min_mark'+ iteration;
+  cw.size = 6;
+  min_mark.appendChild(cw);
+  
+  //appeal
+  var appeal = row.insertCell(6);
+  var a = document.createElement('input');
+  a.type = 'checkbox';
+  a.name = 'appeal' + iteration;
+  a.id = 'appeal'+ iteration; 
+  appeal.appendChild(a);
+
+  //resit
+  var resit = row.insertCell(7);
+  var r = document.createElement('input');
+  r.type = 'checkbox';
+  r.name = 'resit' + iteration;
+  r.id = 'resit'+ iteration; 
+  resit.appendChild(r);
+  
+//allow_null
+  var resit = row.insertCell(8);
+  var r = document.createElement('input');
+  r.type = 'checkbox';
+  r.name = 'allownull' + iteration;
+  r.id = 'allownull'+ iteration; 
+  resit.appendChild(r);
+  
+}
+
+function keyPressTest(e, obj)
+{
+  var validateChkb = document.getElementById('chkValidateOnKeyPress');
+  if (validateChkb.checked) {
+    var displayObj = document.getElementById('spanOutput');
+    var key;
+    if(window.event) {
+      key = window.event.keyCode; 
+    }
+    else if(e.which) {
+      key = e.which;
+    }
+    var objId;
+    if (obj != null) {
+      objId = obj.id;
+    } else {
+      objId = this.id;
+    }
+    displayObj.innerHTML = objId + ' : ' + String.fromCharCode(key);
+  }
+}
+
+
+function removeRowFromTable(total)
+{
+	
+  var curval=3;
+  newtotal=Math.abs(total)+Math.abs(curval);
+  
+  var tbl = document.getElementById('tblComponent');
+  var lastRow = tbl.rows.length;
+ 
+  
+  curval = document.getElementById('iteration').value;
+  if (lastRow > newtotal) {
+	  tbl.deleteRow(lastRow - 2);  
+      document.getElementById('iteration').value = curval-1;
+  }else{
+      alert('Sorry you cannot remove this component. Click on checkbox then click delete button to delete.');
+  }
+}
+
+function onGetTotalMark(){
+
+	 var tbl = document.getElementById('tblComponent');
+	 var lastRow = tbl.rows.length - 3;
+
+	 var i;
+	 var total=0;		  
+	    
+	 for (i=1; i<=lastRow; i++) {
+		 
+  	 var aRow = document.getElementById('component_total_mark' + i);
+  	 
+		 rowVal = aRow.value;
+		 total=total+Math.abs(rowVal);
+	}  
+	  
+	document.getElementById('total_mark').value = total;
+	 	         
+}
+
+function onGetTotalPercentage(){
+
+    	//get total percentage
+	    var tbl = document.getElementById('tblComponent');
+	    var lastRow = tbl.rows.length - 3;
+	  
+	    var i;
+	    var total=0;		  
+	    
+	    for (i=1; i<=lastRow; i++) {
+	      	 var aRow = document.getElementById('component_percentage' + i);
+		   
+			 rowVal = aRow.value;
+			 total=total+Math.abs(rowVal);
+
+			 if(total > 100){
+					alert('You have exceeded total percentage of 100% ');					
+					aRow.value=0;
+					aRow.focus();
+					return;
+			}	
+	    }  
+}
+
+
+function validateRow()
+{	
+	    var tbl = document.getElementById('tblComponent');	    
+	    var lastRow = tbl.rows.length - 3;
+	  
+	    var i;
+	    var total=0;		  
+	   
+	    for (i=1; i<=lastRow; i++) {
+	    	
+	      	  var aRow = document.getElementById('component_percentage' + i);
+			  
+		      if (aRow.value <= 0) {
+		        alert('There is an empty row. Please enter all the information required.');
+		        return false;
+		      }
+		      //alert('1');
+			  var aRow_component_total_mark = document.getElementById('component_total_mark' + i);
+
+			  if($.isNumeric( aRow_component_total_mark.value )==false){ 			      
+			        alert('Please enter component total mark.');
+			        return false;
+			  }
+		    //  alert('2');
+		      var component_row = document.getElementById('component_id'+i);
+		      
+		      if(component_row==0){
+		    	  alert('Please select assessment Type.');
+			        return false;
+		      }
+
+		      
+
+	         //get total percentage
+			 rowVal = aRow.value;
+			 total=total+Math.abs(rowVal);	
+	    }  
+	    
+	    if(lastRow==0){
+	    	alert('There is no assessment component entered.');
+			return false;
+	    }
+	
+		if(total !=100){
+			alert('Please make sure Total Percentage is 100%');
+			return false;
+		}
+		
+		
+					    
+ 	return true;
+}
+
+function save(){
+	message = confirm('Are you sure to save any data?');
+	
+	if (message) {
+		
+		$returnVal = validateRow(document.form1);
+		
+		if($returnVal==true){	   
+			
+			document.form1.submit();
+			
+			//$('#form1').submit();		
+		}
+		else alert('your data is not valid');
+	}
+}
+
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-distribution','action'=>'view','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject), 'default', true);?>";
+}
+
+
+function deleteData(){
+
+	if(checkList()==true){		
+		message = confirm('Are you sure you want to delete this component? By deleting this component, all student mark will be lost.');
+		if(message){
+			url="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-distribution','action'=>'delete'),'default',true)?>";
+			
+		    $('#form1').attr('action', url);
+			$('#form1').submit();
+		}		
+	}	
+}
+
+
+function checkList(){
+	 var isChecked = $('.chk').is(':checked');
+
+	 if(isChecked==true){		 
+		return true;
+	 }else{
+		alert("You did not select any component. Please select.");
+	 } 
+}
+
+</script>
+
+<body>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onClick="save();">
+				<span class='save'></span>Save</a>
+			</li>
+			<li>
+				<a href="#" onClick="deleteData();">
+					<span class='delete'></span>
+					Delete
+				</a>
+			</li>
+			<li>
+				 <a  href="#" onclick="addRowToTable();">
+					<span class='add'></span>
+					Add Row
+				 </a>
+			</li>
+			
+			<li>
+				<a href="#" onClick="removeRowFromTable('<?php echo count($this->component_item);?>');">
+					<span class='remove' align="center"></span>
+					Remove Row
+				</a>
+			</li>
+			
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+
+<table class="table" width="00px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Branch Name"); ?></th>   
+		    <td><?php echo $this->branch['BranchName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+	
+	
+</table>
+<br>
+
+<span id="tbltype1" >
+
+<br>
+<h2>Add Assessment Component Instruction</h2>
+<ul style="1">
+	<li>To add more than one(01) component, click on "Add Row" button.</li>
+	<li>To remove row, click on "Remove Row" button.</li>
+	<li>Fill in the information required then click "Save" button to save.</li>
+</ul>
+<br>
+
+<form name="form1" id="form1" action="" method="post">
+<table id="tblComponent" class="table" width="80%" cellpadding="5" cellspacing="1" >
+  <tr>
+    <th colspan="9">Assessment Component List.</th>
+  </tr>
+  <tr>
+    <td width="5px"><?php echo $this->translate("Order");?></td>   
+    <td width="5px" align="center"></td>   
+    <td><?php echo $this->translate("Item Component Name");?></td>
+    <td><?php echo $this->translate("Total Mark");?></td>  
+    <td><?php echo $this->translate("Percentage");?></td>
+       <td><?php echo $this->translate("Minimum mark");?></td>
+    <td><?php echo $this->translate("Allow Appeal");?></td>
+    <td><?php echo $this->translate("Allow Resit");?></td>
+    <td><?php echo $this->translate("Allow Null");?></td>
+  </tr>
+          <?php 
+		  $no=1;
+		  foreach ($this->main_component as $component){
+		  	if($component["allow_appeal"]==1){
+		  		$appeal = 'checked';
+		  	} else $appeal = '';
+		  	
+		  	if($component["allow_resit"]==1){
+		  		$resit = 'checked';
+		  	} else $resit = '';
+		  	
+		  	if($component["allow_null"]==1){
+		  		$allownull = 'checked';
+		  	} else $allownull = '';
+		  ?>		  		     
+		  <tr>
+		    <td><input type="text" name="ordercomponent<?php echo $no;?>" id="ordercomponent<?php echo $no;?>" size="5" value="<?php if ($component['OrderComponent']==0) echo $no; else echo $component['OrderComponent'];?>"></td>   
+		    <td>	
+		    <input type="hidden" name="IdMarksDistributionMaster<?php echo $no;?>" id="IdMarksDistributionMaster<?php echo $no;?>" value="<?php echo $component["IdMarksDistributionMaster"]?>">	    
+		    <input class='chk' type="checkbox" name="id[]" id="id[]" value="<?php echo $component["IdMarksDistributionMaster"]?>"></input></td>		    
+		    <td>		
+		    <input type="hidden" name="component_id<?php echo $no;?>" value="<?php echo $component["IdComponentType"]?>">   
+		    <input type="text" name="component_name<?php echo $no;?>" value="<?php echo $component["component_name"]?>" readonly>		    
+		    </td>
+		    <td><input type="text" name="component_total_mark<?php echo $no;?>" id="component_total_mark<?php echo $no;?>" value="<?php echo $component["Marks"]?>" readonly style="background-color : #d1d1d1; "></input></td>		    
+		    <td><input type="text" name="component_percentage<?php echo $no;?>" id="component_percentage<?php echo $no;?>" value="<?php echo $component["Percentage"]?>" readonly style="background-color : #d1d1d1; "></input></td>
+		   <td><input type="text" name="min_mark<?php echo $no;?>" id="min_mark<?php echo $no;?>"  size=6 value="<?php echo $component["min_mark"]?>" ></input></td>
+		    <td><input type="checkbox" name="appeal<?php echo $no;?>" id="appeal<?php echo $no;?>" value="1" <?php echo $appeal; ?>></td>
+		    <td><input type="checkbox" name="resit<?php echo $no;?>" id="resit<?php echo $no;?>" value="1" <?php echo $resit; ?>></td>
+		    <td><input type="checkbox" name="allownull<?php echo $no;?>" id="allownull<?php echo $no;?>" value="1" <?php echo $allownull; ?>></td>
+		  </tr>
+		  <?php $no++; } ?>  
+  <tr>
+    <td width="5px">&nbsp;</td>
+    <td width="5px">&nbsp;</td>
+    <td><?php echo $this->translate("Total Mark");?></td>  
+    <td><input type="text" name="total_mark" id="total_mark"  value="<?php echo $this->TotalMark; ?>" readonly></td> 
+    <td><input type="hidden" name="total_percentage" id="total_percentage"  value="100" readonly>100%</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+<input type="hidden" name="iteration" id="iteration" value="<?php echo count($this->main_component); ?>"></input>
+<input type="hidden" name="idSemester" id="idSemester" value="<?php echo $this->idSemester;?>"></input>
+<input type="hidden" name="idProgram" id="idProgram" value="<?php echo $this->idProgram;?>"></input>
+<input type="hidden" name="idBranch" id="idBranch" value="<?php echo $this->idBranch;?>"></input>
+
+<input type="hidden" name="idSubject" id="idSubject" value="<?php echo $this->idSubject;?>"></input>
+</form>
+
+
+</span>
+
+</div>
+</body>
+</html>

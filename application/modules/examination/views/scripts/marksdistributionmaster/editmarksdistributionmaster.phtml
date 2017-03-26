@@ -1,0 +1,315 @@
+<script type="text/javascript">
+    dojo.addOnLoad(function(){
+        //$('#totalmarks').attr("readonly","readonly");
+        <?php if(isset($this->allmaster[0]['IdFaculty']) && ($this->allmaster[0]['IdFaculty'] != '')){?>               
+                fnGetSchmeList("<?php echo ($this->allmaster[0]['IdFaculty'] == '') ? 0 : $this->allmaster[0]['IdFaculty'];?>");
+                setTimeout(function() {
+                       dijit.byId('IdScheme').setValue("<?php echo ($this->allmaster[0]['IdScheme'] == '') ? 0 : $this->allmaster[0]['IdScheme'];?>");
+                       setTimeout(function() {
+                            dijit.byId('IdProgram').setValue(<?php echo ($this->allmaster[0]['program'] == '') ? 0 : $this->allmaster[0]['program'];?>);
+                            setTimeout(function() {
+                                dijit.byId('IdCourse').setValue(<?php echo ($this->allmaster[0]['IdCourse'] == '') ? 0 : $this->allmaster[0]['IdCourse'];?>);
+                            }, 1250);
+                        }, 1250);
+                        dijit.byId('IdFaculty').set("readOnly",true);
+                        dijit.byId('IdScheme').set("readOnly",true);
+                        dijit.byId('IdProgram').set("readOnly",true);
+                        dijit.byId('IdCourse').set("readOnly",true);
+                        dijit.byId('semestercode').set("readOnly",true);
+                }, 1250);
+                $('#semestercode').val("<?php echo $this->allmaster[0]['semester'];?>");
+
+
+                var markLen = $('.mark').length;
+                for(var i=0;i<markLen;i++){
+                    $('#marks_'+i).attr("readonly","readonly");
+                }
+        <?php } ?>
+        <?php if(isset($this->allmaster)){?>
+            <?php if($this->allmaster[0]['Status'] == '243' || $this->allmaster[0]['Status'] == '195'){?>
+                var markLen = $('.mark').length;
+                for(var i=0;i<markLen;i++){
+                    $('#marks_'+i).attr("readonly","readonly");
+                    $('#percentage_'+i).attr("readonly","readonly");
+                }
+                $('#totalmarks').attr("readonly","readonly");
+        <?php } } ?>
+    });
+
+    function fnGetSchmeList(IdFaculty){
+        if(IdFaculty != "") {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/marksdistributionmaster/getschemelist/IdFaculty/"+IdFaculty,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdScheme",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+    }
+
+    function fnGetProgramList(IdScheme){
+        var IdFaculty = dijit.byId("IdFaculty").value;
+        if(IdScheme != "" && IdFaculty !='') {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/marksdistributionmaster/getprogramlist/IdFaculty/"+IdFaculty+"/IdScheme/"+IdScheme,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdProgram",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+
+    }
+
+
+
+    function fnGetCourseList(IdProgram){
+        if(IdProgram != "") {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/marksdistributionmaster/getcourselist/IdProgram/"+IdProgram,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdCourse",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+    }
+
+    function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+        dijit.byId(EditableDropDownId).setValue("");
+        var ddwidget = dijit.byId(EditableDropDownId);
+        ddwidget.setAttribute('disabled', false);
+        var options = {
+            label:"name",
+            identifier:"key",
+            items:JSONText
+        };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+    }
+
+    function getComponent(){
+        var IdCourse = dijit.byId("IdCourse").value;
+        if(IdCourse == ''){
+            alert('Please select course');
+            return false;
+        }
+    }
+
+    function validateform(){
+        var flag = true;
+        var totalmarks = $('#totalmarks').val();
+        if(totalmarks == ''){
+            alert('Please insert total marks');
+            return false;
+        }
+        var markLen = $('.mark').length;
+        var markcount = 0;
+        for(var i=0;i<markLen;i++){
+            if($('#marks_'+i).val() != ''){
+                markcount = parseFloat(markcount) + parseFloat($('#marks_'+i).val());
+            }
+        }
+        if(markcount != totalmarks){
+            alert('count of components marks should be same as totalmarks');
+            return false;
+        }
+
+        var percentlen = $('.percntage').length;
+        var percentcount = 0;
+        for(var i=0;i<markLen;i++){
+            percentcount = parseFloat(percentcount) + parseFloat($('#percentage_'+i).val());
+        }
+
+        if(percentcount != parseFloat('100')){
+            alert('count of percentage could not greater or less than to 100');
+            return false;
+        }
+        return flag;
+    }
+
+    function insertmarksinrow(percentageId){
+        var totalmarks = $('#totalmarks').val();        
+        if(totalmarks == ''){
+            alert('First Insert marks');
+            return false;
+        }
+        var percentageval = $('#'+percentageId).val();        
+        if((isNaN(percentageval))){
+            alert('Please insert numeric value in percentage');
+            return false;
+        }
+
+        var ret = percentageId.split('_');
+        var perkey = ret[1];
+        var mark = ((totalmarks*percentageval)/100);
+        $('#marks_'+perkey).val(mark);
+    }
+
+    function inserttotalmarks(id){
+        var totalmarks = 0;
+        var rowmarks = $('#'+id).val();
+        if((isNaN(rowmarks))){
+            alert('Please insert numeric value in marks');
+            return false;
+        }
+        if(rowmarks <= 0){
+            alert('Marks should be greater than zero');
+            return false;
+        }
+
+        var len = $('.mark').length;
+        for(var i=0;i<len;i++){
+            rowmarks = $('#marks_'+i).val();
+            if(rowmarks!=''){
+                totalmarks = parseInt(totalmarks) + parseInt(rowmarks);
+            }
+        }
+        $('#totalmarks').val(parseInt(totalmarks));
+    }
+</script>
+
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Distribution Master"); ?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                var flag = validateform();
+                if(flag){
+                    return true;
+                }else{
+                    return false;
+                }
+            } else {
+            return false;
+            }
+        </script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Marks Distribution Master"); ?>
+				</th>
+			</tr>
+			<?php if ($this->marksdifferentmessage == '1') { ?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Sum of total marks of details component should be equal to the marks of main component.'); ?>
+				</td>
+			</tr>
+			<?php } ?>
+			<tr>
+				<td><?php echo $this->translate("Faculty"); ?></td>
+				<td><?php echo $this->lobjMarksdistributionmasterForm->IdFaculty; ?>
+				</td>
+				<td><?php echo $this->translate("Scheme"); ?></td>
+				<td><?php echo $this->lobjMarksdistributionmasterForm->IdScheme; ?>
+					<?php echo $this->lobjMarksdistributionmasterForm->IdMarksDistributionMaster; ?>
+					<?php echo $this->lobjMarksdistributionmasterForm->UpdDate; ?> <?php echo $this->lobjMarksdistributionmasterForm->UpdUser; ?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate($this->Program); ?></td>
+				<td><?php echo $this->lobjMarksdistributionmasterForm->IdProgram; ?>
+				</td>
+				<td><?php echo $this->translate($this->Subject); ?></td>
+				<td><?php echo $this->lobjMarksdistributionmasterForm->IdCourse; ?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Semester"); ?></td>
+				<td colspan="3"><?php echo $this->lobjMarksdistributionmasterForm->semestercode; ?>
+				</td>
+			</tr>
+			<!--<tr>
+                <td align="right" colspan="4"><input type='submit' name="Search" id="Search" class="NormalBtn" dojotype="dijit.form.Button" label = "<?php echo $this->translate('Search') ?>" value='click' onclick="getComponent()" /></td>
+            </tr>-->
+		</table>
+		<div id="componentmaster">
+			<table class="table" width="100%">
+				<tr>
+					<th colspan="4"><?php echo $this->translate("General Setup"); ?>
+					</th>
+				</tr>
+				<tr>
+					<th><?php echo $this->translate("Component Type");?>
+					</th>
+					<th><?php echo $this->translate("Component Item");?>
+					</th>
+					<th><?php echo $this->translate("Marks");?></th>
+					<th><?php echo $this->translate("Percentage");?></th>
+				</tr>
+				<?php if(isset($this->allmaster) && (!empty($this->allmaster))){?>
+				<?php $i = 0;foreach($this->allmaster as $list){?>
+				<tr>
+					<td><a
+						href="<?php echo $this->url(array('module' => 'examination', 'controller' => 'marksdistributionmaster', 'action' => 'addmarksdistributiondetail', 'id' => $list['IdMarksDistributionMaster']), 'default', true); ?>"><?php echo ($list['component']) ? $list['component'] : ''?>
+					</a></td>
+					<td><?php echo ($list['componentitem']) ? $list['componentitem'] : ''?>
+					</td>
+					<td><input type="hidden" name="<?php echo 'componentid_'.$i?>"
+						id="<?php echo 'componentid_'.$i?>"
+						value="<?php echo $list['IdMarksDistributionMaster'];?>"> <input
+						type="hidden" name="<?php echo 'componentitem_'.$i?>"
+						id="<?php echo 'componentitem_'.$i?>"
+						value="<?php echo $list['IdComponentItem'];?>"> <input
+						type="hidden" name="<?php echo 'componenttype_'.$i?>"
+						id="<?php echo 'componenttype_'.$i?>"
+						value="<?php echo $list['IdComponentType'];?>"> <!--<input class="mark" type="text" onkeyup="inserttotalmarks(this.id)" dojoType ="dijit.form.ValidationTextBox" name="<?php echo 'marks_'.$i;?>" id="<?php echo 'marks_'.$i;?>" value="<?php echo (isset($list['Marks']) && ($list['Marks']!='')) ? $list['Marks'] : ''?>"></td>-->
+						<input class="mark" type="text"
+						dojoType="dijit.form.ValidationTextBox"
+						name="<?php echo 'marks_'.$i;?>" id="<?php echo 'marks_'.$i;?>"
+						value="<?php echo (isset($list['Marks']) && ($list['Marks']!='')) ? $list['Marks'] : ''?>">
+					</td>
+					<td><input class="percntage" onkeyup="insertmarksinrow(this.id)"
+						type="text" dojoType="dijit.form.ValidationTextBox"
+						name="<?php echo 'percentage_'.$i;?>"
+						id="<?php echo 'percentage_'.$i;?>"
+						value="<?php echo (isset($list['Percentage']) && ($list['Percentage']!='')) ? $list['Percentage'] : ''?>">
+					</td>
+				</tr>
+				<?php $i++;
+}?>
+				<tr>
+					<td></td>
+					<td align="right">
+						<!--<span style="color:RED"><?php echo $this->translate("Please enter Total Marks first");?></span>-->
+						<span><b>Total Marks</b> </span><input type="hidden" name="count"
+						id="count" value="<?php echo $i?>"><input type="hidden"
+						name="course" id="course"
+						value="<?php echo ($this->allmaster[0]['IdCourse']) ? $this->allmaster[0]['IdCourse'] : ''?>">
+						<?php echo $this->translate('Total');?>
+					
+					</td>
+					<td><input type="hidden" name="program" id="program"
+						value="<?php echo (isset($this->allmaster[0]['program'])) ? $this->allmaster[0]['program'] : ''?>"><input
+						type="hidden" name="semester" id="semester"
+						value="<?php echo (isset($this->allmaster[0]['semester'])) ? $this->allmaster[0]['semester'] : ''?>"><input
+						type="text" dojoType="dijit.form.ValidationTextBox"
+						name="totalmarks" id="totalmarks"
+						value="<?php echo (isset($this->allmaster[0]['TotalMark'])) ? $this->allmaster[0]['TotalMark'] : ''?>">
+					</td>
+					<td>100%</td>
+				</tr>
+				<?php } ?>
+			</table>
+		</div>
+		<table class="table" width="100%">
+
+			<tr>
+				<td align="right" colspan="4"><?php if($this->allmaster[0]['Status'] == '243' || $this->allmaster[0]['Status'] == '195'){?>
+					<?php }else{ ?> <?php echo $this->lobjMarksdistributionmasterForm->Save; ?>
+					<?php } ?> <input type='button' class="NormalBtn"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back') ?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'marksdistributionmaster', 'action' => 'index'), 'default', true); ?>';" />
+				</td>
+			</tr>
+		</table>
+
+	</Form>
+
+</fieldset>

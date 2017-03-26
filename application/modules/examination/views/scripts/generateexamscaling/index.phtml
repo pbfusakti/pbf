@@ -1,0 +1,162 @@
+<script type="text/javascript">
+    dojo.addOnLoad(function(){
+        dijit.byId('IdScheme').set('value','');
+        dijit.byId('IdScheme').set('placeHolder','Select');
+        dijit.byId('IdFaculty').set('value','');
+        dijit.byId('IdFaculty').set('placeHolder','Select');
+        dijit.byId('semestercode').set('value','');
+        dijit.byId('semestercode').set('placeHolder','Select');
+        dijit.byId('IdComponent').set('value','');
+        dijit.byId('IdComponent').set('placeHolder','Select');
+        dijit.byId('IdCourse').set('value','');
+        dijit.byId('IdCourse').set('placeHolder','Select');
+
+        <?php if($this->hideProcessScalingButtton=='1') { ?>
+ 			dijit.byId('Save').attr("disabled",true);
+        <?php } ?>
+
+
+        <?php if(isset($this->searchdata)){?>
+                dijit.byId('IdScheme').setValue('<?php echo $this->searchdata['IdScheme'];?>');
+                dijit.byId('semestercode').setValue('<?php echo $this->searchdata['semestercode'];?>');
+                <?php if(!empty($this->studentlist)){?>
+                dijit.byId('IdScheme').set("readOnly",true);
+                dijit.byId('semestercode').set("readOnly",true);
+                <?php } ?>
+                getprogramList('<?php echo $this->searchdata['IdScheme'];?>');
+                setTimeout(function() {
+                        dijit.byId('IdFaculty').setValue("<?php echo $this->searchdata['IdFaculty'];?>");
+                        <?php if(!empty($this->studentlist)){?>
+                        dijit.byId('IdFaculty').set("readOnly",true);
+                        <?php } ?>
+                }, 1250);
+        <?php } ?>
+    });
+
+    function getprogramList(idscheme){
+        if(idscheme != ""){
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/generateexamscaling/getprogramlist/idscheme/"+idscheme,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdProgram",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+     }
+
+    function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+        dijit.byId(EditableDropDownId).setValue("");
+        var ddwidget = dijit.byId(EditableDropDownId);
+        ddwidget.setAttribute('disabled', false);
+        var options = {
+            label:"name",
+            identifier:"key",
+            items:JSONText
+        };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+    }
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Generate Exam Scaling"); ?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl(); ?>/examination/generateexamscaling/index"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                return true;
+            }else {
+                return false;
+            }
+        </script>
+		<table class="table" width="100%">
+			<tr>
+
+
+			<tr>
+				<td><?php echo $this->translate('Scheme'); ?></td>
+				<td><?php echo $this->lobjgenerateexamscalingForm->IdScheme; ?> <?php echo $this->lobjgenerateexamscalingForm->UpdUser; ?>
+					<?php echo $this->lobjgenerateexamscalingForm->UpdDate; ?>
+				</td>
+				<td><?php //echo $this->translate('Program'); ?> <?php echo $this->translate('Faculty'); ?>
+				</td>
+				<td><?php //echo $this->lobjgenerateexamscalingForm->IdProgram; ?> <?php echo $this->lobjgenerateexamscalingForm->IdFaculty; ?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Semester'); ?></td>
+				<td><?php echo $this->lobjgenerateexamscalingForm->semestercode; ?>
+				</td>
+			</tr>
+
+			    <tr>
+				<td align="right" colspan="4">
+				  <?php if($this->hideProcessScalingButtton=='1') { ?>
+                       <div align="center" style='text-align: center; color:red;' >
+                       		<?php echo $this->translate("Sorry, No matching student found. Try different keywords.");?>
+                       	</div>
+				  <?php } ?>
+
+				<?php echo $this->lobjgenerateexamscalingForm->Search; ?>
+
+				</td>
+				</tr>
+
+		</table>
+		<br>
+		<table class="table" width="100%">
+			<tr>
+
+
+			<tr>
+				<td><?php echo $this->translate('Component'); ?></td>
+				<td><?php echo $this->lobjgenerateexamscalingForm->IdComponent; ?>
+				</td>
+				<td><?php echo $this->translate('Course'); ?></td>
+				<td><?php echo $this->lobjgenerateexamscalingForm->IdCourse; ?></td>
+			</tr>
+			<tr>
+				<td colspan="4" align="right"><?php echo $this->lobjgenerateexamscalingForm->Save; ?>
+				</td>
+			</tr>
+		</table>
+		<br>
+		<table class="table" width="100%">
+			<tr>
+				<th><?php echo $this->translate('Student Id');?>
+				</th>
+				<th><?php echo $this->translate('Student Name');?>
+				</th>
+				<th><?php echo $this->translate('Course');?></th>
+				<th><?php echo $this->translate('Component');?></th>
+				<th><?php echo $this->translate('Old Marks');?>
+				</th>
+				<th><?php echo $this->translate('New Marks');?>
+				</th>
+			</tr>
+			<?php if(isset($this->studentlist)){
+$i=1?>
+			<?php foreach($this->studentlist as $list){
+$id = 'Idstudent_'.$i;?>
+			<tr>
+				<td><input type='hidden' name="student[]" id="<?php echo $id;?>"
+					value="<?php echo $list['IdStudentRegistration']?>"> <?php echo $list['registrationId'];?>
+				</td>
+				<td><?php echo $list['fullname']?></td>
+				<td><?php echo $list['SubjectName']?></td>
+				<td><?php echo (isset($list['component']) && $list['component']!='') ? $list['component'] : ''?>
+				</td>
+				<td><?php echo (isset($list['oldmarks']) && $list['oldmarks']!='') ? $list['oldmarks'] : ''?>
+				</td>
+				<td><?php echo (isset($list['newmarks']) && $list['newmarks']!='') ? $list['newmarks'] : ''?>
+				</td>
+			</tr>
+			<?php $i++;
+			}
+} ?>
+		</table>
+	</form>
+</fieldset>

@@ -1,0 +1,167 @@
+<script>
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-record','action'=>'index'), 'default', true);?>";
+}
+
+
+function generate(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-record','action'=>'generateGpa'), 'default', true);?>";
+}
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>	
+		
+		    <li>							
+					<a href="#" onClick="generate()">
+						<span class='process'></span>Generate Grade</a>				
+			</li>	
+				
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+
+<br>
+
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+
+
+<br><br>	
+	
+	
+	<table  class="table" width="100%" cellpadding="5" cellspacing="1" >
+		 
+		  <tr>
+		    <th width="5%" rowspan=2>No</th>   
+		    <th width="20%" rowspan=2>Component Name</th>
+		    <th width="30%" colspan=2>Item Mark</th>
+		    <th width="20%" colspan=2>Main Mark</th>  
+		    <th width="15%" rowspan=2>Final Mark</th>  
+		    <th width="20%" rowspan=2>Mark Status</th>  			    
+		  </tr>
+		  
+		   <tr>
+		    
+		    <th width="15%">Mark Obtained / Total Mark</th> 
+		    <th width="10%">Percentage</th>   
+		    <th width="15%" >Total Mark Obtained</th>   
+		    <th width="10%" >Percentage</th>   			    
+		  </tr>
+		  
+		  <?php 
+		  if($this->rs_component){		
+		  $no=1;
+		  foreach ($this->rs_component as $component){
+		  	
+		  	   //get component item 
+		  	   $oCompitem = new Examination_Model_DbTable_Marksdistributiondetails();	
+		  	   $component_item = $oCompitem->getListComponentItem($component["IdMarksDistributionMaster"]);
+		  	   
+		  	   //get mark
+		  	   $markDb = new Examination_Model_DbTable_StudentMarkEntry();
+		  	   $mark = $markDb->getMark($this->IdStudentRegistration,$component["IdMarksDistributionMaster"],$this->IdStudentRegSubjects,$this->idSemester);
+				
+		  	   $cms_calculation = new Cms_ExamCalculation();
+		  	   $final_mark  = $cms_calculation->calculateFinalMark($mark["TotalMarkObtained"],$component["Percentage"]);
+		  	 
+		   ?>
+		   <tr>
+		    <td>&nbsp;<?php echo $no;?>.</td>   
+		    <td>&nbsp;<?php echo $component["component_name"]?></td>
+		    <td>&nbsp;</td>   		    
+		    <td>&nbsp;</td>  
+		    <td align="center"><input type="text" size =4 value="<?php echo $mark["TotalMarkObtained"]?>" readonly></td>   
+		    <td align="center"><?php echo $component["Percentage"]?></td> 
+		    <td align="center"><?php echo $final_mark;?></td>  
+		    <td>
+		    <?php 
+		    echo (isset($mark["BahasaIndonesia"]) ? $mark["BahasaIndonesia"]:$mark["DefinitionDesc"]);
+		    if($mark["MarksEntryStatus"]==411){
+		    echo '<br>';
+		    echo $this->translate("by").' '. $mark["ApprovedBy"];
+		    echo '<br>';
+		    echo $this->translate("on").' '. date("d-m-Y",strtotime($mark["ApprovedOn"]));
+		    }
+		    ?>
+		    </td>
+		     
+		   </tr>
+				   
+		    <? 		       
+		  	   if($component_item){
+		  	   	$calculate_mark=0;
+		  	   	$total_calculate_mark=0;
+		  	   	foreach ($component_item as $item){
+		  	   		
+		  	   		if(is_array($mark)){
+		  	   			$item_mark = $markDb->getItemMark($mark["IdStudentMarksEntry"],$item["IdMarksDistributionDetails"]);
+		  	   			$item_mark_obtained = $item_mark["MarksObtained"];
+		  	   			
+		  	   		}
+		   ?>
+			    <tr bgcolor="#FFFFF0">
+				    <td>&nbsp;</td>   
+				    <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $item["ComponentName"]?></td>
+				    <td align="center">
+						<input size="4" type="text" value="<?php echo (isset($item_mark_obtained) ? $item_mark_obtained:''); ?>" readonly> / <?php echo $item["Weightage"]; ?> 
+						</td>				    
+				    <td align="center"><?php echo $item["Percentage"]; ?></td>
+				   	<td>&nbsp;</td>		
+				   	<td>&nbsp;</td>   
+				   	  <td>&nbsp;</td>       
+				   	   <td>&nbsp;</td>   
+			    </tr>
+		   <? }   }//end if item?>
+		   
+		  <?php $no++; }
+	}else{ ?>
+	<tr bgcolor="#FFFFFF">
+				    <td colspan="7"><font color="red"></>No assessment component has been setup.</font></td>   
+			    </tr>
+	<?php }?>
+  </table>
+</div>

@@ -1,0 +1,212 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	dijit.byId('field23').set('value','');
+	dijit.byId('field23').set('placeHolder','Select');
+	//dijit.byId('field24').set('value','');
+	//dijit.byId('field24').set('placeHolder','Select');
+    //dijit.byId('field25').set('value','');
+	//dijit.byId('field25').set('placeHolder','Select');
+	dijit.byId('field26').set('value','');
+	dijit.byId('field26').set('placeHolder','Select');
+    dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');
+	dijit.byId('field29').set('value','');
+	dijit.byId('field29').set('placeHolder','Select');	
+});
+
+function formsubmit() {
+    var studentregID = $('#field2').val();
+    var sem = $('#field27').val();
+    var course = $('#field23').val();
+    
+    if(studentregID=='') {    
+    if(sem==''  || course=='' ) {   
+      alert('Course and Semester cannot be left blank');
+      return false;
+    } else {
+        document.searchF.submit();
+    }
+    } else {
+       document.searchF.submit();
+    }
+    
+}
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+    var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+    ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+
+function getGroup(course) {
+	var LecturerId = dijit.byId("field29").value;
+	if(course!='') { 
+		var xhrArgs = {
+				url: "<?php echo $this->baseUrl();?>"+"/examination/marksentryindividual/getgroup/IdCourse/"+course,
+			    handleAs:'json',
+			    load:function(data){ 
+			    	AutoFillNextEditableDropDown("field26",data); 
+			    }
+		}
+		dojo.xhrGet(xhrArgs); 
+	}
+}
+
+function getLecturer(group){
+	var courseId = dijit.byId("field23").value;
+	if(group!='' && courseId!='') { 
+		var xhrArgs = {
+				url: "<?php echo $this->baseUrl();?>"+"/examination/marksentryindividual/getlecturer/Idgroup/"+group+"/courseId/"+courseId,
+			    handleAs:'json',
+			    load:function(data){ 
+			    	AutoFillNextEditableDropDown("field29",data); 
+			    }
+		}
+		dojo.xhrGet(xhrArgs); 
+	}
+	
+}
+
+function getCourses(lecturerId){
+	if(lecturerId!='') { 
+		var xhrArgs = {
+				url: "<?php echo $this->baseUrl();?>"+"/examination/marksentryindividual/getlecturercourses/IdLecturer/"+lecturerId,
+			    handleAs:'json',
+			    load:function(data){ 
+			    	AutoFillNextEditableDropDown("field23",data); 
+			    }
+		}
+		dojo.xhrGet(xhrArgs); 
+	}
+}
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Entry Individual");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/marksentryindividual/index/search/1"
+		name="searchF" id="searchF" method="POST">
+		<input type="hidden" name='Search' id="Search" value="Search">
+		<table width="100%">
+			<!--  <tr>
+				<td><?php echo $this->translate("Student ID");?></td>
+				<td><?php echo $this->lobjform->field2;?></td>
+				<td><?php echo $this->translate('Course');?><span>*</span></td>
+				<td><?php echo $this->lobjform->field23;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Group");?></td>
+				<td><?php echo $this->lobjform->field26;?></td>
+				<td><?php echo $this->translate('Lecturer');?></td>
+				<td><?php echo $this->lobjform->field29;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Program');?></td>
+				<td><?php echo $this->lobjform->field24;?></td>
+				<td><?php echo $this->translate('Scheme');?></td>
+				<td><?php echo $this->lobjform->field25;?></td>				
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Semester');?></td>
+				<td><?php echo $this->lobjform->field27;?></td>
+			</tr>-->
+			
+			<tr>
+				<td><?php echo $this->translate('Semester');?><span>*</span></td>
+				<td><?php echo $this->lobjform->field27;?></td>
+				<td><?php echo $this->translate('Lecturer');?></td>
+				<td><?php echo $this->lobjform->field29;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Course');?><span>*</span></td>
+				<td><?php echo $this->lobjform->field23;?></td>
+				<td><?php echo $this->translate("Group");?></td>
+				<td><?php echo $this->lobjform->field26;?></td>				
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Student ID");?></td>
+				<td><?php echo $this->lobjform->field2;?></td>
+				<!-- <td><?php echo $this->translate('Program');?></td>
+				<td><?php echo $this->lobjform->field24;?></td>
+				<td><?php echo $this->translate('Scheme');?></td>
+				<td><?php echo $this->lobjform->field25;?></td>		 -->		
+			</tr>	
+			
+			
+			<tr>
+				<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+					<?php echo $this->lobjform->Clear;?>
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+<br />
+
+
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+		<tr>
+			<th><?php echo $this->translate("Student ID");?></th>
+			<th><?php echo $this->translate("Program");?></th>
+			<th><?php echo $this->translate("Course");?></th>
+			<th><?php echo $this->translate("Component");?></th>
+			<th><?php echo $this->translate("Marks Obtained");?></th>
+			<th><?php echo $this->translate("Marks Status");?></th>
+			<th><?php echo $this->translate("Attendance Status");?>
+			</th>
+		</tr>
+		<?php if (count($this->paginator)) {  ?>
+		<?php foreach ($this->paginator as $lobjprogram ) {  
+			$tot = count($lobjprogram['Idcomponents'])+1;
+			?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+			<td rowspan="<?php echo $tot;?>">
+				<a href="<?php echo $this->baseUrl();?>/examination/marksentryindividual/marksentrylist/id/<?php echo $lobjprogram['IdStudentRegSubjects'];?>/idstudent/<?php echo $lobjprogram['IdStudentRegistration'];?>/idprogram/<?php echo $lobjprogram['IdProgram'];?>/idcourse/<?php echo $lobjprogram['IdSubject'];?>">
+					<?php echo $lobjprogram['registrationId'];?>
+				</a>
+			</td>
+			<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['ProgramCode'].'-'.$lobjprogram['ProgramName'];?>
+			</td>
+			<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['SubjectName'].'-'.$lobjprogram['SubCode'];?>
+			</td>
+			<?php foreach($lobjprogram['Idcomponents'] as $values) {   ?>
+		
+		
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))?>" >
+			<td><?php echo $values['ComponentName'].'-'.$values['MainComponentItemName'];?></td>
+			<td><?php echo $values['TotalMarkObtained'];?></td>
+			<td><?php echo $values['MarksEntryStatusName'];?></td>
+			<td><?php echo $values['AttendanceStatusName'];?></td>
+		</tr>
+		<?php } ?>
+
+		</tr>
+		<?php } ?>
+
+
+		<tr>
+			<td colspan="7" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator,'Sliding','/partials/my_pagination_control.phtml'); ?>
+				</div>
+			</td>
+		</tr>
+		<?php }  else { ?>
+		<tr>
+			<td colspan="7" align="center" style="color: red;"><?php echo $this->translate("No matching record
+				found. Try different keywords.");?></td>
+		</tr>
+		<?php } ?>
+	</table>
+</fieldset>
+

@@ -1,0 +1,755 @@
+<head>
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+<?php $tot = count($this->gradereqresult); 
+if($tot=='0') { ?>
+var rowid=1;
+<?php } else {   ?>
+var rowid=<?php echo $tot+1;?>;   
+<?php } ?>
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+<?php foreach($this->gradereqresult as $values) { ?>
+        batchArray.push('<?php echo $values['GradeDesc'];?>');
+<?php } ?> 
+var BeforeChangeValue = <?php echo $this->larrGradeDetails['BasedOn'];?>;
+var AfterChangeValue = <?php echo $this->larrGradeDetails['BasedOn'];?>;
+dojo.addOnLoad(function(){
+	
+	dijit.byId('IdSemester').set('value','<?php echo $this->idsem;?>');        
+	dijit.byId('IdSemester').set('placeHolder','select');
+        dijit.byId('IdScheme').set('value','<?php echo $this->idsch;?>');
+	dijit.byId('IdScheme').set('placeHolder','select');
+        dijit.byId('IdAward').set('value','<?php echo $this->idawrd;?>');
+	dijit.byId('IdAward').set('placeHolder','select');
+        dijit.byId('IdProgram').set('value','<?php echo $this->idprg;?>');
+	dijit.byId('IdProgram').set('placeHolder','select');        
+        dijit.byId('IdSubject').set('value','<?php echo $this->idsub;?>');
+	dijit.byId('IdSubject').set('placeHolder','select');
+        dijit.byId('Grade').set('value','');
+	dijit.byId('Grade').set('placeHolder','select');
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').BasedOn;        
+	//fnToggleProgramSubjectDetails(<?php echo $this->larrGradeDetails['BasedOn'];?>);
+        //alert(value);
+        <?php if($this->idsem!='') {  ?>
+        dijit.byId('IdSemester').set('readOnly',true);
+        <?php } ?>
+        
+        <?php if(count($this->larrresult)>0) { ?>
+        if(value=='0') { 
+            //alert(value);
+            dijit.byId('IdScheme').set('readOnly',true);
+            dijit.byId('IdAward').set('readOnly',true);
+            dijit.byId('IdProgram').set('readOnly',true);
+            dijit.byId('IdSubject').set('readOnly',true);
+        } else if (value=='1') {
+            dijit.byId('IdProgram').set('readOnly',true);
+            dijit.byId('IdSubject').set('readOnly',true); 
+            dijit.byId('IdScheme').set('readOnly',true);
+            dijit.byId('IdAward').set('readOnly',true);
+        } else if (value=='2') {
+            dijit.byId('IdProgram').set('readOnly',true);  
+            dijit.byId('IdSubject').set('readOnly',true); 
+            dijit.byId('IdScheme').set('readOnly',true);
+            dijit.byId('IdAward').set('readOnly',true);
+        }
+        <?php } else { ?>
+            
+           if(value=='0') { 
+            //alert(value);
+            //dijit.byId('IdScheme').set('readOnly',true);
+            //dijit.byId('IdAward').set('readOnly',true);
+            dijit.byId('IdProgram').set('readOnly',true);
+            dijit.byId('IdSubject').set('readOnly',true);
+        } else if (value=='1') {
+            //dijit.byId('IdProgram').set('readOnly',true);
+           // dijit.byId('IdSubject').set('readOnly',true); 
+            dijit.byId('IdScheme').set('readOnly',true);
+            dijit.byId('IdAward').set('readOnly',true);
+        } else if (value=='2') {
+            //dijit.byId('IdProgram').set('readOnly',true);  
+            dijit.byId('IdSubject').set('readOnly',true); 
+            dijit.byId('IdScheme').set('readOnly',true);
+            dijit.byId('IdAward').set('readOnly',true);
+        }
+            
+        <?php } ?>    
+//	jQuery("input[name='BasedOn']").each(function(i) {
+//        jQuery(this).attr('disabled', 'disabled');
+//        });
+
+
+             $('input[name=BasedOn]').mouseup(function(){
+                    //alert("Before change "+$('input[name=BasedOn]:checked').val());
+                    //BeforeChangeValue = $('input[name=BasedOn]:checked').val();
+                    var form = dijit.byId("myForm");
+                    var value1=form.attr('value').BasedOn; 
+                    BeforeChangeValue = value1;
+                    
+            }).change(function(){
+                    //alert("After change "+$('input[name=BasedOn]:checked').val());
+                    //AfterChangeValue = $('input[name=BasedOn]:checked').val();
+                     var form = dijit.byId("myForm");
+                     var value1=form.attr('value').BasedOn; 
+                     AfterChangeValue = value1;
+            })  
+
+
+
+        
+	});
+        
+        
+        
+       
+	
+	
+
+
+
+
+function fnToggleProgramSubjectDetails(value){ 
+    
+     
+        var total = '<?php echo count($this->larrresult)?>'; 
+        var tableList = document.getElementById("hor"); 
+        var totalRows = tableList.rows.length;
+        var flag = true;
+        if(value!=<?php echo $this->larrGradeDetails['BasedOn'];?>) { 
+         
+         if (totalRows>2) {  
+         
+         var dStat = confirm("You have changed your BasedOn option. Are you sure to delete all the Grade Entries listed?");
+         if(dStat == true){  
+                var table = document.getElementById("hor");                
+                for(var i = table.rows.length - 2; i > 0; i--) {  table.deleteRow(i); }
+                rowid=1;
+                batchArray  = [];
+                var flag = true;  
+               
+         } else 
+         {   
+             //alert('hhh'); 
+             //var value12='<?php //echo $this->larrGradeDetails['BasedOn'];?>'; 
+             //dijit.byId('BasedOn').set('value', value12) ;
+             //dijit.byId('BasedOn-'+value12).set('checked', 'checked');
+             //value = value12;
+             dijit.byId('BasedOn-'+BeforeChangeValue).set('checked', 'checked');
+             value = BeforeChangeValue;
+             var flag = false;  
+         }         
+         
+         }
+        }
+        //alert(value);
+        
+        if(value == 0) {
+       // alert('kkk');
+                
+                 if(flag==true) {
+                    dijit.byId('IdScheme').set('readOnly',false);
+                    dijit.byId('IdAward').set('readOnly',false);
+                 } else {  
+                    dijit.byId('IdScheme').set('readOnly',true);
+                    dijit.byId('IdAward').set('readOnly',true);
+                 }
+                
+                if(flag==true) {
+                    dijit.byId("IdProgram").reset();
+                    dijit.byId("IdProgram").set("value",'');
+                    dijit.byId('IdProgram').set('placeHolder','select');
+
+                    dijit.byId("IdSubject").reset();
+                    dijit.byId("IdSubject").set("value",'');
+                    dijit.byId('IdSubject').set('placeHolder','select');
+                }
+                
+                
+		dijit.byId("IdScheme").attr('required',true);
+                dijit.byId("IdAward").attr('required',true);
+                dijit.byId('IdSubject').set('readOnly',true);
+                dijit.byId('IdProgram').set('readOnly',true);
+                dijit.byId("IdSubject").attr('required',false);
+                dijit.byId("IdProgram").attr('required',false);                
+                
+                
+	} else if(value == 1) {                
+                
+		 if(flag==true) {
+                    dijit.byId('IdSubject').set('readOnly',false);
+                    dijit.byId('IdProgram').set('readOnly',false);
+                 } else { 
+                    dijit.byId('IdSubject').set('readOnly',true);
+                    dijit.byId('IdProgram').set('readOnly',true);
+                }
+                
+                dijit.byId("IdScheme").reset();
+                dijit.byId("IdScheme").set("value",'');
+                dijit.byId('IdScheme').set('placeHolder','select');
+
+                dijit.byId("IdAward").reset();
+                dijit.byId("IdAward").set("value",'');
+                dijit.byId('IdAward').set('placeHolder','select');
+                
+               if(flag==true) {
+                     dijit.byId("IdSubject").reset();
+                     dijit.byId("IdSubject").set("value",'');
+                     dijit.byId('IdSubject').set('placeHolder','select');
+
+                     dijit.byId("IdProgram").reset();
+                     dijit.byId("IdProgram").set("value",'<?php echo $this->larrformDataM['IdProgram'];?>');
+                     dijit.byId('IdProgram').set('placeHolder','select');
+                } else { 
+                
+            
+                }
+                
+                
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true);                
+                dijit.byId("IdScheme").attr('required',false);
+                dijit.byId("IdAward").attr('required',false); 
+                dijit.byId("IdSubject").attr('required',true);
+                dijit.byId("IdProgram").attr('required',true);
+                
+	} else if (value == 2)  {
+            
+                 if(flag==true) {
+                    dijit.byId('IdProgram').set('readOnly',false);
+                 } else {    
+                    dijit.byId('IdProgram').set('readOnly',true);
+                 }
+                 
+                
+                
+                dijit.byId("IdScheme").reset();
+                dijit.byId("IdScheme").set("value",'');
+                dijit.byId('IdScheme').set('placeHolder','select');
+
+                dijit.byId("IdAward").reset();
+                dijit.byId("IdAward").set("value",'');
+                dijit.byId('IdAward').set('placeHolder','select');
+                
+                
+                dijit.byId("IdSubject").reset();
+                dijit.byId("IdSubject").set("value",'');
+                dijit.byId('IdSubject').set('placeHolder','select');
+                
+                if(flag==true) {
+                    dijit.byId("IdProgram").reset();
+                    dijit.byId("IdProgram").set("value","");
+                    dijit.byId('IdProgram').set('placeHolder','select');
+                }
+                
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true); 
+                dijit.byId("IdSubject").attr('readOnly',true);
+                dijit.byId("IdSubject").attr('required',false);
+                dijit.byId('IdScheme').set('required',false);
+                dijit.byId('IdAward').set('required',false);                
+                dijit.byId("IdProgram").attr('required',true);            
+            
+        }
+       
+    
+
+}
+
+
+function fnToggleProgram() {   
+
+        var IdScheme =  dijit.byId('IdScheme').value;
+        var IdAward =  dijit.byId('IdAward').value;  
+        if(IdScheme=='' && IdAward=='') {   } else { 
+        var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getprogramlist/IdScheme/"+IdScheme+"/IdAward/"+IdAward,
+                            handleAs:'json',
+                            load:function(data){ 
+                                    AutoFillNextEditableDropDown("IdProgram",data); 
+                                    var form = dijit.byId("myForm");
+                                    var value=form.attr('value').BasedOn;
+                                    if(value==<?php echo $this->larrGradeDetails['BasedOn'];?>) {
+                                    dijit.byId('IdProgram').set('value','<?php echo $this->idprg;?>'); }
+                            }
+                       }
+       dojo.xhrGet(xhrArgs);   
+       }
+
+    }
+   
+   function fnToggleSubject(val1) {
+       var form = dijit.byId("myForm");
+       var value=form.attr('value').BasedOn;
+       
+       if(val1!='' && value=='1') {
+       var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getsubjectlist/Idprogram/"+val1,
+                            handleAs:'json',
+                            load:function(data){ 
+                                    AutoFillNextEditableDropDown("IdSubject",data); 
+                                    dijit.byId('IdSubject').set('value','<?php echo $this->idsub;?>');
+                            }
+                       }
+       dojo.xhrGet(xhrArgs); 
+       }
+   
+   }
+
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+    var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+    ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+function addGradedetails() {
+	var flag = true;
+        var minP =  dijit.byId('MinPoint').value;
+        var maxP =  dijit.byId('MaxPoint').value;
+        var gradeP =  dijit.byId('GradePoint').value;
+        var grade = dijit.byId("Grade").value;
+        var gradedescD =  dijit.byId('GradeDesc').get('displayedValue');
+        var minPD =  dijit.byId('MinPoint').get('displayedValue');
+        var maxPD =  dijit.byId('MaxPoint').get('displayedValue');
+        var gradePD =  dijit.byId('GradePoint').get('displayedValue');
+        var rankD  = dijit.byId("Rank").get('displayedValue');
+        var intRegex = /^(?:\d*\.\d{1,2}|\d+)$/;
+        var intRegexRank = /^[0-9]$/; 
+        
+	if(gradedescD==''){
+	      //dijit.byId("GradeDesc").focus();                         
+              dijit.byId("GradeDesc").set( "state", "Error" );
+              flag = false; 
+	}
+        
+        if (minPD=='' || minPD>999 ||  (!intRegex.test(minPD)) ) { 
+	        //dijit.byId("MinPoint").focus();                         
+                dijit.byId("MinPoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (maxPD=='' || maxPD>999 ||  (!intRegex.test(maxPD)) ) { 
+	        //dijit.byId("MaxPoint").focus();                         
+                dijit.byId("MaxPoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (gradePD=='' || gradePD>999 ||  (!intRegex.test(gradePD)) ) { 
+	        //dijit.byId("GradePoint").focus();                         
+                dijit.byId("GradePoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (rankD=='' || rankD>9 ||  (!intRegexRank.test(rankD)) ) { 
+	        //dijit.byId("Rank").focus();                         
+                dijit.byId("Rank").set( "state", "Error" );
+                flag = false;
+        }
+       if (grade=='') {	
+	      //dijit.byId("Grade").focus();                         
+              dijit.byId("Grade").set( "state", "Error" );
+              flag = false;
+        }
+       
+       if( minP>maxP ){   
+            var flag = false;
+            alert(' Minimum Point must be less than Maximum Point ');             
+       }
+        
+        if(gradedescD=='' && minPD=='' && maxPD=='' && gradePD==''  && rankD=='' && grade=='' ) {                 
+                var flag = false;        
+        }
+        
+        
+	if(flag == true) {
+		GradedetailsInsert();	
+	}			
+	return flag;
+}
+
+
+
+function GradedetailsInsert() {
+	// console.log(batchArray);
+	var GradeDesc = dijit.byId("GradeDesc").value;	
+        var DefaultLanguage = dijit.byId("DefaultLanguage").value;
+        var GradePoint = dijit.byId("GradePoint").value;
+	var MinPoint = dijit.byId("MinPoint").displayedValue;
+	var MaxPoint = dijit.byId("MaxPoint").displayedValue;
+	var Rank = dijit.byId("Rank").value;
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').Pass;
+	if(value == 1){
+		var PassName = "Yes";
+	}else{
+		var PassName = "No";
+	}	
+	
+	var GradeName = dijit.byId("Grade").value;
+	var GradeDisplayName = dijit.byId("Grade").displayedValue;
+	
+	var IdSubject = dijit.byId("IdSubject").value;
+	var SubjectName = dijit.byId("IdSubject").displayedValue;
+       
+	batchArray.push(GradeDesc);
+	if(arrHasDupes(batchArray))
+	{
+		batchArray = batchArray.unique();
+		alert("Duplicate Grade Description. Please try a different.");
+	} 
+	else 
+	{
+
+		var trow = document.getElementById('hor').insertRow(rowid);
+			
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		var tcol5=trow.insertCell(4);
+		var tcol6=trow.insertCell(5);
+                var tcol7=trow.insertCell(6);
+                var tcol8=trow.insertCell(7);
+                var tcol9=trow.insertCell(8);
+                var tcol10=trow.insertCell(9);
+                
+		tcol1.innerHTML="<input type='hidden' value='"+IdSubject+"' name=IdSubjectgrid[]>"+SubjectName;
+                tcol2.innerHTML="<input type='hidden' value='"+GradeName+"' name=Gradegrid[]>"+GradeDisplayName;
+		tcol3.innerHTML="<input type='hidden' value='"+GradeDesc+"' name=GradeDescgrid[]>"+GradeDesc;
+                tcol4.innerHTML="<input type='hidden' value='"+DefaultLanguage+"' name=DefaultLanguagegrid[]>"+DefaultLanguage;		
+		tcol5.innerHTML="<input type='hidden' value='"+MinPoint+"' name=MinPointgrid[]>"+MinPoint;
+		tcol6.innerHTML="<input type='hidden' value='"+MaxPoint+"' name=MaxPointgrid[]>"+MaxPoint;
+                tcol7.innerHTML="<input type='hidden' value='"+GradePoint+"' name=GradePointgrid[]>"+GradePoint;		
+		tcol8.innerHTML="<input type='hidden' value='"+Rank+"' name=Rankgrid[]>"+Rank;
+		tcol9.innerHTML="<input type='hidden' value='"+PassName+"' name=Passgrid[]>"+PassName;		
+		tcol10.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this,\''+GradeDisplayName+'\'); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+		rowid++;
+                
+                //dijit.byId('IdSemester').set('readOnly',true);
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true);
+                dijit.byId('IdProgram').set('readOnly',true);
+                dijit.byId('IdSubject').set('readOnly',true);   
+                clearpageAdd();
+                
+	}
+}
+function clearpageAdd() {
+        
+//        dijit.byId("IdSemester").reset();
+//        dijit.byId("IdSemester").set("value",null);
+//        dijit.byId('IdSemester').set('placeHolder','select');
+//        
+//        dijit.byId("IdScheme").reset();
+//        dijit.byId("IdScheme").set("value",null);
+//        dijit.byId('IdScheme').set('placeHolder','select');
+//        
+//        dijit.byId("IdAward").reset();
+//        dijit.byId("IdAward").set("value",null);
+//        dijit.byId('IdAward').set('placeHolder','select');
+//        
+//        dijit.byId("IdProgram").reset();
+//        dijit.byId("IdProgram").set("value",null);
+//        dijit.byId('IdProgram').set('placeHolder','select');
+//        
+//        dijit.byId("IdSubject").reset();
+//        dijit.byId("IdSubject").set("value",null);
+//        dijit.byId('IdSubject').set('placeHolder','select');
+        
+        dijit.byId("GradeDesc").reset();
+        dijit.byId("GradeDesc").set("value",null);
+        dijit.byId("DefaultLanguage").reset();
+        dijit.byId("MinPoint").reset();
+        dijit.byId("MinPoint").set("value",null);
+        dijit.byId("MaxPoint").reset();
+        dijit.byId("MaxPoint").set("value",null);
+        
+        dijit.byId("Grade").reset();
+        dijit.byId("Grade").set("value",null);
+        dijit.byId('Grade').set('placeHolder','select');  
+        
+        dijit.byId("Rank").reset();	
+	dijit.byId("Rank").set("value",null);
+        
+        dijit.byId("GradePoint").reset();
+        dijit.byId("GradePoint").set("value",null);
+	dijit.byId("Pass").set("value",null);   
+        
+       
+	
+}
+
+function deleteRow(r,GradeDesc)
+{      
+	var dStat = confirm("Are you sure to delete the Grade?");
+        if(dStat == true){     
+        rowid--;	
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+        
+        var makeArr = GradeDesc;
+        batchArray.splice(batchArray.indexOf(makeArr), 1);
+        
+	document.getElementById('hor').deleteRow(i);
+        }
+	
+}
+
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+	var i, j, n;
+	n=A.length;
+                                         // to ensure the fewest possible comparisons
+	for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+		for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+			if (A[i]==A[j]) return true;
+	}	}
+	return false;
+}
+
+Array.prototype.unique = function () {
+    var r = new Array();
+    o:for(var i = 0, n = this.length; i < n; i++)
+    {
+        for(var x = 0, y = r.length; x < y; x++)
+        {
+                if(r[x]==this[i])
+                {
+                	continue o;
+                }
+                
+        }
+        r[r.length] = this[i];
+    }
+    return r;
+}
+
+function deletegradedetails(IdGradeSetUp) {
+    
+        var dStat = confirm("Are you sure to delete the Grade?");
+        if(dStat == true){     
+	var xhrArgs = {url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/deletegradesetup/IdGradeSetUp/"+IdGradeSetUp,
+			handleAs:'json',
+			load:function(data){ 
+				if(data == '1') {
+					// window.location = "<?php echo $this->baseUrl(); ?>/examination/gradesetup/editgradesetup/id/<?php echo $this->lintIdGrade;?>"
+				}
+			}
+	}
+	dojo.xhrPost(xhrArgs); 
+        }
+}
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Grade Set-Up");?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gradesetup/editgradesetup/id/<?php echo $this->lintIdGrade;?>"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+			    } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<?php if($this->errorMsg=='1') { ?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Record Already Exists. Please try a different.');?>
+				</td>
+			</tr>
+			<?php } ?>
+
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details Set-Up");?>
+				</th>
+			</tr>
+
+
+			<tr>
+				<?php echo $this->lobjGradesetupForm->IdGradeSetUp;?>
+				<?php echo $this->lobjGradesetupForm->UpdDate;?>
+				<?php echo $this->lobjGradesetupForm->UpdUser;?>
+				<td><?php echo $this->translate("Based On");?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->BasedOn;?></td>
+				<td><?php echo $this->translate("Semester");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->IdSemester;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Scheme");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdScheme;?></td>
+				<td><?php echo $this->translate("Award");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdAward;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Program");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdProgram;?></td>
+				<td><?php echo $this->translate("Subject");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdSubject;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Active");?></td>
+				<td><?php echo $this->lobjGradesetupForm->Active;?></td>
+			</tr>
+
+
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade Description");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradeDesc;?></td>
+				<td><?php echo $this->translate($this->defaultlanguage);?></td>
+				<td><?php echo $this->lobjGradesetupForm->DefaultLanguage;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Minimum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MinPoint;?></td>
+				<td><?php echo $this->translate("Maximum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MaxPoint;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradePoint;?></td>
+				<td><?php echo $this->translate("Grade");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Grade;?></td>
+
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Pass");?><span></span></td>
+				<td><?php echo $this->lobjGradesetupForm->Pass;?></td>
+				<td><?php echo $this->translate("Rank");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Rank;?></td>
+
+
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjGradesetupForm->Add;?>
+					<?php echo $this->lobjGradesetupForm->Clear;?>
+				</td>
+			</tr>
+
+		</table>
+
+
+
+
+
+
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Subject");?></th>
+				<th><?php echo $this->translate("Grade");?></th>
+				<th><?php echo $this->translate("Grade Description");?>
+				</th>
+				<th><?php echo $this->translate($this->defaultlanguage);?></th>
+				<th><?php echo $this->translate("Minimum Point");?>
+				</th>
+				<th><?php echo $this->translate("Maximum Point");?>
+				</th>
+				<th><?php echo $this->translate("Grade Point");?>
+				</th>
+				<th><?php echo $this->translate("Rank");?></th>
+				<th><?php echo $this->translate("Pass");?></th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $gradesetup) {?>
+
+			<tr>
+				<td><?php echo $this->escape($gradesetup['SubjectName']);?> <input
+					type="hidden" name="IdSubjectgrid[]"
+					value="<?php echo $this->escape($gradesetup['IdSubject']);?>">
+				</td>
+
+				<td><?php echo $this->escape($gradesetup['GradeName']);?> <input
+					type="hidden" name="Gradegrid[]"
+					value="<?php echo $this->escape($gradesetup['Grade']);?>">
+				</td>
+
+				<td><?php echo $this->escape($gradesetup['GradeDesc']);?> <input
+					type="hidden" name="GradeDescgrid[]"
+					value="<?php echo $this->escape($gradesetup['GradeDesc']);?>">
+				</td>
+				<td><?php echo $this->escape($gradesetup['DefaultLanguage']);?> <input
+					type="hidden" name="DefaultLanguagegrid[]"
+					value="<?php echo $this->escape($gradesetup['DefaultLanguage']);?>">
+				</td>
+				<td><?php echo $this->escape($gradesetup['MinPoint']);?> <input
+					type="hidden" name="MinPointgrid[]"
+					value="<?php echo $this->escape($gradesetup['MinPoint']);?>">
+				</td>
+				<td><?php echo $this->escape($gradesetup['MaxPoint']);?> <input
+					type="hidden" name="MaxPointgrid[]"
+					value="<?php echo $this->escape($gradesetup['MaxPoint']);?>">
+				</td>
+				<td><?php echo $this->escape($gradesetup['GradePoint']);?> <input
+					type="hidden" name="GradePointgrid[]"
+					value="<?php echo $this->escape($gradesetup['GradePoint']);?>">
+				</td>
+
+				<td><?php echo $this->escape($gradesetup['Rank']);?> <input
+					type="hidden" name="Rankgrid[]"
+					value="<?php echo $this->escape($gradesetup['Rank']);?>">
+				</td>
+				<td><?php if($gradesetup['Pass'] == 1){ 
+					echo "Yes"; $pV = 'Yes';
+				} else { echo "No"; $pV = 'No';
+} ?> <input type="hidden" name="Passgrid[]"
+					value="<?php echo $this->escape($pV);?>">
+				</td>
+				<td><a href="javascript:void(0);"
+					onClick="deleteRow(this,'<?php echo $this->escape($gradesetup['GradeDesc']);?>');return false;"><img
+						src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+						width='16' height='16'> </a></td>
+			</tr>
+			<?php   }?>
+			<?php } ?>
+			<tr>
+				<td align="right" colspan="10"><?php echo $this->lobjGradesetupForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gradesetup', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</form>
+
+</fieldset>
+

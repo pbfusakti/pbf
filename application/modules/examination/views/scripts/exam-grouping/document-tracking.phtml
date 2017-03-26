@@ -1,0 +1,106 @@
+<script>
+
+function cetak(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-group','action'=>'print-event','id'=>$this->idgroup), 'default', true);?>";
+}
+
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+         <li>
+			<a href="#" onclick="cetak();">
+				<span class='print'></span>
+				Print Berita Acara
+			</a>
+			
+		</li>
+		
+		</ul>
+		
+	</div>
+</div>
+
+<br>
+<fieldset><legend><?php echo $this->translate('Document Tracking Recording')?></legend>
+<fieldset>
+	<legend><?php echo $this->translate('Group Info');?></legend>
+<table>
+	<tr>
+		<td><?php echo $this->translate("Semester");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['semester_name'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Subject");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['subject_name'];?> - <?php echo $this->group['subject_code'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Name");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_exam_name'];?> <?php echo $this->group['eg_repeat_status']==1?"(".$this->translate("Repeat").")":"";?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Group Name");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_group_name'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Group Code");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_group_code'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Date");?></td>
+		<td>:</td>
+		<td><?php echo date('d-m-Y', strtotime($this->group['eg_date']));?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Time");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_start_time'];?> - <?php echo $this->group['eg_end_time'];?></td>
+		
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Room");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['av_room_name_short'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Capacity");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_capacity'];?></td>
+	</tr>
+</table>
+</fieldset>
+<fieldset><legend><?php echo $this->translate($this->title)?></legend>
+<table>
+<form name="form" method="post">
+<input type="hidden" name='idExamGroup' value="<?php echo $this->group_id; ?>">
+<input type="hidden" name='idDocTracker' value="<?php echo $this->tracker_id; ?>">
+<?php if ($this->send=="0") {
+	if ($this->record['isMarkList']) $marklist="checked";
+	if ($this->record['isAttendanceList']) $attendance="checked";?>
+	<tr><td><?php echo $this->translate('Number of Student') ?></td><td>:</td><td><?php echo $this->nOfstudent;?></td>
+	<tr><td><?php echo $this->translate('Number of Document') ?></td><td>:</td><td><INPUT type="text" name="n_of_doc_sent" value=<?php echo $this->record['n_of_doc_sent']?>></td></tr>
+	<tr><td><?php echo $this->translate('Mark List Document') ?></td><td>:</td><td><INPUT type="checkbox" name="isMarkList" value="1" <?php echo $marklist;?>></td></tr>
+	<tr><td><?php echo $this->translate('Attendance List Document') ?></td><td>:</td><td><INPUT type="checkbox" name="isAttendanceList" value="1" <?php echo $attendance?>></td></tr>
+	<tr><td><?php echo $this->translate('Note')?></td><td>:</td><td><textarea name="send_note" rows="4" cols="50"><?php echo $this->record['send_note']?></textarea></td></tr>
+<?php }else{
+	if ($this->record['isMarkListRec']) $marklist="checked";
+	if ($this->record['isDocumentRec']) $docRec="checked";?>
+	<tr><td><?php echo $this->translate('Number of Student') ?></td><td>:</td><td><?php echo $this->nOfstudent;?></td>
+	<tr><td><?php echo $this->translate('Number of Sent Document') ?></td><td>:</td><td><?php echo $this->record['n_of_doc_sent']?></td></tr>
+	<tr><td><?php echo $this->translate('Note')?></td><td>:</td><td><?php echo $this->record['send_note']?></td></tr>
+	<tr bgcolor="Gray"><td colspan="3"></td></tr>
+	<tr><td><?php echo $this->translate('Mark list Document') ?></td><td>:</td><td><INPUT type="checkbox" name="isMarkListRec" value="1" <?php echo $marklist;?>></td></tr>
+	<tr><td><?php echo $this->translate('Exam Document') ?></td><td>:</td><td><INPUT type="checkbox" name="isDocumentRec" value="1" <?php echo $docRec;?>></td></tr>
+	<tr><td><?php echo $this->translate('Number of Received Document') ?></td><td>:</td><td><INPUT type="text" name="n_of_doc_received" value=<?php echo $this->record['n_of_doc_received']?>></td></tr>
+	<tr><td><?php echo $this->translate('Note')?></td><td>:</td><td><textarea name="receive_note" rows="4" cols="50"><?php echo $this->record['receive_note']?></textarea></td></tr>
+<?php }?>
+<tr><td><INPUT type="submit" name="Submit"></td></tr>
+</table>
+</fieldset>
+</fieldset>

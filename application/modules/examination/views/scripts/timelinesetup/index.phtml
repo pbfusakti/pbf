@@ -1,0 +1,80 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+
+	dijit.byId('field5').set('value','');
+	dijit.byId('field5').set('placeHolder','Select');
+	dijit.byId('field8').set('value','');
+	dijit.byId('field8').set('placeHolder','Select');
+       });
+
+
+</script>
+</head>
+<body class="claro">
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Exam Calendar"); ?>
+		</legend>
+		<form
+			action="<?php echo $this->baseUrl();?>/examination/timelinesetup/index/search/1"
+			name="searchF" id="searchF" method="POST">
+			<input type="hidden" name='Search' id="Search" value="Search">
+			<table width="100%">
+				<tr>
+					<td><?php echo $this->translate("Semester Code");?></td>
+					<td><?php echo $this->lobjform->field2; ?></td>
+					<td><?php echo $this->translate("Start Date");?></td>
+					<td><?php echo $this->lobjform->field14; ?></td>
+				</tr>
+				<tr>
+					<td colspan="6" style="height: 5px"></td>
+				</tr>
+				<tr>
+					
+					<td><?php echo $this->translate("End Date");?></td>
+					<td><?php echo $this->lobjform->field15; ?></td>
+				</tr>
+
+				
+
+				<tr>
+					<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+						<?php echo $this->lobjform->Clear;?>
+					</td>
+				</tr>
+
+			</table>
+		</form>
+		</table>
+	</fieldset>
+
+
+	<fieldset>
+		<table class="table" width="100%" cellpadding="3" cellspacing="1">
+			<tr>
+
+				<th><?php echo $this->translate("Semester Code");?></th>
+				
+				<th><?php echo $this->translate("Start Date (DD-MM-YYYY)");?></th>
+				<th><?php echo $this->translate("End Date (DD-MM-YYYY");?></th>
+			</tr>
+
+			<?php if (count($this->paginator)): ?>
+			<?php foreach ($this->paginator as $list): ?>
+			<?php
+			$url = $this->url(array('module' => 'examination', 'controller' => 'timelinesetup', 'action' => 'add', 'id' => $list['IdSemesterMaster']), 'default', true);
+			?>
+			<tr>
+				<td><a href='<?php echo $url;?>'><?php echo $list['SemesterMainCode']; ?>
+				</a></td>
+				
+				<td><?php echo date('d-m-Y',strtotime($list['SemesterMainStartDate'])); ?></td>
+				<td><?php echo date('d-m-Y',strtotime($list['SemesterMainEndDate'])); ?></td>
+
+			</tr>
+
+			<?php endforeach; ?>
+			<?php endif; ?>
+		</table>
+	</fieldset>

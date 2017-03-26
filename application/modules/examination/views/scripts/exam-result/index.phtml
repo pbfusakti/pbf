@@ -1,0 +1,55 @@
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+<div>
+
+<?php echo $this->form; ?>
+
+<br>
+
+<div id="loading">
+</div>
+<?php if(count($this->student_list)>0){?>
+
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="5px"><?php echo $this->translate("No");?>.</th>		
+		<th width="40%"><?php echo $this->translate("Student Name");?></th>
+		<th width="30%"><?php echo $this->translate("Student NIM");?></th>
+		<th width="30%"><?php echo $this->translate("Profile Status");?></th>		
+	</tr>
+	<?php foreach($this->student_list as $index=>$student){?>
+	<tr>
+	    <td><?php echo $index+1;?></td>
+		<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-result','action'=>'khs','id'=>$student["IdStudentRegistration"]),'default',true);?>"><?php echo $student["StudentName"];?></a></td>
+		<td><?php echo $student["registrationId"]?></td>
+		<td><?php echo $student["status"]?></td>
+	</tr>
+	<?php } ?>
+</table>
+
+<?php } ?>
+</div>
+
+<br>

@@ -1,0 +1,120 @@
+<script>
+function validate(){
+	if($('#idProgram').val()=='' || $('#idSemester').val()==''){
+		alert('Please select program and semester');
+	}else{
+		$("#form3").submit();
+	}
+	
+   
+}
+
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>			
+			
+		
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+
+
+<div style="width:100%;">
+
+<fieldset><legend>Search Option</legend>
+<form id="form3" method="post">
+<table width="100%" border="0" cellpadding="5" cellspacing="0" class="">
+  	<tr>
+			<td>Program </td>
+			<td>:			   
+			    <select id="idProgram" name="idProgram" >
+						<option value=""><?php echo $this->translate("Please Select"); ?></option>
+					<?php 
+					 foreach($this->program as $program){
+							if($this->idProgram == $program["IdProgram"]){
+								$selected = "selected";
+							}else{
+								$selected='';
+							}
+						?>
+						<option value="<?php echo $program["IdProgram"];?>" <?php echo $selected;?>><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+					<?php  } ?>
+				</select></td>
+	    </tr>
+    <tr>
+			<td>Semester  </td>
+			<td>:					   
+			    <select id="idSemester" name="idSemester" >
+						<option value=""><?php echo $this->translate("Please Select"); ?></option>
+					<?php 
+					 foreach($this->semester as $mysem){
+							if($this->idSemester == $mysem["IdSemesterMaster"]){
+								$selected = "selected";
+							}else{
+								$selected='';
+							}
+						?>
+						<option value="<?php echo $mysem["IdSemesterMaster"];?>" <?php echo $selected;?>><?php echo $mysem["SemesterMainName"];?></option>
+					<?php  } ?>
+				</select></td>
+	    </tr>
+	 
+	 
+	  <tr><td>&nbsp;</td><td><input type="button" value="Search" onclick="validate();"></td></tr> </table>
+</form>
+</fieldset>
+<br>
+
+
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th><?php echo $this->translate("Group")?></th>
+		<th><?php echo $this->translate("Code")?></th>
+		<th><?php echo $this->translate("Semester")?></th>
+		<th><?php echo $this->translate("Subject Code")?></th>
+		<th><?php echo $this->translate("Subject Name")?></th>
+		<th><?php echo $this->translate("Coordinator")?></th>
+		<th><?php echo $this->translate("Total Student")?></th>	
+		
+	</tr>
+	<?php 
+	$i=1;
+	if(count($this->list_groups)>0){
+	foreach($this->list_groups as $group){
+	?>
+	<tr>
+		
+		<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'display-mark','action'=>'component-list','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$group["IdSubject"],'id'=>$group["IdCourseTaggingGroup"]),'default',true)?>"><?php echo $group["GroupName"];?></a></td>
+		<td><?php echo $group["GroupCode"];?></td>
+		<td><?php echo $group["semester_name"];?></td>
+		<td><?php echo $group["subject_code"];?></td>
+		<td><?php echo $group["subject_name"];?></td>
+		<td><?php echo ($group["IdLecturer"]!=0 ?  $group["coordinator"]:$this->translate("-"));?></td>
+		<td align="center">
+		<?php echo ($group["total_student"]==0 ? '0':$group["total_student"]);?></td>
+		
+	</tr>
+	<?php $i++; } }else{ echo '<tr><td colspan=7>No Data Found</td></tr>'; }?>
+</table>
+
+
+</div>
+<br>

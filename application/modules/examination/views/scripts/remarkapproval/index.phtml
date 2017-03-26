@@ -1,0 +1,145 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	dijit.byId('field23').set('value','');
+	dijit.byId('field23').set('placeHolder','Select');
+	dijit.byId('field1').set('value','');
+	dijit.byId('field1').set('placeHolder','Select');
+        dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');
+	dijit.byId('field25').set('value','');
+	dijit.byId('field25').set('placeHolder','Select');	
+});
+
+function formsubmit() {
+    //var studentregID = $('#field2').val();
+    //var sem = $('#field27').val();
+    //var course = $('#field23').val();
+    
+    //if(studentregID=='') {
+	
+    //if(sem==''  || course=='' ) {   
+    //  alert('Course and Semester cannot be left blank');
+    //  return false;
+    //} else {
+    //    document.searchF.submit();
+    //}
+    //} else {
+       document.searchF.submit();
+    //}
+    
+}
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Remark Approval Search");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/remarkapproval/index/search/1"
+		name="searchF" id="searchF" method="POST">
+		<input type="hidden" name='Search' id="Search" value="Search">
+		<table width="100%">
+
+			<tr>
+				<td><?php echo $this->translate("Student ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+
+				<td><?php echo $this->translate("Application ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field3;?></td>
+
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate('Semester');?></td>
+				<td><?php echo $this->lobjform->field27;?></td>
+
+				<td><?php echo $this->translate('Course');?></td>
+				<td><?php echo $this->lobjform->field23;?></td>
+			</tr>
+
+			<tr>
+
+				<td><?php echo $this->translate('Status');?></td>
+				<td><?php echo $this->lobjform->field25;?></td>
+
+				<td><?php echo $this->translate('Mode');?></td>
+				<td><?php echo $this->lobjform->field1;?></td>
+
+			</tr>
+
+
+			<tr>
+				<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+					<?php echo $this->lobjform->Clear;?>
+				</td>
+			</tr>
+
+
+		</table>
+	</form>
+</fieldset>
+<br />
+
+
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+		<tr>
+			<th><?php echo $this->translate('Application ID');?>
+			</th>
+			<th><?php echo $this->translate('Student ID');?>
+			</th>
+			<th><?php echo $this->translate('Student Name');?>
+			</th>
+			<th><?php echo $this->translate("Program");?></th>
+			<th><?php echo $this->translate("Semester");?></th>
+			<th><?php echo $this->translate("Course");?></th>
+			<th><?php echo $this->translate("Status");?></th>
+			<th><?php echo $this->translate("Mode");?></th>
+
+		</tr>
+
+
+		<?php if (count($this->paginator)) {  ?>
+		<?php foreach ($this->paginator as $larrresult ) {  
+			?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+			<td><a
+				href="<?php echo $this->baseUrl();?>/examination/remarkapproval/addremarkapproval/id/<?php echo $larrresult['IdAppeal'];?>"><?php echo $larrresult['AppealApplicationID'];?><a />
+			
+			</td>
+			<td><?php echo $larrresult['IdStudent'];?></td>
+			<td><?php echo $larrresult['StudentName'];?></td>
+			<td><?php echo $larrresult['ProgramName'];?></td>
+			<td><?php echo $larrresult['SemesterCode'];?></td>
+			<td><?php echo $larrresult['SubjectName'];?></td>
+			<td><?php echo $larrresult['DefinitionCode'];?></td>
+			<td><?php if($larrresult['ApplicationSource']==215) {
+				echo 'Manual';
+			}
+			else{ echo 'Online';
+};?>
+			</td>
+
+		</tr>
+		<?php } ?>
+
+
+		<tr>
+			<td colspan="8" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator,'Sliding','/partials/my_pagination_control.phtml'); ?>
+				</div>
+			</td>
+		</tr>
+		<?php }  else { ?>
+		<tr>
+			<td colspan="8" align="center" style="color: red;"><?php echo $this->translate("No matching record
+				found. Try different keywords.");?></td>
+		</tr>
+		<?php } ?>
+	</table>
+</fieldset>

@@ -1,0 +1,67 @@
+<head>
+<script>
+dojo.addOnLoad(function(){	
+        //dijit.byId('SemesterCode').set('value','');
+	//dijit.byId('SemesterCode').set('placeHolder','Select');
+	//dijit.byId('ChooseMarks').set('value','');
+	//dijit.byId('ChooseMarks').set('placeHolder','Select');	
+});
+
+function formsubmit() {   
+    var max = $('#MaxAppeal').val();
+    if(max <= 0)
+    {  
+      alert('Please Enter Max Appeal Greater than 0');
+      return false;
+    }
+}
+
+
+</script>
+</head>
+<body class="claro">
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Re-examine Examination"); ?>
+		</legend>
+		<Form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+			name="myForm">
+			<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } 
+				else {
+                    return false;
+                }
+				</script>
+			<?php echo $this->lobjform->IdUniversity;?>
+			<?php echo $this->lobjform->UpdUser;?>
+			<?php echo $this->lobjform->UpdDate;?>
+			<table class="table" width="100%">
+
+				<tr>
+					<td width="30%">Max Appeal</td>
+					<td width="20%"><?php echo $this->lobjform->MaxAppeal;?></td>
+					<td width="30%">Marks Highest or latest</td>
+					<td width="20%"><?php echo $this->lobjform->ChooseMarks;?></td>
+
+					<!--	
+            </tr>
+		<td width="30%">Semester</td>
+                <td width="20%"><?php //echo $this->lobjform->SemesterCode;?></td>
+             </tr>  
+            -->
+				
+				
+				<tr>
+					<td colspan="6" align="right"><?php echo $this->lobjform->Save;?>
+					</td>
+				</tr>
+			</table>
+
+		</form>
+
+
+
+		</table>
+	</fieldset>

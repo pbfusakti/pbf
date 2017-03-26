@@ -1,0 +1,64 @@
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+dojo.addOnLoad(function(){
+	
+	})
+	
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("CGPA").' '.$this->translate("Calculation").' '.$this->translate("Details");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gpacalculation/newgpacalculation"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("CGPA").' '.$this->translate("Calculation").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate("Student").' '.$this->translate("Name");?><span></span></span>
+				</td>
+				<td><?php echo $this->studname;?>
+				</td>
+				<?php echo $this->lobjCgpacalculationForm->UpdDate;?>
+				<?php echo $this->lobjCgpacalculationForm->UpdUser;?>
+				<?php echo $this->lobjCgpacalculationForm->Cgpa;?>
+				<?php echo $this->lobjCgpacalculationForm->IdStudentRegistration;?>
+				<td><?php echo $this->translate("Program").' '.$this->translate("Name");?>
+				</td>
+				<td><?php echo $this->Progname;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Obtained").' '.$this->translate("CGPA");?>
+				</td>
+				<td><?php echo $this->cgpa;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+
+			<tr>
+				<td align="right" colspan="10"><?php echo $this->lobjCgpacalculationForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gpacalculation', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+
+</fieldset>
+</Form>

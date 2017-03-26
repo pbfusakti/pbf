@@ -1,0 +1,1056 @@
+<head>
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+var basedOnArray  = new Array();
+var BeforeChangeValue = 0;
+var AfterChangeValue = 0;
+dojo.addOnLoad(function(){
+	
+	dijit.byId('IdSemester').set('value',"<?php echo $this->larrformDataM['IdSemester'];?>");
+	dijit.byId('IdSemester').set('placeHolder','select');
+        dijit.byId('IdScheme').set('value',"<?php echo $this->larrformDataM['IdScheme'];?>");
+	dijit.byId('IdScheme').set('placeHolder','select');
+        dijit.byId('IdAward').set('value',"<?php echo $this->larrformDataM['IdAward'];?>");
+	dijit.byId('IdAward').set('placeHolder','select');
+        dijit.byId('IdProgram').set('value',"<?php echo $this->larrformDataM['IdProgram'];?>");
+	dijit.byId('IdProgram').set('placeHolder','select');
+        dijit.byId('IdSubject').set('value',"<?php echo $this->larrformDataM['IdSubject'];?>");
+	dijit.byId('IdSubject').set('placeHolder','select');
+        dijit.byId('Grade').set('value','');
+	dijit.byId('Grade').set('placeHolder','select');
+       
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').BasedOn; 
+        //var basedOnGlobal  = value;
+	fnToggleProgramSubjectDetails(value);	
+        
+        // COPY FROM        
+        dijit.byId('CopyFromIdSemester').set('value',"<?php echo $this->larrformData['CopyFromIdSemester'];?>");
+	dijit.byId('CopyFromIdSemester').set('placeHolder','select');
+        dijit.byId('CopyFromIdScheme').set('value',"<?php echo $this->larrformData['CopyFromIdScheme'];?>");
+	dijit.byId('CopyFromIdScheme').set('placeHolder','select');
+        dijit.byId('CopyFromIdAward').set('value',"<?php echo $this->larrformData['CopyFromIdAward'];?>");
+	dijit.byId('CopyFromIdAward').set('placeHolder','select');
+        dijit.byId('CopyFromIdProgram').set('value',"<?php echo $this->larrformData['CopyFromIdProgram'];?>");
+	dijit.byId('CopyFromIdProgram').set('placeHolder','select');
+        dijit.byId('CopyFromIdSubject').set('value',"<?php echo $this->larrformData['CopyFromIdSubject'];?>");
+	dijit.byId('CopyFromIdSubject').set('placeHolder','select');
+        
+        dijit.byId('CopyToIdSemester').set('value',"<?php echo $this->larrformData['CopyToIdSemester'];?>");
+	dijit.byId('CopyToIdSemester').set('placeHolder','select');
+        dijit.byId('CopyToIdScheme').set('value',"<?php echo $this->larrformData['CopyToIdScheme'];?>");
+	dijit.byId('CopyToIdScheme').set('placeHolder','select');
+        dijit.byId('CopyToIdAward').set('value',"<?php echo $this->larrformData['CopyToIdAward'];?>");
+	dijit.byId('CopyToIdAward').set('placeHolder','select');
+        dijit.byId('CopyToIdProgram').set('value',"<?php echo $this->larrformData['CopyToIdProgram'];?>");
+	dijit.byId('CopyToIdProgram').set('placeHolder','select');
+        dijit.byId('CopyToIdSubject').set('value',"<?php echo $this->larrformData['CopyToIdSubject'];?>");
+	dijit.byId('CopyToIdSubject').set('placeHolder','select');
+
+        
+        
+        var myCopyForm = dijit.byId("myCopyForm");
+	var valueCopy=myCopyForm.attr('value').CopyBasedOn;        
+	fnToggleProgramSubjectDetailsCopy(valueCopy);
+        
+        
+         $('input[name=BasedOn]').mouseup(function(){
+                    //alert("Before change "+$('input[name=BasedOn]:checked').val());
+                    //BeforeChangeValue = $('input[name=BasedOn]:checked').val();
+                    var form = dijit.byId("myForm");
+                    var value1=form.attr('value').BasedOn; 
+                    BeforeChangeValue = value1;
+                    
+            }).change(function(){
+                    //alert("After change "+$('input[name=BasedOn]:checked').val());
+                    //AfterChangeValue = $('input[name=BasedOn]:checked').val();
+                     var form = dijit.byId("myForm");
+                     var value1=form.attr('value').BasedOn; 
+                     AfterChangeValue = value1;
+            })  
+	
+	});
+        
+
+      
+        
+function fnToggleProgramSubjectDetails(value){        
+        var flag = true;
+        if(rowid>=2) {   
+        var dStat = confirm("You have changed your BasedOn option. Are you sure to delete all the Grade Entries listed?");
+	        if(dStat == true){  
+	                var table = document.getElementById("hor");                
+	                for(var i = table.rows.length - 2; i > 0; i--) {  table.deleteRow(i); }
+	                rowid=1;
+	                batchArray  = [];
+	                var flag = true;                 
+	        }else 
+	         {     
+	                //alert(BeforeChangeValue);
+	                dijit.byId('BasedOn-'+BeforeChangeValue).set('checked', 'checked');
+	                value = BeforeChangeValue;
+	                var flag = false;
+	         }
+        
+        }
+        
+        
+        //alert(value);
+        if(value == 0) {
+                 if(flag==true) {
+                    dijit.byId('IdScheme').set('readOnly',false);
+                    dijit.byId('IdAward').set('readOnly',false);
+                 } else {  
+                    dijit.byId('IdScheme').set('readOnly',true);
+                    dijit.byId('IdAward').set('readOnly',true);
+                 }
+                
+                if(flag==true) {
+                    dijit.byId("IdProgram").reset();
+                    dijit.byId("IdProgram").set("value","<?php echo $this->larrformDataM['IdProgram'];?>");
+                    dijit.byId('IdProgram').set('placeHolder','select');
+                
+                
+                    dijit.byId("IdSubject").reset();
+                    dijit.byId("IdSubject").set("value","<?php echo $this->larrformDataM['IdSubject'];?>");
+                    dijit.byId('IdSubject').set('placeHolder','select');
+                }
+                
+		dijit.byId("IdScheme").attr('required',true);
+                dijit.byId("IdAward").attr('required',true);
+                dijit.byId('IdSubject').set('readOnly',true);
+                dijit.byId('IdProgram').set('readOnly',true);
+                dijit.byId("IdSubject").attr('required',false);
+                dijit.byId("IdProgram").attr('required',false);                
+                
+                
+	} else if(value == 1) {                
+                if(flag==true) {
+                    dijit.byId('IdSubject').set('readOnly',false);
+                    dijit.byId('IdProgram').set('readOnly',false);
+                 } else { 
+                    dijit.byId('IdSubject').set('readOnly',true);
+                    dijit.byId('IdProgram').set('readOnly',true);
+                }
+                dijit.byId("IdScheme").reset();
+                dijit.byId("IdScheme").set("value","<?php echo $this->larrformDataM['IdScheme'];?>");
+                dijit.byId('IdScheme').set('placeHolder','select');
+                
+                dijit.byId("IdAward").reset();
+                dijit.byId("IdAward").set("value","<?php echo $this->larrformDataM['IdAward'];?>");
+                dijit.byId('IdAward').set('placeHolder','select');
+                
+                if(flag==true) {
+                    dijit.byId("IdProgram").reset();
+                    dijit.byId("IdProgram").set("value","<?php echo $this->larrformDataM['IdProgram'];?>");
+                    dijit.byId('IdProgram').set('placeHolder','select');               
+                
+                    dijit.byId("IdSubject").reset();
+                    dijit.byId("IdSubject").set("value","<?php echo $this->larrformDataM['IdSubject'];?>");
+                    dijit.byId('IdSubject').set('placeHolder','select');
+                }
+                
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true);                
+                dijit.byId("IdScheme").attr('required',false);
+                dijit.byId("IdAward").attr('required',false); 
+                dijit.byId("IdSubject").attr('required',true);
+                dijit.byId("IdProgram").attr('required',true);
+                
+	} else if (value == 2)  {
+                
+                 if(flag==true) {
+                    dijit.byId('IdProgram').set('readOnly',false);
+                 } else {    
+                    dijit.byId('IdProgram').set('readOnly',true);
+                 }
+                dijit.byId('IdScheme').set('readOnly',false);
+                dijit.byId('IdAward').set('readOnly',false);
+                
+                dijit.byId("IdScheme").reset();
+                dijit.byId("IdScheme").set("value","<?php echo $this->larrformDataM['IdScheme'];?>");
+                dijit.byId('IdScheme').set('placeHolder','select');
+                
+                dijit.byId("IdAward").reset();
+                dijit.byId("IdAward").set("value","<?php echo $this->larrformDataM['IdAward'];?>");
+                dijit.byId('IdAward').set('placeHolder','select');
+                
+                dijit.byId("IdSubject").reset();
+                dijit.byId("IdSubject").set("value","<?php echo $this->larrformDataM['IdSubject'];?>");
+                dijit.byId('IdSubject').set('placeHolder','select');
+                
+               
+                if(flag==true) {
+                    dijit.byId("IdProgram").reset();
+                    dijit.byId("IdProgram").set("value","<?php echo $this->larrformDataM['IdProgram'];?>");
+                    dijit.byId('IdProgram').set('placeHolder','select');
+                }
+                
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true); 
+                dijit.byId('IdSubject').set('readOnly',true);
+                dijit.byId("IdSubject").attr('required',false);
+                dijit.byId('IdScheme').set('required',false);
+                dijit.byId('IdAward').set('required',false);                
+                dijit.byId("IdProgram").attr('required',true);            
+            
+        } else if (value == 3)  {
+
+	       	 if(flag==true) {
+	             dijit.byId("IdProgram").reset();
+	             dijit.byId("IdProgram").set("value","<?php echo $this->larrformDataM['IdProgram'];?>");
+	             dijit.byId('IdProgram').set('placeHolder','select');
+	         
+	         
+	             dijit.byId("IdSubject").reset();
+	             dijit.byId("IdSubject").set("value","<?php echo $this->larrformDataM['IdSubject'];?>");
+	             dijit.byId('IdSubject').set('placeHolder','select');
+	         }
+
+	       	 dijit.byId('IdScheme').set('readOnly',true);
+             dijit.byId('IdAward').set('readOnly',true); 
+             dijit.byId('IdSubject').set('readOnly',true);
+             dijit.byId('IdProgram').set('readOnly',true);
+             
+	         dijit.byId('IdScheme').set('required',false);
+	         dijit.byId('IdAward').set('required',false);  
+	         dijit.byId('IdSubject').set('required',false);
+	         dijit.byId("IdProgram").set('required',false);    
+        }
+        
+
+}
+
+    function fnToggleProgram() {   
+
+        var IdScheme =  dijit.byId('IdScheme').value;
+        var IdAward =  dijit.byId('IdAward').value;  
+       // if(IdScheme!='' && IdAward!='') { 
+        var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getprogramlist/IdScheme/"+IdScheme+"/IdAward/"+IdAward,
+                            handleAs:'json',
+                            load:function(data){
+                                    AutoFillNextEditableDropDown("IdProgram",data); 
+                            }
+                       }
+       dojo.xhrGet(xhrArgs);  
+       //}
+
+    }
+   
+   function fnToggleSubject(val1) {
+	   var IdSemester =  dijit.byId('IdSemester').value;
+	    
+       if(val1!='') {
+            
+	       var xhrArgs = {
+	                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getsubjectlist/Idprogram/"+val1+"/IdSemester/"+IdSemester,
+	                            handleAs:'json',
+	                            load:function(data){ 
+	                                    AutoFillNextEditableDropDown("IdSubject",data); 
+	                            }
+	                       }
+	       dojo.xhrGet(xhrArgs);  
+	       
+	       var xhrArgs = {
+	               url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getlandscape/IdProgram/"+val1,
+	               handleAs:'json',
+	               load:function(data){ 
+	                       AutoFillNextEditableDropDown("IdLandscape",data); 
+	                       dijit.byId('IdLandscape').set('value','<?php echo $this->idlandscape;?>');
+	               }
+	          }
+			dojo.xhrGet(xhrArgs);
+	       
+       }
+   
+   }
+
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+    var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+    ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+function addGradedetails() {
+	var flag = true;
+        var minP =  dijit.byId('MinPoint').value;
+        var maxP =  dijit.byId('MaxPoint').value;
+        var gradeP =  dijit.byId('GradePoint').value;
+        var grade = dijit.byId("Grade").value;
+        var gradedescD =  dijit.byId('GradeDesc').get('displayedValue');
+        var minPD =  dijit.byId('MinPoint').get('displayedValue');
+        var maxPD =  dijit.byId('MaxPoint').get('displayedValue');
+        var gradePD =  dijit.byId('GradePoint').get('displayedValue');
+        var rankD  = dijit.byId("Rank").get('displayedValue');
+        var intRegex = /^(?:\d*\.\d{1,2}|\d+)$/;
+        var intRegexRank = /^[0-9]$/; 
+        
+	if(gradedescD==''){
+	      //dijit.byId("GradeDesc").focus();                         
+              dijit.byId("GradeDesc").set( "state", "Error" );
+              flag = false; 
+	}
+        
+        if (minPD=='' || minPD>999 ||  (!intRegex.test(minPD)) ) { 
+	        //dijit.byId("MinPoint").focus();                         
+                dijit.byId("MinPoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (maxPD=='' || maxPD>999 ||  (!intRegex.test(maxPD)) ) { 
+	        //dijit.byId("MaxPoint").focus();                         
+                dijit.byId("MaxPoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (gradePD=='' || gradePD>999 ||  (!intRegex.test(gradePD)) ) { 
+	        //dijit.byId("GradePoint").focus();                         
+                dijit.byId("GradePoint").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (rankD=='' || rankD>9 ||  (!intRegexRank.test(rankD)) ) { 
+	        //dijit.byId("Rank").focus();                         
+                dijit.byId("Rank").set( "state", "Error" );
+                flag = false;
+        }
+       if (grade=='') {	
+	      //dijit.byId("Grade").focus();                         
+              dijit.byId("Grade").set( "state", "Error" );
+              flag = false;
+        }
+       
+       if( minP>maxP ){   
+            var flag = false;
+            alert(' Minimum Point must be less than Maximum Point ');             
+       }
+        
+        if(gradedescD=='' && minPD=='' && maxPD=='' && gradePD==''  && rankD=='' && grade=='' ) {                 
+                var flag = false;        
+        }
+        
+        
+	if(flag == true) {
+		GradedetailsInsert();	
+	}			
+	return flag;
+}
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+<?php 
+if (count($this->gradereqresult)>0) { 
+foreach($this->gradereqresult as $values) { ?>
+        //batchArray.push('<?php echo $values['Grade'];?>');
+<?php } } ?> 
+
+function GradedetailsInsert() {
+	
+	var GradeDesc = dijit.byId("GradeDesc").value;	
+        var DefaultLanguage = dijit.byId("DefaultLanguage").value;
+        var GradePoint = dijit.byId("GradePoint").value;
+	var MinPoint = dijit.byId("MinPoint").displayedValue;
+	var MaxPoint = dijit.byId("MaxPoint").displayedValue;
+	var Rank = dijit.byId("Rank").value;
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').Pass;
+	if(value == 1){
+		var PassName = "Yes";
+	}else{
+		var PassName = "No";
+	}	
+
+	var value_countable=form.attr('value').Countable;
+	if(value_countable == 1){
+		var CountableName = "No";
+	}else{
+		var CountableName = "Yes";
+	}	
+	
+	var GradeName = dijit.byId("Grade").value;
+	var GradeDisplayName = dijit.byId("Grade").displayedValue;
+	
+	var IdSubject = dijit.byId("IdSubject").value;
+	var SubjectName = dijit.byId("IdSubject").displayedValue;
+
+	batchArray.push(GradeDisplayName);       
+	if(arrHasDupes(batchArray))
+	{
+		batchArray = batchArray.unique();                
+		alert("Duplicate Grade. Please try a different.");
+	} 
+	else 
+	{
+
+		var trow = document.getElementById('hor').insertRow(rowid);
+			
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		var tcol5=trow.insertCell(4);
+		var tcol6=trow.insertCell(5);
+                var tcol7=trow.insertCell(6);
+                var tcol8=trow.insertCell(7);
+                var tcol9=trow.insertCell(8);
+                var tcol10=trow.insertCell(9);
+                var tcol11=trow.insertCell(10);
+                
+		tcol1.innerHTML="<input type='hidden' value='"+IdSubject+"' name=IdSubjectgrid[]>"+SubjectName;
+                tcol2.innerHTML="<input type='hidden' value='"+GradeName+"' name=Gradegrid[]>"+GradeDisplayName;
+		tcol3.innerHTML="<input type='hidden' value='"+GradeDesc+"' name=GradeDescgrid[]>"+GradeDesc;
+                tcol4.innerHTML="<input type='hidden' value='"+DefaultLanguage+"' name=DefaultLanguagegrid[]>"+DefaultLanguage;		
+		tcol5.innerHTML="<input type='hidden' value='"+MinPoint+"' name=MinPointgrid[]>"+MinPoint;
+		tcol6.innerHTML="<input type='hidden' value='"+MaxPoint+"' name=MaxPointgrid[]>"+MaxPoint;               
+		tcol7.innerHTML="<input type='hidden' value='"+GradePoint+"' name=GradePointgrid[]>"+GradePoint;
+		tcol8.innerHTML="<input type='hidden' value='"+Rank+"' name=Rankgrid[]>"+Rank;
+		tcol9.innerHTML="<input type='hidden' value='"+PassName+"' name=Passgrid[]>"+PassName;	
+		tcol10.innerHTML="<input type='hidden' value='"+CountableName+"' name=Countablegrid[]>"+CountableName;		
+		tcol11.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this,\''+GradeDesc+'\'); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+		rowid++;
+                
+                //dijit.byId('IdSemester').set('readOnly',true);
+                dijit.byId('IdScheme').set('readOnly',true);
+                dijit.byId('IdAward').set('readOnly',true);
+                dijit.byId('IdProgram').set('readOnly',true);
+                dijit.byId('IdSubject').set('readOnly',true);   
+                clearpageAdd();
+	}
+}
+function clearpageAdd() {
+        
+//        dijit.byId("IdSemester").reset();
+//        dijit.byId("IdSemester").set("value",null);
+//        dijit.byId('IdSemester').set('placeHolder','select');
+//        
+//        dijit.byId("IdScheme").reset();
+//        dijit.byId("IdScheme").set("value",null);
+//        dijit.byId('IdScheme').set('placeHolder','select');
+//        
+//        dijit.byId("IdAward").reset();
+//        dijit.byId("IdAward").set("value",null);
+//        dijit.byId('IdAward').set('placeHolder','select');
+//        
+//        dijit.byId("IdProgram").reset();
+//        dijit.byId("IdProgram").set("value",null);
+//        dijit.byId('IdProgram').set('placeHolder','select');
+//        
+//        dijit.byId("IdSubject").reset();
+//        dijit.byId("IdSubject").set("value",null);
+//        dijit.byId('IdSubject').set('placeHolder','select');
+        
+        dijit.byId("GradeDesc").reset();
+        dijit.byId("GradeDesc").set("value",null);
+        dijit.byId("DefaultLanguage").reset();
+        dijit.byId("MinPoint").reset();
+        dijit.byId("MinPoint").set("value",null);
+        dijit.byId("MaxPoint").reset();
+        dijit.byId("MaxPoint").set("value",null);
+        
+        dijit.byId("Grade").reset();
+        dijit.byId("Grade").set("value",null);
+        dijit.byId('Grade').set('placeHolder','select');  
+        
+        dijit.byId("Rank").reset();	
+	    dijit.byId("Rank").set("value",null);
+        
+        dijit.byId("GradePoint").reset();
+        dijit.byId("GradePoint").set("value",null);
+        
+	    //dijit.byId("Pass").set("value",null); 
+        
+        
+	
+}
+function deleteRow(r,GradeDesc)
+{      
+	var dStat = confirm("Are you sure to delete the Grade?");
+        if(dStat == true){     
+        rowid--;	
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+        
+        var makeArr = GradeDesc;
+        batchArray.splice(batchArray.indexOf(makeArr), 1);
+        
+	document.getElementById('hor').deleteRow(i);
+        }
+	
+}
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+		var i, j, n;
+		n=A.length;   						// to ensure the fewest possible comparisons
+		for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+			for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+				if (A[i]==A[j])
+					return true;
+			}
+		}
+		return false;
+	}
+
+	Array.prototype.unique = function () {
+	    var r = new Array();
+	    o:for(var i = 0, n = this.length; i < n; i++) {
+	        for(var x = 0, y = r.length; x < y; x++) {
+	        	if(r[x]==this[i]) {
+	                	continue o;
+	              }
+	        }
+	        r[r.length] = this[i];
+	    }
+	    return r;
+	}
+
+function deletegradedetails(IdGradeSetUp) {
+	var xhrArgs = {url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/deletegradesetup/IdGradeSetUp/"+IdGradeSetUp,
+			handleAs:'json',
+			load:function(data){ 
+				if(data == '1') {
+					window.location = "<?php echo $this->baseUrl(); ?>/examination/gradesetup/newgradesetup/id/<?php echo $this->IdProgram;?>"
+				}
+			}
+	}
+	dojo.xhrPost(xhrArgs); 
+}
+
+
+// COPY FROM
+function fnToggleProgramSubjectDetailsCopy(value){
+                dijit.byId("CopyFromIdSemester").attr('required',true); 
+                dijit.byId("CopyToIdSemester").attr('required',true); 
+
+//                dijit.byId("CopyToIdAward").reset();
+//                dijit.byId("CopyToIdAward").set("value",null);
+//                dijit.byId('CopyToIdAward').set('placeHolder','select');
+//                
+//                dijit.byId("CopyToIdProgram").reset();
+//                dijit.byId("CopyToIdProgram").set("value",null);
+//                dijit.byId('CopyToIdProgram').set('placeHolder','select');
+//
+//                dijit.byId("CopyToIdSubject").reset();
+//                dijit.byId("CopyToIdSubject").set("value",null);
+//                dijit.byId('CopyToIdSubject').set('placeHolder','select');
+//                
+//                dijit.byId("CopyToIdScheme").reset();
+//                dijit.byId("CopyToIdScheme").set("value",null);
+//                dijit.byId('CopyToIdScheme').set('placeHolder','select');
+//                
+//                dijit.byId("CopyToIdSemester").reset();
+//                dijit.byId("CopyToIdSemester").set("value",null);
+//                dijit.byId('CopyToIdSemester').set('placeHolder','select');
+                
+                
+
+	if(value == 0) {
+                
+                dijit.byId('CopyFromIdScheme').set('readOnly',false);
+                dijit.byId('CopyFromIdAward').set('readOnly',false);
+                dijit.byId('CopyToIdScheme').set('readOnly',false);
+                dijit.byId('CopyToIdAward').set('readOnly',false);
+              
+                dijit.byId("CopyFromIdProgram").reset();
+                dijit.byId("CopyFromIdProgram").set("value",null);
+                dijit.byId('CopyFromIdProgram').set('placeHolder','select');
+
+                dijit.byId("CopyFromIdSubject").reset();
+                dijit.byId("CopyFromIdSubject").set("value",null);
+                dijit.byId('CopyFromIdSubject').set('placeHolder','select');
+                
+                
+                dijit.byId("CopyToIdProgram").reset();
+                dijit.byId("CopyToIdProgram").set("value",null);
+                dijit.byId('CopyFromIdProgram').set('placeHolder','select');
+
+                dijit.byId("CopyToIdSubject").reset();
+                dijit.byId("CopyToIdSubject").set("value",null);
+                dijit.byId('CopyToIdSubject').set('placeHolder','select');
+                
+                
+		dijit.byId("CopyFromIdScheme").attr('required',true);
+                dijit.byId("CopyFromIdAward").attr('required',true);
+                dijit.byId('CopyFromIdSubject').set('readOnly',true);
+                dijit.byId('CopyFromIdProgram').set('readOnly',true);
+                dijit.byId("CopyFromIdSubject").attr('required',false);
+                dijit.byId("CopyFromIdProgram").attr('required',false); 
+                
+                dijit.byId("CopyToIdScheme").attr('required',true);
+                dijit.byId("CopyToIdAward").attr('required',true);
+                dijit.byId('CopyToIdSubject').set('readOnly',true);
+                dijit.byId('CopyToIdProgram').set('readOnly',true);
+                dijit.byId("CopyToIdSubject").attr('required',false);
+                dijit.byId("CopyToIdProgram").attr('required',false);
+                
+                
+	} else if(value == 1) {                
+                
+		dijit.byId('CopyFromIdSubject').set('readOnly',false);
+                dijit.byId('CopyFromIdProgram').set('readOnly',false);
+                dijit.byId('CopyToIdSubject').set('readOnly',false);
+                dijit.byId('CopyToIdProgram').set('readOnly',false);
+            
+                dijit.byId("CopyFromIdScheme").reset();
+                dijit.byId("CopyFromIdScheme").set("value",null);
+                dijit.byId('CopyFromIdScheme').set('placeHolder','select');
+
+                dijit.byId("CopyFromIdAward").reset();
+                dijit.byId("CopyFromIdAward").set("value",null);
+                dijit.byId('CopyFromIdAward').set('placeHolder','select');
+                
+                
+                dijit.byId("CopyToIdScheme").reset();
+                dijit.byId("CopyToIdScheme").set("value",null);
+                dijit.byId('CopyToIdScheme').set('placeHolder','select');
+
+                dijit.byId("CopyToIdAward").reset();
+                dijit.byId("CopyToIdAward").set("value",null);
+                dijit.byId('CopyToIdAward').set('placeHolder','select');
+//                
+                dijit.byId("CopyFromIdProgram").reset();
+                dijit.byId("CopyFromIdProgram").set("value",null);
+                dijit.byId('CopyFromIdProgram').set('placeHolder','select');
+                
+                dijit.byId("CopyToIdProgram").reset();
+                dijit.byId("CopyToIdProgram").set("value",null);
+                dijit.byId('CopyToIdProgram').set('placeHolder','select');
+//                
+                dijit.byId("CopyFromIdSubject").reset();
+                dijit.byId("CopyFromIdSubject").set("value",null);
+                dijit.byId('CopyFromIdSubject').set('placeHolder','select');
+                
+                dijit.byId("CopyToIdSubject").reset();
+                dijit.byId("CopyToIdSubject").set("value",null);
+                dijit.byId('CopyToIdSubject').set('placeHolder','select');
+                
+                dijit.byId('CopyFromIdScheme').set('readOnly',false);
+                dijit.byId('CopyFromIdAward').set('readOnly',false);                
+                dijit.byId("CopyFromIdScheme").attr('required',false);
+                dijit.byId("CopyFromIdAward").attr('required',false); 
+                dijit.byId("CopyFromIdSubject").attr('required',true);
+                dijit.byId("CopyFromIdProgram").attr('required',true);
+                
+                dijit.byId('CopyToIdScheme').set('readOnly',false);
+                dijit.byId('CopyToIdAward').set('readOnly',false);                
+                dijit.byId("CopyToIdScheme").attr('required',false);
+                dijit.byId("CopyToIdAward").attr('required',false); 
+                dijit.byId("CopyToIdSubject").attr('required',true);
+                dijit.byId("CopyToIdProgram").attr('required',true);
+                
+                
+	} else if (value == 2)  {
+                dijit.byId('CopyFromIdSubject').set('readOnly',false);
+                dijit.byId('CopyFromIdProgram').set('readOnly',false);
+                dijit.byId('CopyFromIdScheme').set('readOnly',false);
+                dijit.byId('CopyFromIdAward').set('readOnly',false);
+                
+                dijit.byId('CopyToIdSubject').set('readOnly',false);
+                dijit.byId('CopyToIdProgram').set('readOnly',false);
+                dijit.byId('CopyToIdScheme').set('readOnly',false);
+                dijit.byId('CopyToIdAward').set('readOnly',false);
+                
+//                dijit.byId("CopyFromIdSemester").reset();
+//                dijit.byId("CopyFromIdSemester").set("value",null);
+//                dijit.byId('CopyFromIdSemester').set('placeHolder','select');
+//                
+                dijit.byId("CopyFromIdScheme").reset();
+                dijit.byId("CopyFromIdScheme").set("value",'');
+                dijit.byId('CopyFromIdScheme').set('placeHolder','select');
+
+                dijit.byId("CopyFromIdAward").reset();
+                dijit.byId("CopyFromIdAward").set("value",'');
+                dijit.byId('CopyFromIdAward').set('placeHolder','select');
+                
+                dijit.byId("CopyFromIdSubject").reset();
+                dijit.byId("CopyFromIdSubject").set("value",null);
+                dijit.byId('CopyFromIdSubject').set('placeHolder','select');
+                
+                dijit.byId("CopyToIdSubject").reset();
+                dijit.byId("CopyToIdSubject").set("value",null);
+                dijit.byId('CopyToIdSubject').set('placeHolder','select');
+//                
+                dijit.byId("CopyFromIdProgram").reset();
+                dijit.byId("CopyFromIdProgram").set("value",null);
+                dijit.byId('CopyFromIdProgram').set('placeHolder','select');
+                
+                
+                dijit.byId("CopyToIdProgram").reset();
+                dijit.byId("CopyToIdProgram").set("value",null);
+                dijit.byId('CopyToIdProgram').set('placeHolder','select');
+                
+                dijit.byId("CopyFromIdSubject").attr('required',false);
+                dijit.byId('CopyFromIdScheme').set('required',false);
+                dijit.byId('CopyFromIdAward').set('required',false);                
+                dijit.byId("CopyFromIdProgram").attr('required',true);  
+                
+                dijit.byId("CopyToIdSubject").attr('required',false);
+                dijit.byId('CopyToIdScheme').set('required',false);
+                dijit.byId('CopyToIdAward').set('required',false);                
+                dijit.byId("CopyToIdProgram").attr('required',true); 
+            
+        }
+}
+
+
+function fnToggleProgramCopy() {   
+
+        var IdScheme =  dijit.byId('CopyFromIdScheme').value;
+        var IdAward =  dijit.byId('CopyFromIdAward').value;  
+        //if(IdScheme!='' && IdAward!='') { 
+        var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getprogramlist/IdScheme/"+IdScheme+"/IdAward/"+IdAward,
+                            handleAs:'json',
+                            load:function(data){ 
+                                    AutoFillNextEditableDropDown("CopyFromIdProgram",data); 
+                            }
+                       }
+       dojo.xhrGet(xhrArgs);  
+      // }
+
+    }
+   
+   function fnToggleSubjectCopy(val1) {
+	 
+	   var CopyFromIdSemester =  dijit.byId('CopyFromIdSemester').value;
+	   
+       if(val1!='') { 
+       var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getsubjectlist/Idprogram/"+val1+"/IdSemester/"+CopyFromIdSemester,
+                            handleAs:'json',
+                            load:function(data){ 
+                                    AutoFillNextEditableDropDown("CopyFromIdSubject",data); 
+                            }
+                       }
+       dojo.xhrGet(xhrArgs);  
+       }
+   
+   }
+
+   function fnToggleSubjectCopyTo(val1) {
+		 
+	   var CopyToIdSemester =  dijit.byId('CopyToIdSemester').value;
+	   
+       if(val1!='') { 
+       var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getsubjectlist/Idprogram/"+val1+"/IdSemester/"+CopyToIdSemester,
+                            handleAs:'json',
+                            load:function(data){ 
+                                    AutoFillNextEditableDropDown("CopyToIdSubject",data); 
+                            }
+                       }
+       dojo.xhrGet(xhrArgs);  
+       }
+   
+   }
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Grade Set-Up");?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gradesetup/addgradesetup"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+			    } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<?php if($this->errorMsg=='1') { ?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Record Already Exists. Please try a different.');?>
+				</td>
+			</tr>
+			<?php } ?>
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details Set-Up");?>
+				</th>
+			</tr>
+
+
+			<tr>
+				<?php echo $this->lobjGradesetupForm->IdGradeSetUp;?>
+				<?php echo $this->lobjGradesetupForm->UpdDate;?>
+				<?php echo $this->lobjGradesetupForm->UpdUser;?>
+				<td><?php echo $this->translate("Based On");?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->BasedOn;?> <!--<input type="text" name="org" id="org" value="0" >
+                            <input type="text" name="new" id="new" value="0" >-->
+				</td>
+				<td><?php echo $this->translate("Semester");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->IdSemester;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Scheme");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdScheme;?></td>
+				<td><?php echo $this->translate("Award");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdAward;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Program");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdProgram;?></td>
+				<td><?php echo $this->translate("Subject");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdSubject;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Active");?></td>
+				<td><?php echo $this->lobjGradesetupForm->Active;?></td>
+				<td><?php echo $this->translate("Landscape");?></td>
+				<td><?php echo $this->lobjGradesetupForm->IdLandscape;?></td>
+			
+			</tr>
+
+
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade Description");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradeDesc;?></td>
+				<td><?php echo $this->translate($this->defaultlanguage);?></td>
+				<td><?php echo $this->lobjGradesetupForm->DefaultLanguage;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Minimum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MinPoint;?></td>
+				<td><?php echo $this->translate("Maximum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MaxPoint;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradePoint;?></td>
+				<td><?php echo $this->translate("Grade");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Grade;?></td>
+
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Pass");?><span></span></td>
+				<td><?php echo $this->lobjGradesetupForm->Pass;?></td>
+				<td><?php echo $this->translate("Rank");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Rank;?></td>
+
+
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Countable");?><span></span></td>
+				<td><?php echo $this->lobjGradesetupForm->Countable;?></td>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+
+
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjGradesetupForm->Add;?>
+					<?php echo $this->lobjGradesetupForm->Clear;?>
+				</td>
+			</tr>
+
+		</table>
+
+
+
+
+
+
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Subject");?></th>
+				<th><?php echo $this->translate("Grade");?></th>
+				<th><?php echo $this->translate("Grade Description");?>
+				</th>
+				<th><?php echo $this->translate($this->defaultlanguage);?></th>
+				<th><?php echo $this->translate("Minimum Point");?>
+				</th>
+				<th><?php echo $this->translate("Maximum Point");?>
+				</th>
+				<th><?php echo $this->translate("Grade Point");?>
+				</th>
+				<th><?php echo $this->translate("Rank");?></th>
+				<th><?php echo $this->translate("Pass");?></th>
+				<th><?php echo $this->translate("Countable");?></th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $gradesetup) {?>
+
+			<tr>
+				<td><?php echo $this->escape($gradesetup['SubjectName']);?></td>
+				<td><?php echo $this->escape($gradesetup['Grade']);?></td>
+				<td><?php echo $this->escape($gradesetup['GradeDesc']);?></td>
+				<td><?php echo $this->escape($gradesetup['GradePoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['MinPoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['MaxPoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['GradePoint']);?></td>
+
+				<td><?php echo $this->escape($gradesetup['Rank']);?></td>
+				<td><?php if($gradesetup['Pass'] == 1){ 
+					echo "Yes";
+				} else{ echo "No";
+}?>
+				</td>
+				<td><?php if($gradesetup['Countable'] == 1){ 
+					echo "No";
+				} else{ echo "Yes";
+					}?>
+				</td>
+				<td><?php echo $this->escape($gradesetup['DefinitionDescEng']);?></td>
+				<td><?php echo $this->escape($gradesetup['DefinitionDescBahas']);?>
+				</td>
+				<td><a href="#"
+					onClick="deletegradedetails('<?php echo $gradesetup['IdGradeSetUp'];?>','<?php echo $gradesetup['GradeDesc'];?>');">
+						<img src='<?php echo $this->baseUrl();?>/images/delete.png'
+						border=0 width='16' height='16'>
+				</a></td>
+			</tr>
+			<?php   }?>
+			<?php } ?>
+			<tr>
+				<td align="right" colspan="11"><?php echo $this->lobjGradesetupForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gradesetup', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</Form>
+
+</fieldset>
+
+</br>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Copy From"); ?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myCopyForm" action=""
+		method="post" name="myCopyForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {                
+               return true;
+            }else {
+                return false;
+            }
+        </script>
+		<table class="table" width="100%">
+			<?php if($this->errorMsg=='2') { ?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Record Already Exists. Please try a different.');?>
+				</td>
+			</tr>
+			<?php } ?>
+
+			<?php if($this->errorMsg=='3') { ?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('No Matching record found. Please try a different.');?>
+				</td>
+			</tr>
+			<?php } ?>
+
+
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details Set-Up");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Based On');?></td>
+				<td colspan="3"><?php echo $this->lobjGradesetupForm->CopyBasedOn;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('From Semester');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdSemester;?>
+				</td>
+				<td><?php echo $this->translate('To Semester');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdSemester;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('From Scheme');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdScheme;?>
+				</td>
+				<td><?php echo $this->translate('To Scheme');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdScheme;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('From Award');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdAward;?>
+				</td>
+				<td><?php echo $this->translate('To Award');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdAward;?>
+				</td>
+			</tr>
+
+
+
+			<tr>
+				<td><?php echo $this->translate('From Program');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdProgram;?>
+				</td>
+				<td><?php echo $this->translate('To Program');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdProgram;?>
+				</td>
+			</tr>
+
+
+			<tr>
+				<td><?php echo $this->translate('From Subject');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdSubject;?>
+				</td>
+				<td><?php echo $this->translate('To Subject');?>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdSubject;?>
+				</td>
+			</tr>
+
+			<tr>
+				<td colspan="4" align="right"><?php echo $this->lobjGradesetupForm->CopySetup;?>
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>

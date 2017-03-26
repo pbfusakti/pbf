@@ -1,0 +1,274 @@
+<script>
+$(function(){
+
+	 
+	$( "#dialog-assign" ).dialog({
+	  autoOpen: false,
+      modal: true,
+      width: 550,
+      buttons: {
+   
+        "<?php echo $this->translate('Assign'); ?>": function() {
+       	 //cek for class lecturer
+       	 staffid=$('#staff_list').val();
+         component=$("#component").val(); 
+         idmark=$("#idmark").val();
+         idgroup=$("#IdGroup").val();
+         idmarkdetail=$("#idmarkdetail").val();
+	         $.ajax({
+	  			url: "<?php echo $this->url(array('module'=>'examination','controller'=>'mark-distribution', 'action'=>'ajax-set-operator'),'default',true);?>",
+	  			data: {'IdGroup':idgroup,'IdLecturer':staffid, 'IdMark':idmark, 'IdMarkDetail':idmarkdetail,'Component':component},
+	  			type: 'POST',
+	  			async: false,
+	  			dataType: 'json'	
+	  			 
+	  		}).done(function ( data ) {
+	
+	  			element_entryitem="#entryitem"+idgroup+idmarkdetail;
+	  			element_entry="#entry"+idgroup+idmark;
+	  			element_verifyitem="#verifyitem"+idgroup+idmarkdetail;
+	  			element_verify="#verify"+idgroup+idmark;
+	  		 
+	  			if (idmarkdetail!='') {
+		  			if (component=='Entry')
+	  					$(element_entryitem).text(data.EntryFullName);
+		  			else 
+			  			$(element_verifyitem).text(data.VerFullName);
+	  			} else {
+	  				if (component=='Entry') 
+	  					$(element_entry).text(data.EntryFullName);
+	  				else 
+		  				$(element_verify).text(data.VerFullName);
+	  			}  
+	  			 $("#dialog-assign").dialog("close");
+	  		});
+          
+        },
+        Close: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+
+});
+
+function getLecturer(element,targetElement){
+	var idCollege = $(element).val();
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'generalsetup','controller'=>'course-group', 'action'=>'ajax-get-lecturer'),'default',true);?>",
+		data: {'idCollege':$(element).val()},
+		type: 'POST',
+		dataType: 'json',	
+		beforeSend: function(){
+			$(targetElement).hide();
+			$(targetElement).parent().append('<div class="loading">Loading...</div>');	
+		}	
+	}).done(function ( data ) {
+
+		$('.loading').remove();  
+		$(targetElement).show();
+		
+		$(targetElement).empty().append('<option value="0"> <?php echo $this->translate("Please Select"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$(targetElement).append('<option value="'+data[index].IdStaff+'"> '+data[index].FullName+' </option>');
+		});
+	});
+}
+function assign(element,idgroup,idmark,idmarkdetail) {
+	 
+	var clik=$(element).val();
+	$("#idmark").val(idmark);
+	$("#IdGroup").val(idgroup);
+	$("#idmarkdetail").val(idmarkdetail);
+	
+	if (clik=="Assign Entry") 
+		$("#component").val("Entry");
+	else
+		$("#component").val("Verify");
+	
+	$("#dialog-assign").dialog("open");
+	
+}
+function edit(){	
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-distribution','action'=>'edit','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idBranch'=>$this->idBranch,'idSubject'=>$this->idSubject),'default',true)?>";
+}
+ 
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-distribution','action'=>'index'), 'default', true);?>";
+}
+
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			 
+		  	<?php if($this->total > 0){?>
+			<li>
+				<a href="#" onClick="edit()">
+				<span class='edit'></span>Edit</a>
+			</li>
+			<?php } ?>
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Branch Name"); ?></th>   
+		    <td><?php echo $this->branch['BranchName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+<br><br>	
+  <?php foreach ($this->group_list as $group) {
+  	$idgroup=$group['IdCourseTaggingGroup'];
+  		//echo var_dump($group);?>
+  	<h2><?php echo 'Group Name:'.$group['GroupName'].' - Coordinator: '.$group['Coordinator'];?></h2>
+	<table  class="table" width="100%" cellpadding="5" cellspacing="1" >
+		  <tr>
+		    <th colspan="9">Assessment Component List.</th>
+		  </tr>
+		  <tr>
+		    <th>No</th>   
+		    <th>Component Name</th>
+		    <th>Component Item</th>
+		    <th width="10%">Item Mark</th>  
+		    <th width="10%">Total Mark</th>
+		    <th width="10%">Item Percentage</th>
+		    <th width="10%">Total Percentage</th>	
+		    <th width="15%">Mark Entrier</th>
+		    <th width="15%">Mark Verifier</th>
+		  </tr>
+		  <?php 
+		  $rs_component=$group['component'];
+		   
+		  if(count($rs_component)>0) {		
+				  $no=1;
+				  foreach ($rs_component as $component){
+					 $idmark=$component['IdMarksDistributionMaster'];
+				  ?>
+				   <tr>
+				    <td>&nbsp;<?php echo $no;?>.</td>   
+				    <td>&nbsp;<?php echo $component["component_name"]?></td>
+				    <td>&nbsp;</td>   
+				    <td>&nbsp;</td> 
+				    <td align="center">&nbsp;<?php echo $component["Marks"];?></td>
+				    <td align="center">&nbsp;</td>
+				    <td align="center">&nbsp;<?php echo $component["Percentage"];?></td>		
+				    <td align="center">
+				    <?php    $component_item = $component['item'];
+				    if(count($component_item)==0) {?>	
+					    <div id="entry<?php echo $idgroup.$component['IdMarksDistributionMaster']?>"><?php echo $component['EntrierFullName']?></div>
+					   	<input type="button"	name="entry" id="entry<?php echo $idgroup.$component['IdMarksDistributionMaster']?>" value="Assign Entry" onclick="assign(this,<?php echo  $group['IdCourseTaggingGroup']?>,<?php echo  $component['IdMarksDistributionMaster']?>,'')">       
+					   	</td> 
+					   	 <td align="center">
+					   	<div id="verify<?php echo $idgroup.$component['IdMarksDistributionMaster']?>"><?php echo $component['VerFullName']?></div>	
+					    <input type="button"	name="verify" id="verify<?php echo $idgroup.$component['IdMarksDistributionMaster']?>" value="Assign Verify" onclick="assign(this,<?php echo  $group['IdCourseTaggingGroup']?>,<?php echo  $component['IdMarksDistributionMaster']?>,'')">       
+					   	
+					   	</td>   
+				   </tr>
+				   <?php } else {?>
+				   <td></td><td></td>
+				   <?php }?>
+				    <?php 
+				       //get component item 
+				  	  
+				  	   if(count($component_item)>0){
+				  	   	foreach ($component_item as $item){
+				   ?>
+					    <tr bgcolor="#FFFFF0">
+						    <td>&nbsp;</td>   
+						    <td>&nbsp;</td>
+						    <td>&nbsp;<?php echo $item["ComponentName"]?></td>				    
+						    <td align="center">&nbsp;<?php echo $item["Weightage"]?></td>
+						    <td align="center">&nbsp;</td> 
+						    <td align="center">&nbsp;<?php echo $item["Percentage"]?></td>
+						    <td align="center">&nbsp;</td>
+						   	<td align="center">
+				    		 <div id="entryitem<?php echo $idgroup.$item['IdMarksDistributionDetails']?>"><?php echo $item['EntrierFullName']?></div>
+				    		<input type="button"	name="entry" id="entry<?php echo $idgroup.$item['IdMarksDistributionDetails']?>" value="Assign Entry" onclick="assign(this,<?php echo  $group['IdCourseTaggingGroup']?>,<?php echo $component['IdMarksDistributionMaster'] ?>,<?php echo  $item['IdMarksDistributionDetails']?>)">       
+				   			</td> 
+				   			 <td align="center">	
+				   			 <div id="verifyitem<?php echo $idgroup.$item['IdMarksDistributionDetails']?>"><?php echo $item['VerFullName']?></div>
+				    		<input type="button"	name="verify" id="verify<?php echo $idgroup.$item['IdMarksDistributionDetail']?>" value="Assign Verify" onclick="assign(this,<?php echo  $group['IdCourseTaggingGroup']?>,<?php echo $component['IdMarksDistributionMaster'] ?>,<?php echo  $item['IdMarksDistributionDetails']?>)">       
+				   			</td>   				     
+					    </tr>
+				   <?php }   
+						}//end if item?>
+				   
+				  <?php $no++; }
+			}else{ ?>
+	<tr bgcolor="#FFFFFF">
+				    <td colspan="8"><font color="red"></>No assessment component has been setup.</font></td>   
+			    </tr>
+	<?php }
+	}//end group
+	?>
+  </table>
+</div>
+<div id="dialog-assign" title="Assign Academic Staff">
+
+<input type="hidden" id="IdGroup" name="IdGroup">
+<input type="hidden" id="idmark" name="idmark">
+<input type="hidden" id="idmarkdetail" name="idmarkdetail">
+<input type="hidden" id="component" name="component">
+
+  <table>
+    <tr>
+      <td><?php echo $this->translate('Faculty'); ?></td>
+      <td>:</td>
+      <td>
+        <select name="faculty" id="faculty" onchange="getLecturer(this,$('#staff_list'));">
+          <option><?php echo $this->translate("Please select"); ?></option>
+          <?php 
+          foreach($this->faculty_list as $faculty):
+          ?>
+          <option value="<?php echo $faculty['IdCollege'];?>"><?php echo $faculty['ArabicName'];?> - <?php echo $faculty['CollegeCode'];?></option>
+          <?php 
+          endforeach;
+          ?>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><?php echo $this->translate('Staff'); ?></td>
+      <td>:</td>
+      <td>
+        <select name="staff_list" id="staff_list">
+        </select>
+      </td>
+    </tr>
+  </table>
+</div>
