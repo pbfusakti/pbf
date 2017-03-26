@@ -13,7 +13,10 @@ public function getKhsAction(){
     	$dbPublish=new Examination_Model_DbTable_PublishMark();
     	 
     	$IdStudentRegistration = $this->_getParam('IdStudentRegistration',null);   
-    	$idSemesterStatus = $this->_getParam('idSemStatus',null);
+    	$idSemester  = $this->_getParam('IdSemester',null);
+    	
+    	$dbSem=new App_Model_General_DbTable_Semestermaster();
+    	$semesterStudi = $dbSem->fnGetSemestermaster($idSemester);
     	$token = $this->_getParam('token',null);
 	    if ($token==$mysession->authtoken) {
 	    		 
@@ -24,7 +27,7 @@ public function getKhsAction(){
 	        
 	        //get info college
 	    	$collegedB = new App_Model_General_DbTable_Collegemaster();
-	        $college = $collegedB->getFullInfoCollege($student["IdCollege"]);
+	        $college = $collegedB->getData($student["IdCollege"]);
 	        
 	        //get info program
 	        $programDb = new App_Model_General_DbTable_Program();
@@ -52,7 +55,7 @@ public function getKhsAction(){
 	    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
 	    	    	 
 	        //get photo student
-	    	$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
+	    	$uploadFileDb = new App_Model_General_DbTable_UploadFile();
 	    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
 	    	    	
 			if(isset($file["pathupload"])){
@@ -64,26 +67,34 @@ public function getKhsAction(){
 	    	}else{
 	    		$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
 	    	}    	
-	    	 
+	    	
 	    	//get semester regsiter info
-		    $studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
-			$semesterStudi = $studentSemesterDB->getSemesterInfo($idSemesterStatus);		         	
-	        $courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 	   	
-			$regularSem = $courseRegisterDb->getSemesterRegular($semesterStudi["IdSemesterMain"],$IdStudentRegistration);
-	    	    	
+		    $courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 	   	
+	       
+	        $regularSem = $courseRegisterDb->getSemesterRegular($idSemester,$IdStudentRegistration);
+	    	 	
 	    	 //To get Registered Courses   
-	         $landscapeDb = new GeneralSetup_Model_DbTable_Landscape();
+	         $landscapeDb = new App_Model_General_DbTable_Landscape();
 	         $landscape = $landscapeDb->getData($student["IdLandscape"]);
 	         
 	        	if($landscape["LandscapeType"]==43) {//Semester Based 
 			         		
 	         			//get course registered  per semester
 			  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-			  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);
+			  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$idSemester);
 			  			foreach ($courses as $index=>$value) {
-			  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
-			  					$courses[$index]['publish']="1";
-			  				} else $courses[$index]['publish']="0";
+			  				if ($dbPublish->isAllMarkPublished($idSemester, $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
+			  					$TableCourses[$index]['publish']="1";
+			  				} else $TableCourses[$index]['publish']="0";
+			  				
+			  				$TableCourses[$index]['SubCode']=$value['SubCode'];
+			  				$TableCourses[$index]['SubjectName']=$value['SubjectName'];
+			  				$TableCourses[$index]['CreditHours']=$value['CreditHours'];
+			  				$TableCourses[$index]['grade_name']=$value['grade_name'];
+			  				$TableCourses[$index]['exam_status']=$value['exam_status'];
+			  				$TableCourses[$index]['final_course_mark']=$value['final_course_mark'];
+			  				$TableCourses[$index]['grade_status']=$value['grade_status'];
+			  				
 			  			}
 			  			
 			  			//get gpa and cgpa
@@ -97,17 +108,26 @@ public function getKhsAction(){
 	         	
 			         	//get registered blocks
 			         	$studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
-			         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);         	
+			         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$idSemester);         	
 			         	
 			         	foreach($semester_blocks as $key=>$block){
 					
 				         	//get course registered  by block
 				  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-				  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"],$block["IdBlock"]);
+				  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$idSemester,$block["IdBlock"]);
 				  			foreach ($courses as $index=>$value) {
-				  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
-				  					$courses[$index]['publish']="1";
-				  				} else $courses[$index]['publish']="0";
+				  				if ($dbPublish->isAllMarkPublished($idSemester, $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
+				  					$TableCourses[$index]['publish']="1";
+				  				} else $TableCourses[$index]['publish']="0";
+				  				$TableCourses[$index]['SubCode']=$value['SubCode'];
+				  				$TableCourses[$index]['SubjectName']=$value['SubjectName'];
+				  				$TableCourses[$index]['CreditHours']=$value['CreditHours'];
+				  				$TableCourses[$index]['grade_name']=$value['grade_name'];
+				  				$TableCourses[$index]['exam_status']=$value['exam_status'];
+				  				$TableCourses[$index]['final_course_mark']=$value['final_course_mark'];
+				  				$TableCourses[$index]['grade_status']=$value['grade_status'];
+				  				 
+				  				
 				  			}
 				  			 
 				  			//$semester_blocks[$key]["courses"]=$courses;
@@ -122,10 +142,10 @@ public function getKhsAction(){
 			         		         	 
 	         	}//end if
 	         	
-	         	$chlimitDB = new Registration_Model_DbTable_Chlimit();
+	         	$chlimitDB = new App_Model_General_DbTable_Chlimit();
 	         	$limit=$chlimitDB->getLimit($student['IdProgram'], $student['IdIntake'], $gpa);
 	         	 
-	         
+	        
 	         $fieldValues = array(
 	    	  'PROGRAM'=>$student["ArabicName"],
 	    	  'FACULTY'=>'FAKULTAS '.$student["NamaKolej"],
@@ -153,13 +173,14 @@ public function getKhsAction(){
 	          'B_EMAIL'=>$addemail
 	    	);
 	         
-	         echo var_dump($courses);exit;
 	         
-	    	$coursestable=array('subcode'=>$courses['subjectcode']);
-	    	$result=array('kop'=>$fieldValues,'course'=>$courses);
+	         
+	    	
+	    	$result=array('header'=>$fieldValues,'courses'=>$TableCourses);
 	    }
 	       
     	else{
+    		 
     		$result=array();
     	}
     	

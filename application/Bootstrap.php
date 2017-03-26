@@ -12,13 +12,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		endif;
 		Zend_Registry::set('sis',$sis);
 
-            $applicant = new Zend_Session_Namespace('applicant');
-	    if (!isset($sis->initialized)) :
-			Zend_Session::regenerateId();
-			$sis->initialized = true;
-		endif;
-		Zend_Registry::set('applicant',$applicant);
-	
+         
         Zend_Locale::setDefault('id_ID');
         
     }
@@ -121,9 +115,10 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		
 		 $resource = $this->getPluginResource('multidb');
       	 Zend_Registry::set("multidb", $resource);	
-      	
+      	 
     }
      
+    
 	/* protected function _initDomPdf(){
 		//set_include_path(APPLICATION_PATH . "/../../library/dompdf" . PATH_SEPARATOR . get_include_path());
 		set_include_path("/var/www/html/sis/library/dompdf/" . PATH_SEPARATOR . get_include_path());

@@ -8,14 +8,17 @@ class App_Model_Login extends Zend_Db_Table_Abstract {
 	public function attempLogin($user,$pass){
 	
 		$db = Zend_Db_Table::getDefaultAdapter();
-	
+		
 		$select = $db ->select()
 					  ->from(array('sa'=>$this->_name))
-					  ->join(array('st'=>'tbl_studentregistration'),'sa.appl_id=st.IdApllication')
+					  ->join(array('st'=>'tbl_studentregistration'),'sa.appl_id=st.IdApplication')
 					  ->where('sa.appl_email=?',$user)
 					  ->where('sa.appl_password=?',$pass);
+
 		$rows = $db->fetchRow($select);
+		
 		$result=array();
+		
 		if ($rows) {
 			//get appl_id
 			
