@@ -1,6 +1,6 @@
 <?php 
 
-class App_Model_DbTable_Login extends Zend_Db_Table_Abstract {
+class App_Model_Login extends Zend_Db_Table_Abstract {
 	
 	protected $_name = 'applicant_profile'; 
 	

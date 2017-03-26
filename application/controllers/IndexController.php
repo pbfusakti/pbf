@@ -17,7 +17,7 @@ class IndexController extends Zend_Controller_Action {
     
     	$ajaxContext = $this->_helper->getHelper('AjaxContext');
     	     
-    	$dbLog=new App_Model_DbTable_Login();
+    	$dbLog=new App_Model_Login();
     	
     	$token = $dbLog->attempLogin($user, $password);
      	$token=array('token'=>$token);
