@@ -1,5 +1,5 @@
 <?php
-class IndexController extends Base_Base {
+class IndexController extends Zend_Controller_Action {
 
 	private $gstrsessionSIS;//Global Session Name
 	public function init() { //instantiate log object

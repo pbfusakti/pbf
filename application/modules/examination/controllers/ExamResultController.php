@@ -1,6 +1,6 @@
 <?php
  
-class Examination_ExamResultController extends Base_Base {
+class Examination_ExamResultController extends Zend_Controller_Action {
 
 	 
 	 
