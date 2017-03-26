@@ -2,391 +2,181 @@
  
 class Examination_ExamResultController extends Base_Base {
 
-	public function indexAction(){
-		
-		$this->view->title = "Kartu Hasil Studi";
-		 
-		$form = new Examination_Form_ExamResultSearchForm();		
-		
-		//intake
-		$intakeDb = new App_Model_Record_DbTable_Intake();
-		$this->view->intake_list = $intakeDb->getData();	
-
-		
-		//program
-		$programDb = new Registration_Model_DbTable_Program();
-		$this->view->program_list = $programDb->getData();	
-		
-		//semester
-		$semesterDB = new GeneralSetup_Model_DbTable_Semestermaster();
-		$semesterList = $semesterDB->fnGetSemestermasterList();
-		$this->view->semester_list = $semesterList;
-		
-		
-		if ($this->getRequest()->isPost()) {
-			
-			$formData = $this->getRequest()->getPost();	
-
-			$form->populate($formData);
-			//get Student
-			$studentRegDB = new Examination_Model_DbTable_StudentRegistration();
-			$student_list = $studentRegDB->getStudentRegistration($formData);
-			$this->view->student_list = $student_list;
-			
-		}
-		$this->view->form = $form;
-		
-	}
+	 
+	 
 	
-	public function khsAction(){
+public function getKhsAction(){
     	
-    	$this->view->title = "Kartu Hasil Studi";
-    	
-    	$IdStudentRegistration = $this->_getParam('id',null);    
-    	$this->view->IdStudentRegistration = $IdStudentRegistration;
-    	
-	    //To get Student Academic Info        
-        $studentRegDB = new Examination_Model_DbTable_StudentRegistration();
-        $student = $studentRegDB->getStudentInfo($IdStudentRegistration);
-        $this->view->student = $student;
-        
-        //get info college
-    	$collegedB = new App_Model_General_DbTable_Collegemaster();
-        $college = $collegedB->getData($student["IdCollege"]);
-        
-        //get salutation
-    	$defDB = new App_Model_General_DbTable_Definationms();
-    	$academic_front_salutation = $defDB->getData($student["FrontSalutation"]);
-    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
-    	    	 
-        //get photo student
-    	$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
-    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
-    	    	
-    	$imageHelper = new icampus_Function_General_Image();
-    	$this->view->photo_url = $imageHelper->getImagePath($file['pathupload'],150,150);
-    	    	
-    	$dbPublish=new Examination_Model_DbTable_PublishMark();
-    	
-    	//To get Registered Courses   
-        $landscapeDb = new GeneralSetup_Model_DbTable_Landscape();
-        $landscape = $landscapeDb->getData($student["IdLandscape"]);
-        	
-    	//get total registered semester 
-	    $studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-	    $semester = $studentSemesterDB->getRegisteredSemester($IdStudentRegistration);
-	    $this->view->semester = $semester;
-	    
-	    if ($this->getRequest()->isPost()) {
-			
-			$formData = $this->getRequest()->getPost();	
-			$idSemesterStatus=$formData["idSemesterStatus"];
-			$this->view->idSemesterStatus = $idSemesterStatus;
-			
-	        //get semester regsiter info
-	        $studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-			$semesterStudi = $studentSemesterDB->getSemesterInfo($idSemesterStatus);		         	
-         	
-			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 
-			$regularSem = $courseRegisterDb->getSemesterRegular($semesterStudi["IdSemesterMain"],$IdStudentRegistration);
-    	
-	         	         
-         	if($landscape["LandscapeType"]==43) {//Semester Based 
-		         		
-         			//get course registered  per semester
-		  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-		  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);
-		  			foreach ($courses as $index=>$value) {
-		  				//echo var_dump($value);exit;
-		  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
-		  					$courses[$index]['publish']="1";
-		  				} else $courses[$index]['publish']="0";
-		  			}
-		  			$sem[0]["courses"]=$courses;
-		  			 	  			
-		  			
-		  			//get gpa and cgpa
-		  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-		  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$idSemesterStatus);
-		  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
-		  			$sem[0]["sem_credithour"] = $grade["sg_univ_sem_credithour"];
-		  			$sem[0]["cum_credithour"] = $grade["sg_cum_credithour"];	  			
-		  			$sem[0]["gpa"] = $grade["sg_univ_gpa"];
-		  			$sem[0]["cgpa"] = $grade["sg_cgpa"];
-		  			$sem[0]["sks_lulus"] = $grade["sg_sem_sks_lulus"];
-		  			$sem[0]["sks_gagal"] = $grade["sg_sem_sks_gagal"];	
-				  			
-           		
-         	}elseif($landscape["LandscapeType"]==44){
-         	
-		         	//get registered blocks
-		         	$studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-		         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);         	
-		         	
-		         	foreach($semester_blocks as $key=>$block){
-				
-			         	//get course registered  by block
-			  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-			  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"],$block["IdBlock"]);
-			  			foreach ($courses as $index=>$value) {
-			  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
-			  					$courses[$index]['publish']="1";
-			  				} else $courses[$index]['publish']="0";
-			  			}
-			  			$blocks[$key]["courses"]=$courses;
-			  		    $semesterStudi['SemesterMainName']=$block["SemesterMainName"];
-			  			
-			  			//get gpa and cgpa
-			  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-			  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$block["idstudentsemsterstatus"]);
-			  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
-			  			$semester_blocks[$key]["sem_credithour"] = $grade["sg_sem_credithour"];
-			  			$semester_blocks[$key]["cum_credithour"] = $grade["sg_cum_credithour"];	  			
-			  			$semester_blocks[$key]["gpa"] = $grade["sg_gpa"];
-			  			$semester_blocks[$key]["cgpa"] = $grade["sg_cgpa"];
-			  			$semester_blocks[$key]["sks_lulus"] = $grade["sg_sem_sks_lulus"];
-		  			    $semester_blocks[$key]["sks_gagal"] = $grade["sg_sem_sks_gagal"];	
-			  			$sem = $semester_blocks;
-			  			
-		         	}	//end foreach
-		         		         	 
-         	}//end if
-         	
-         	/*echo '<pre>';
-         	print_r($sem);
-         	echo '</pre>';*/
-         	$this->view->sem = $sem;
-         
-		}//end post
-	
-	}
-	
-	
-	public function cetakKhsAction(){
-    	
-    	$this->view->title = "Kartu Hasil Studi";
     	 
-    	global $courses; 
-
+		$mysession = new Zend_Session_Namespace('authtoken');
+		
     	$dbPublish=new Examination_Model_DbTable_PublishMark();
     	 
     	$IdStudentRegistration = $this->_getParam('IdStudentRegistration',null);   
     	$idSemesterStatus = $this->_getParam('idSemStatus',null);
-    	
-    	 //To get Student Academic Info        
-        $studentRegDB = new Examination_Model_DbTable_StudentRegistration();
-        $student = $studentRegDB->getStudentInfo($IdStudentRegistration);
-        
-        
-        //get info college
-    	$collegedB = new GeneralSetup_Model_DbTable_Collegemaster();
-        $college = $collegedB->getFullInfoCollege($student["IdCollege"]);
-        
-        //get info program
-        $programDb = new App_Model_Record_DbTable_Program();
-        $program = $programDb->getCollegeDean($student["IdProgram"]);
-         
-        //brach
-        $branchDb=new GeneralSetup_Model_DbTable_Branchofficevenue();
-        $branch=$branchDb->fnviewBranchofficevenueDtls($student['IdBranch']);
-        
-        //get info majoring
-        $majorDb = new GeneralSetup_Model_DbTable_ProgramMajoring();
-        $major = $majorDb->getInfo($student['IdProgramMajoring']);
-        if ($major['Address1']=='') {
-        	$addphone=$branch["Phone"];
-        	$addemail=$branch["Email"];
-        	$add=ucwords(strtolower($branch["Addr1"])).' '.ucwords(strtolower($branch["Addr2"])).' '.ucwords(strtolower($branch["StateName"])).' '.ucwords(strtolower($branch["CountryName"]));
-        } else {
-        	$addphone=$major["Phone"];
-        	$addemail=$major["Email"];
-        	$add=ucwords(strtolower($major["Addr1"])).' '.ucwords(strtolower($major["Addr2"])).' '.ucwords(strtolower($major["StateName"])).' '.ucwords(strtolower($major["CountryName"]));
-        }
-        //get salutation
-    	$defDB = new App_Model_General_DbTable_Definationms();
-    	$academic_front_salutation = $defDB->getData($student["FrontSalutation"]);
-    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
-    	    	 
-        //get photo student
-    	$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
-    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
-    	    	
-		if(isset($file["pathupload"])){
-    		if (file_exists($file["pathupload"])) {
-    			$photo_url = $file["pathupload"];	    		
-    		}else{
-    			$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
-    		}
-    	}else{
-    		$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
-    	}    	
-    	 
-    	//get semester regsiter info
-	    $studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-		$semesterStudi = $studentSemesterDB->getSemesterInfo($idSemesterStatus);		         	
-        $courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 	   	
-		$regularSem = $courseRegisterDb->getSemesterRegular($semesterStudi["IdSemesterMain"],$IdStudentRegistration);
-    	    	
-    	 //To get Registered Courses   
-         $landscapeDb = new GeneralSetup_Model_DbTable_Landscape();
-         $landscape = $landscapeDb->getData($student["IdLandscape"]);
-         
-        	if($landscape["LandscapeType"]==43) {//Semester Based 
-		         		
-         			//get course registered  per semester
-		  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-		  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);
-		  			foreach ($courses as $index=>$value) {
-		  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
-		  					$courses[$index]['publish']="1";
-		  				} else $courses[$index]['publish']="0";
-		  			}
-		  			
-		  			//get gpa and cgpa
-		  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-		  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$idSemesterStatus);
-		  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
-		  			$gpa=$grade["sg_univ_gpa"];
-				  			
-           		
-         	}elseif($landscape["LandscapeType"]==44){
-         	
-		         	//get registered blocks
-		         	$studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-		         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);         	
-		         	
-		         	foreach($semester_blocks as $key=>$block){
-				
-			         	//get course registered  by block
+    	$token = $this->_getParam('token',null);
+	    if ($token==$mysession->authtoken) {
+	    		 
+	    	 //To get Student Academic Info        
+	        $studentRegDB = new Examination_Model_DbTable_StudentRegistration();
+	        $student = $studentRegDB->getStudentInfo($IdStudentRegistration);
+	        
+	        
+	        //get info college
+	    	$collegedB = new App_Model_General_DbTable_Collegemaster();
+	        $college = $collegedB->getFullInfoCollege($student["IdCollege"]);
+	        
+	        //get info program
+	        $programDb = new App_Model_General_DbTable_Program();
+	        $program = $programDb->getCollegeDean($student["IdProgram"]);
+	         
+	        //brach
+	        $branchDb=new App_Model_General_DbTable_Branchofficevenue();
+	        $branch=$branchDb->fnviewBranchofficevenueDtls($student['IdBranch']);
+	        
+	        //get info majoring
+	        $majorDb = new App_Model_General_DbTable_ProgramMajoring();
+	        $major = $majorDb->getInfo($student['IdProgramMajoring']);
+	        if ($major['Address1']=='') {
+	        	$addphone=$branch["Phone"];
+	        	$addemail=$branch["Email"];
+	        	$add=ucwords(strtolower($branch["Addr1"])).' '.ucwords(strtolower($branch["Addr2"])).' '.ucwords(strtolower($branch["StateName"])).' '.ucwords(strtolower($branch["CountryName"]));
+	        } else {
+	        	$addphone=$major["Phone"];
+	        	$addemail=$major["Email"];
+	        	$add=ucwords(strtolower($major["Addr1"])).' '.ucwords(strtolower($major["Addr2"])).' '.ucwords(strtolower($major["StateName"])).' '.ucwords(strtolower($major["CountryName"]));
+	        }
+	        //get salutation
+	    	$defDB = new App_Model_General_DbTable_Definationms();
+	    	$academic_front_salutation = $defDB->getData($student["FrontSalutation"]);
+	    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
+	    	    	 
+	        //get photo student
+	    	$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
+	    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
+	    	    	
+			if(isset($file["pathupload"])){
+	    		if (file_exists($file["pathupload"])) {
+	    			$photo_url = $file["pathupload"];	    		
+	    		}else{
+	    			$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
+	    		}
+	    	}else{
+	    		$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
+	    	}    	
+	    	 
+	    	//get semester regsiter info
+		    $studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
+			$semesterStudi = $studentSemesterDB->getSemesterInfo($idSemesterStatus);		         	
+	        $courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 	   	
+			$regularSem = $courseRegisterDb->getSemesterRegular($semesterStudi["IdSemesterMain"],$IdStudentRegistration);
+	    	    	
+	    	 //To get Registered Courses   
+	         $landscapeDb = new GeneralSetup_Model_DbTable_Landscape();
+	         $landscape = $landscapeDb->getData($student["IdLandscape"]);
+	         
+	        	if($landscape["LandscapeType"]==43) {//Semester Based 
+			         		
+	         			//get course registered  per semester
 			  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-			  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"],$block["IdBlock"]);
+			  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);
 			  			foreach ($courses as $index=>$value) {
 			  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
 			  					$courses[$index]['publish']="1";
 			  				} else $courses[$index]['publish']="0";
 			  			}
-			  			 
-			  			//$semester_blocks[$key]["courses"]=$courses;
 			  			
 			  			//get gpa and cgpa
 			  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-			  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$block["idstudentsemsterstatus"]);
+			  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$idSemesterStatus);
 			  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
 			  			$gpa=$grade["sg_univ_gpa"];
-			  			
-		         	}	//end foreach
-		         		         	 
-         	}//end if
-         	
-         	$chlimitDB = new Registration_Model_DbTable_Chlimit();
-         	$limit=$chlimitDB->getLimit($student['IdProgram'], $student['IdIntake'], $gpa);
-         	 
-         
-         $fieldValues = array(
-    	  '$[PROGRAM]'=>$student["ArabicName"],
-    	  '$[FACULTY]'=>'FAKULTAS '.$student["NamaKolej"],
-    	  '$[NIM]'=>$student["registrationId"],
-    	  '$[NAME]'=>$student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"],    	 
-    	  '$[ACADEMIC_ADVISOR]'=>$academic_front_salutation["BahasaIndonesia"].' '.$student["AcademicAdvisor"].' '.$academic_back_salutation["BahasaIndonesia"],    	 
-    	  '$[PHOTO]'=>$photo_url,    	 
-		  //'$[ADDRESS]'=>ucwords(strtolower($college["Add1"])).' '.ucwords(strtolower($college["Add2"])).' '.ucwords(strtolower($college["CityName"])).' '.ucwords(strtolower($college["StateName"])),
-		  //'$[PHONE]'=>$college["Phone1"],
-		  //'$[EMAIL]'=>$college["Email"],
-          '$[SEMESTER]'=>$semesterStudi["SemesterMainName"],
-    	  '$[SKS_LULUS]'=>$grade["sg_sem_sks_lulus"],
-    	  '$[SKS_GAGAL]'=>$grade["sg_sem_sks_gagal"],
-    	  '$[TOTAL_SKS]'=>$grade["sg_univ_sem_credithour"],
-    	  '$[SKS_KUMULATIF]'=>$grade["sg_cum_credithour"],
-    	  '$[STRATA]'=>$student["strata"],
-    	  '$[IPS]'=>$grade["sg_univ_gpa"],
-    	  '$[IPK]'=>$grade["sg_cgpa"],
-		  '$[limit]'=>$limit,
-    	  '$[KONSENTRASI]'=>$student["majoring"],
-    	  '$[MAJORING]'=>$student["majoring_english"],
-          '$[ADDRESS]'=>ucwords(strtolower($program["Address1"])).' '.ucwords(strtolower($program["Address2"])).' '.ucwords(strtolower($program["CityName"])).' '.ucwords(strtolower($program["StateName"])),
-          '$[PHONE]'=>$program["Phone1"],
-          '$[EMAIL]'=>$program["Email"],
-          '$[B_ADDRESS]'=>$add,
-          '$[B_PHONE]'=>$addphone,
-          '$[B_EMAIL]'=>$addemail
-    	);
+					  			
+	           		
+	         	}elseif($landscape["LandscapeType"]==44){
+	         	
+			         	//get registered blocks
+			         	$studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
+			         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"]);         	
+			         	
+			         	foreach($semester_blocks as $key=>$block){
+					
+				         	//get course registered  by block
+				  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
+				  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$semesterStudi["IdSemesterMain"],$block["IdBlock"]);
+				  			foreach ($courses as $index=>$value) {
+				  				if ($dbPublish->isAllMarkPublished($value['IdSemesterMain'], $value['IdProgram'], $value['IdSubject'], $value['IdCourseTaggingGroup'])) {
+				  					$courses[$index]['publish']="1";
+				  				} else $courses[$index]['publish']="0";
+				  			}
+				  			 
+				  			//$semester_blocks[$key]["courses"]=$courses;
+				  			
+				  			//get gpa and cgpa
+				  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
+				  			//$grade = $studentGradeDb->getGradebySemester($IdStudentRegistration,$block["idstudentsemsterstatus"]);
+				  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
+				  			$gpa=$grade["sg_univ_gpa"];
+				  			
+			         	}	//end foreach
+			         		         	 
+	         	}//end if
+	         	
+	         	$chlimitDB = new Registration_Model_DbTable_Chlimit();
+	         	$limit=$chlimitDB->getLimit($student['IdProgram'], $student['IdIntake'], $gpa);
+	         	 
+	         
+	         $fieldValues = array(
+	    	  'PROGRAM'=>$student["ArabicName"],
+	    	  'FACULTY'=>'FAKULTAS '.$student["NamaKolej"],
+	    	  'NIM'=>$student["registrationId"],
+	    	  'NAME'=>$student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"],    	 
+	    	  'ACADEMIC_ADVISOR'=>$academic_front_salutation["BahasaIndonesia"].' '.$student["AcademicAdvisor"].' '.$academic_back_salutation["BahasaIndonesia"],    	 
+	    	  'PHOTO'=>$photo_url,    	 
+			 
+	          'SEMESTER'=>$semesterStudi["SemesterMainName"],
+	    	  'SKS_LULUS'=>$grade["sg_sem_sks_lulus"],
+	    	  'SKS_GAGAL'=>$grade["sg_sem_sks_gagal"],
+	    	  'TOTAL_SKS'=>$grade["sg_univ_sem_credithour"],
+	    	  'SKS_KUMULATIF'=>$grade["sg_cum_credithour"],
+	    	  'STRATA'=>$student["strata"],
+	    	  'IPS'=>$grade["sg_univ_gpa"],
+	    	  'IPK'=>$grade["sg_cgpa"],
+			  'limit'=>$limit,
+	    	  'KONSENTRASI'=>$student["majoring"],
+	    	  'MAJORING'=>$student["majoring_english"],
+	          'ADDRESS'=>ucwords(strtolower($program["Address1"])).' '.ucwords(strtolower($program["Address2"])).' '.ucwords(strtolower($program["CityName"])).' '.ucwords(strtolower($program["StateName"])),
+	          'PHONE'=>$program["Phone1"],
+	          'EMAIL'=>$program["Email"],
+	          'B_ADDRESS'=>$add,
+	          'B_PHONE'=>$addphone,
+	          'B_EMAIL'=>$addemail
+	    	);
+	         
+	         echo var_dump($courses);exit;
+	         
+	    	$coursestable=array('subcode'=>$courses['subjectcode']);
+	    	$result=array('kop'=>$fieldValues,'course'=>$courses);
+	    }
+	       
+    	else{
+    		$result=array();
+    	}
     	
+    	$this->_helper->layout->disableLayout();
     	
+    	$ajaxContext = $this->_helper->getHelper('AjaxContext');
     	
-    	/* ------------------------------
-    	 * start create directrory folder
-    	 * ------------------------------ */
-    	   
-		//$location_path
-		$location_intake_path = DOCUMENT_PATH."/student/".$student["IdIntake"];
-		
-        //create directory to locate file			
-		if (!is_dir($location_intake_path)) {
-	    	mkdir($location_intake_path, 0775);
-		}
-		
-		
-        //$location_path
-		$location_program_path = $location_intake_path."/".$student["ProgramCode"];
-		
-        //create directory to locate file			
-		if (!is_dir($location_program_path)) {
-	    	mkdir($location_program_path, 0775);
-		}
-		
-		//output_directory_path
-		$output_directory_path = $location_program_path."/".$student["registrationId"];
-		
-        //create directory to locate file			
-		if (!is_dir($output_directory_path)) {
-	    	mkdir($output_directory_path, 0775);
-		}			
-		
-		//creating folder student
-		if($student["repository"]==''){
-			//$studentRegDB->updateData(array('repository'=>"student/".$student["IdIntake"]."/".$student["ProgramCode"]."/".$student["registrationId"]),$IdStudentRegistration);
-		}		
-				
-		//output filename 
-		$output_filename = $student["registrationId"]."_kartu_hasil_studi.pdf";
-		
-		//to rename output file			
-		$output_file_path = $output_directory_path."/".$output_filename;
-		 		
-		
-		/* ------------------------------
-    	 * end  create directrory folder
-    	 * ------------------------------ */
+    	 
+    	$ajaxContext->addActionContext('view', 'html')
+    	->addActionContext('form', 'html')
+    	->addActionContext('process', 'json')
+    	->initContext();
     	
-    		
-    	require_once 'dompdf_config.inc.php';
-		
-		$autoloader = Zend_Loader_Autoloader::getInstance(); // assuming we're in a controller
-		$autoloader->pushAutoloader('DOMPDF_autoload');
-		
-		//template path	 
-		$html_template_path = DOCUMENT_PATH."/template/khs.html";
-		//echo $html_template_path;exit;
-		$html = file_get_contents($html_template_path);			
-    		
-		//replace variable
-		foreach ($fieldValues as $key=>$value){
-			$html = str_replace($key,$value,$html);	
-		}
-		//echo $html;exit;
-		$dompdf = new DOMPDF();
-		$dompdf->load_html($html);
-		$dompdf->set_paper('a4', 'potrait');
-		$dompdf->render();
-		
-		//$dompdf = $dompdf->output();
-		$dompdf->stream($output_filename);						
-		
-		file_put_contents($output_file_path, $dompdf);
-		
-		$this->view->file_path = $output_file_path;
-		
+    	$json = Zend_Json::encode($result);
     	
+    	echo $json;
+    	exit();
     	
      }
      

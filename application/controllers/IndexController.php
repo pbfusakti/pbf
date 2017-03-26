@@ -1,5 +1,5 @@
 <?php
-class IndexController extends Zend_Controller_Action {
+class IndexController extends Base_Base {
 
 	private $gstrsessionSIS;//Global Session Name
 	public function init() { //instantiate log object
@@ -20,7 +20,7 @@ class IndexController extends Zend_Controller_Action {
     	$dbLog=new App_Model_Login();
     	
     	$token = $dbLog->attempLogin($user, $password);
-     	$token=array('token'=>$token);
+     	 
     
     	$ajaxContext->addActionContext('view', 'html')
     	->addActionContext('form', 'html')
