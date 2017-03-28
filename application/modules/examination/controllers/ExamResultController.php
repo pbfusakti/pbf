@@ -2,7 +2,78 @@
  
 class Examination_ExamResultController extends Zend_Controller_Action {
 
-	 
+	public function getSemesterKhsAction(){
+		 
+	
+		$stdid = $this->_getParam('studentId',null);
+		 
+	
+		$this->_helper->layout->disableLayout();
+		 
+		$ajaxContext = $this->_helper->getHelper('AjaxContext');
+	
+		$dbStd=new App_Model_General_DbTable_Studentsemesterstatus();
+		$semester=$dbStd->getRegisteredSemester($stdid);
+		
+		$semesters=array("key"=>$semester['IdSemesterMaster'],"value"=>$semester['SemesterMainName']);
+	
+		 
+		$ajaxContext->addActionContext('view', 'html')
+		->addActionContext('form', 'html')
+		->addActionContext('process', 'json')
+		->initContext();
+	
+		$json = Zend_Json::encode($semestersoken);
+	
+		echo $json;
+		exit();
+	}
+	
+	public function getKrsAction(){
+			
+	
+		$stdid = $this->_getParam('studentId',null);
+		$semesterid = $this->_getParam('semesterId',null);
+	
+		$this->_helper->layout->disableLayout();
+			
+		$ajaxContext = $this->_helper->getHelper('AjaxContext');
+	
+		$dbCoursGroup= new App_Model_General_DbTable_CourseGroup();
+		
+		$course=$dbCoursGroup->getCourseRegisterByStudent($semesterid, $stdid);
+		$dbStaff=new App_Model_General_DbTable_Staffmaster();
+		
+		$TableCourses=array();
+		foreach ($course as $index=>$value) {
+			$TableCourses[$index]['SubCode']=$value['sub_code'];
+			$TableCourses[$index]['SubjectName']=$value['subject_name'];
+			$TableCourses[$index]['CreditHours']=$value['sks'];
+			$TableCourses[$index]['kelas']=$value['GroupName'];
+			$TableCourses[$index]['day']=$value['sc_day'];
+			$TableCourses[$index]['started']=$value['sc_start_time'];
+			$TableCourses[$index]['ended']=$value['sc_end_time'];
+			$TableCourses[$index]['venue']=$value['sc_venue'];
+			//get lecturer name
+			if ($value['coordinator']!='') {
+				$staff=$dbStaff->getData($value['IdLecturer']);
+				if ($staff['BS']!='') $staffname=$staff[''].', '.$staff['BS'];
+				if ($staff['FS']!='') $staffname=$staff['FS'].' '.$staff[''];
+			} else $staffname="";
+			$TableCourses[$index]['Lecturer']=$staffname;
+				  				 
+		}
+			
+		$ajaxContext->addActionContext('view', 'html')
+		->addActionContext('form', 'html')
+		->addActionContext('process', 'json')
+		->initContext();
+	
+		$json = Zend_Json::encode(array("krs"=>$TableCourses));
+	
+		echo $json;
+		exit();
+	}
 	 
 	
 public function getKhsAction(){
@@ -272,11 +343,10 @@ public function getKhsAction(){
 		
 	}
 	
-	public function viewTranscriptAction(){
+	public function getTranscriptAction(){
 		
-		$this->view->title = "Daftar Prestasi Akademik";
-		
-		$IdStudentRegistration = $this->_getParam('id',null);  
+	 
+		$IdStudentRegistration = $this->_getParam('stdid',null);  
 		$this->view->id= $IdStudentRegistration;
 		$idProfile = $this->_getParam('idProfile',null); 
 		$this->view->idProfile =$idProfile;
@@ -452,14 +522,10 @@ public function getKhsAction(){
 		
 	}
 	
-	public function viewTempTranscriptAction(){
-	
-		$this->view->title = "Daftar Prestasi Akademik";
-	
-		$IdStudentRegistration = $this->_getParam('id',null);
-		$this->view->id= $IdStudentRegistration;
-		$idProfile = $this->_getParam('idProfile',null);
-		$this->view->idProfile =$idProfile;
+	public function getTempTranscriptAction(){
+	 
+		$IdStudentRegistration = $this->_getParam('stdid',null);
+		 
 		//To get Student Academic Info
 		$studentRegDB = new Examination_Model_DbTable_StudentRegistration();
 		$student = $studentRegDB->getStudentInfo($IdStudentRegistration);
@@ -467,51 +533,27 @@ public function getKhsAction(){
 			$student["majoring"]="-";
 			$student["majoring_english"]="-";
 		}
-	
-		$this->view->student = $student;
-		$this->view->idSemester = $student['IdSemesterMain'];
-		$this->view->idProgram = $student['IdProgram'];
-		 
-		//get photo student
-		$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
-		$file = $uploadFileDb->getFile($student["transaction_id"],51);
-	
-		if(isset($file["pathupload"])){
-			if (file_exists($file["pathupload"])) {
-				 
-				$fnImage = new icampus_Function_General_Image();
-				$photo_url = $fnImage->getImagePath($file['pathupload'],100,123);
-				//$photo_url = str_replace("/var/www/html/triapp", "", $file["pathupload"]);
-	
-				$this->view->photo_url  = $photo_url;
-			}else{
-				$this->view->photo_url = "http://".ONNAPP_HOSTNAME."/images/no-photo.jpg";
-			}
-		}else{
-			$this->view->photo_url = "http://".ONNAPP_HOSTNAME."/images/no-photo.jpg";
-		}
-		 
-	
+	 
 		$studentGradeDB = new Examination_Model_DbTable_StudentGrade();
 		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
 		 
 		$student_grade = $studentGradeDB->getStudentGradeInfo($IdStudentRegistration);
-		$this->view->student_grade = $student_grade;
+		 
 		 
 		//get cgpa info
 		$gradeDb = new Examination_Model_DbTable_Academicstatus();
 		//echo $student_grade['sg_semesterId']."xx".$student['IdProgram'];exit;
-		$this->view->grade = $gradeDb->getListAcademicStatus($student_grade['sg_semesterId'],$student['IdProgram'],$type=1,$basedon='Program');
+		$grade = $gradeDb->getListAcademicStatus($student_grade['sg_semesterId'],$student['IdProgram'],$type=1,$basedon='Program');
 	
 		//get dean info
-		$deanDB = new GeneralSetup_Model_DbTable_Deanmaster();
+		$deanDB = new App_Model_General_DbTable_Deanmaster();
 		$dean = $deanDB->getCollegeDean($student['IdCollege']);
 		
 		 
 		//get salutatuion
 		$definationsDb = new App_Model_General_DbTable_Definationms();
-		$this->view->FrontSalutation = $definationsDb->getData($dean['FrontSalutation']);
-		$this->view->BackSalutation  = $definationsDb->getData($dean['BackSalutation']);
+		$FrontSalutation = $definationsDb->getData($dean['FrontSalutation']);
+		$BackSalutation  = $definationsDb->getData($dean['BackSalutation']);
 		
 		$deanName=$dean['Fullname'];
 		if (isset($FrontSalutation['DefinitionDesc'])) {
@@ -520,207 +562,38 @@ public function getKhsAction(){
 		if (isset($BackSalutation['DefinitionDesc'])) {
 			$deanName=$deanName.', '.$BackSalutation['DefinitionDesc'];
 		}
-		$this->view->deanName = $deanName;
+		 
 		//transcript profile
 		$DbProfile = new GeneralSetup_Model_DbTable_TranscriptProfile();
 		$DbProfileDetail = new GeneralSetup_Model_DbTable_TranscriptProfileDetail();
 		$subject_category =$this->getTranscriptList($IdStudentRegistration,$idProfile);
-		//echo var_dump($subject_category);exit;
-		$db = new Finalassignment_Model_DbTable_FinalAssignment();
-		$ta = $db->fnGetFinalAssigmentStd($IdStudentRegistration);
-		//exit;
-		if (isset($ta)) {
-			$this->view->TaTitle=$ta['Title'];
-			$this->view->TaTitleBahasa=$ta['TitleBahasa'];
-		}else{
-			$this->view->TaTitle=null;
-			$this->view->TaTitleBahasa=null;
-		}
-		$this->view->subject_category = $subject_category;
-		 
+
+		$result=array('Item'=>array('dean'=>$deanName,
+									'major'=>$student['majoring'],
+									'ipk'=>$grade['sg_cgpa'],
+									'skstotal'=>$grade['sg_cum_credithour']
+									),
+				      'course'=>$subject_category);
 	
 	
-		/*echo '<pre>';
-		 print_r($subject_category);
-		echo '</pre>';*/
-	}
-	
-	
-	public function cetakKhsBulkAction(){
+		$this->_helper->layout->disableLayout();
     	
-    	$this->view->title = "Kartu Hasil Studi";
-    	    	
-    	if ($this->getRequest()->isPost()) {
-			
-			$formData = $this->getRequest()->getPost();	
-							
-			global $student_info;    	
-			
-				for($i=0; $i<count($formData['IdStudentRegistration']); $i++){
-	
-						$IdStudentRegistration = $formData['IdStudentRegistration'][$i] ;  
-			    		//$idSemesterStatus = $formData['idsemesterstatus'][$IdStudentRegistration];
-			    		$courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 
-			    		$regularSem = $courseRegisterDb->getSemesterRegular($formData['IdSemester'],$IdStudentRegistration);
-			    		$IdSemester = $formData['IdSemester'];
-			    		
-			    		
-			    	
-			    		 //To get Student Academic Info        
-				        $studentRegDB = new Examination_Model_DbTable_StudentRegistration();
-				        $student = $studentRegDB->getStudentInfo($IdStudentRegistration);
-				        				        
-				        //get info college
-				    	$collegedB = new GeneralSetup_Model_DbTable_Collegemaster();
-				        $college = $collegedB->getFullInfoCollege($student["IdCollege"]);
-				        
-				        //get info program
-				        $programDb = new App_Model_Record_DbTable_Program();
-				        $program = $programDb->getCollegeDean($student["IdProgram"]);
-				         
-				        //brach
-				        $branchDb=new GeneralSetup_Model_DbTable_Branchofficevenue();
-				        $branch=$branchDb->fnviewBranchofficevenueDtls($student['IdBranch']);
-				        
-				        //get info majoring
-				        $majorDb = new GeneralSetup_Model_DbTable_ProgramMajoring();
-				        $major = $majorDb->getInfo($student['IdProgramMajoring']);
-				        if ($major['Address1']=='') {
-				        	$addphone=$branch["Phone"];
-				        	$addemail=$branch["Email"];
-				        	$add=ucwords(strtolower($branch["Addr1"])).' '.ucwords(strtolower($branch["Addr2"])).' '.ucwords(strtolower($branch["StateName"])).' '.ucwords(strtolower($branch["CountryName"]));
-				        } else {
-				        	$addphone=$major["Phone"];
-				        	$addemail=$major["Email"];
-				        	$add=ucwords(strtolower($major["Addr1"])).' '.ucwords(strtolower($major["Addr2"])).' '.ucwords(strtolower($major["StateName"])).' '.ucwords(strtolower($major["CountryName"]));
-				        }
-				        
-				        //get salutation
-				    	$defDB = new App_Model_General_DbTable_Definationms();
-				    	$academic_front_salutation = $defDB->getData($student["FrontSalutation"]);
-				    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
-				    	    	 
-				        //get photo student
-				    	$uploadFileDb = new App_Model_Application_DbTable_UploadFile();
-				    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
-				    	    	
-						if(isset($file["pathupload"])){
-				    		if (file_exists($file["pathupload"])) {
-				    			$photo_url = $file["pathupload"];	    		
-				    		}else{
-				    			$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
-				    		}
-				    	}else{
-				    		$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
-				    	}    	
-				    	 
-				    	//get semester info
-					    $SemesterDB = new GeneralSetup_Model_DbTable_Semestermaster();
-						$semesterStudi = $SemesterDB->fnGetSemestermaster($IdSemester);		         	
-				         	   	
-				    	   
-				         if($student["LandscapeType"]==43) {//Semester Based 
-						         		
-				         			//get course registered  per semester
-						  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-						  			$courses = $courseRegisterDb->getCourseRegisteredBySemester($IdStudentRegistration,$IdSemester);
-						  			
-						  			//get gpa and cgpa
-						  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-						  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
-						  			
-								  			
-				           		
-				           }elseif($student["LandscapeType"]==44){
-				         	
-						         	//get registered blocks
-						         	$studentSemesterDB = new Registration_Model_DbTable_Studentsemesterstatus();
-						         	$semester_blocks = $studentSemesterDB->getRegisteredSemesterBlock($IdStudentRegistration,$IdSemester);         	
-						         	
-						         	foreach($semester_blocks as $key=>$block){
-								
-							         	//get course registered  by block
-							  			$courseRegisterDb = new Examination_Model_DbTable_StudentRegistration();
-							  			$courses = $courseRegisterDb->getCourseRegisteredBySemesterBlock($IdStudentRegistration,$IdSemester,$block["IdBlock"]);
-							  			
-							  			//get gpa and cgpa
-							  			$studentGradeDb = new Examination_Model_DbTable_StudentGrade();
-							  			$grade = $studentGradeDb->getStudentGrade($IdStudentRegistration,$regularSem['IdSemesterMaster']);
-							  								  			
-							  			
-						         	}	//end foreach					         		         	 
-				           }//end if
-				         
-				        
-				    	   $fieldValues = array(
-					    	  	'$[PROGRAM]'=>$student["ArabicName"],
-					    	  	'$[FACULTY]'=>'FAKULTAS '.$student["CollegeName"],			    	 
-					    	 	'$[ADDRESS]'=>ucwords(strtolower($program["Address1"])).' '.ucwords(strtolower($program["Address2"])).' '.ucwords(strtolower($program["CityName"])).' '.ucwords(strtolower($program["StateName"])),
-		  						'$[PHONE]'=>$program["Phone1"],
-		  						'$[EMAIL]'=>$program["Email"],
-		  						'$[B_ADDRESS]'=>$add,
-		  						'$[B_PHONE]'=>$addphone,
-		  						'$[B_EMAIL]'=>$addemail
-				    	   		
-				    	   );
-					         
-					       $student_info[$i]['nim']= $student["registrationId"];
-					       $student_info[$i]['name']= $student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"];
-					       $student_info[$i]['academic_advisor']= $academic_front_salutation["BahasaIndonesia"].' '.$student["AcademicAdvisor"].' '.$academic_back_salutation["BahasaIndonesia"];
-					       $student_info[$i]['photo']= $photo_url;		       
-					       $student_info[$i]['semester']= $semesterStudi["SemesterMainName"];
-					       $student_info[$i]['sks_lulus']= $grade["sg_sem_sks_lulus"];
-					       $student_info[$i]['sks_gagal']= $grade["sg_sem_sks_gagal"];
-					       $student_info[$i]['total_sks']= $grade["sg_univ_sem_credithour"];
-					       $student_info[$i]['sks_kumulatif']= $grade["sg_cum_credithour"];
-					       $student_info[$i]['strata']= $student["strata"];
-					       $student_info[$i]['ips']= $grade["sg_univ_gpa"];
-					       $student_info[$i]['ipk']= $grade["sg_cgpa"];
-					       $student_info[$i]['subjects']= $courses;
-				          
-				}
-			
-			
-				
-				require_once 'dompdf_config.inc.php';
-			
-				$autoloader = Zend_Loader_Autoloader::getInstance(); // assuming we're in a controller
-				$autoloader->pushAutoloader('DOMPDF_autoload');
-				
-				//template path	 
-				$html_template_path = DOCUMENT_PATH."/template/bulk_khs.html";
-				
-				$html = file_get_contents($html_template_path);			
-		    		
-				//replace variable
-				foreach ($fieldValues as $key=>$value){
-					$html = str_replace($key,$value,$html);	
-				}
-					
-				$dompdf = new DOMPDF();
-				$dompdf->load_html($html);
-				$dompdf->set_paper('a4', 'potrait');
-				$dompdf->render();
-	
-				//output filename 
-				$output_filename = "bulk_khs.pdf";
-						
-				//$dompdf = $dompdf->output();
-				$dompdf->stream($output_filename);						
-									
-				//to rename output file						
-			    $output_file_path = DOCUMENT_PATH."/student/".$output_filename;
-				
-				file_put_contents($output_file_path, $dompdf);
-				
-				$this->view->file_path = $output_file_path;
-		
-		
-			
-    	}
-    	exit;
-   
+    	$ajaxContext = $this->_helper->getHelper('AjaxContext');
+    	
+    	 
+    	$ajaxContext->addActionContext('view', 'html')
+    	->addActionContext('form', 'html')
+    	->addActionContext('process', 'json')
+    	->initContext();
+    	
+    	$json = Zend_Json::encode($result);
+    	
+    	echo $json;
+    	exit();
 	}
+	
+	
+	 
 	
 	
 	public function cetakTranscriptAction(){
