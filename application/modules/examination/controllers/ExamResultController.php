@@ -537,6 +537,7 @@ public function getKhsAction(){
 			$student["majoring_english"]="-";
 		}
 		$idProfile=$student['idTranscriptProfile'];
+		 
 		$studentGradeDB = new Examination_Model_DbTable_StudentGrade();
 		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
 		 
@@ -570,7 +571,7 @@ public function getKhsAction(){
 		$DbProfile = new App_Model_General_DbTable_TranscriptProfile();
 		$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
 		$subject_category =$this->getTranscriptList($IdStudentRegistration,$idProfile);
-
+		 
 		$result=array('Item'=>array('dean'=>$deanName,
 									'major'=>$student['majoring'],
 									'ipk'=>$student_grade['sg_cgpa'],
@@ -1289,7 +1290,7 @@ public function getKhsAction(){
 		$dbStudent = new App_Model_General_DbTable_Studentregistration();
 		$student = $dbStudent->SearchStudentRegistration(array('IdStudentRegistration'=>$idStudentRegistration));
 		 
-		 if ($idProfile==null ) {
+		 if ($idProfile==0 ) {
 			
 			$idLandscape = $student['IdLandscape'];
 			$idProgram = $student['IdProgram'];
