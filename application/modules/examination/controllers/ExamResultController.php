@@ -536,7 +536,7 @@ public function getKhsAction(){
 			$student["majoring"]="-";
 			$student["majoring_english"]="-";
 		}
-	 
+		$idProfile=$student['idTranscriptProfile'];
 		$studentGradeDB = new Examination_Model_DbTable_StudentGrade();
 		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
 		 
@@ -567,14 +567,14 @@ public function getKhsAction(){
 		}
 		 
 		//transcript profile
-		$DbProfile = new GeneralSetup_Model_DbTable_TranscriptProfile();
-		$DbProfileDetail = new GeneralSetup_Model_DbTable_TranscriptProfileDetail();
+		$DbProfile = new App_Model_General_DbTable_TranscriptProfile();
+		$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
 		$subject_category =$this->getTranscriptList($IdStudentRegistration,$idProfile);
 
 		$result=array('Item'=>array('dean'=>$deanName,
 									'major'=>$student['majoring'],
-									'ipk'=>$grade['sg_cgpa'],
-									'skstotal'=>$grade['sg_cum_credithour']
+									'ipk'=>$student_grade['sg_cgpa'],
+									'skstotal'=>$student_grade['sg_cum_credithour']
 									),
 				      'course'=>$subject_category);
 	
@@ -1285,8 +1285,8 @@ public function getKhsAction(){
 	public function getTranscriptList($idStudentRegistration,$idProfile=null) {
 		//get student profile
 		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
-		$DbProfileDetail = new GeneralSetup_Model_DbTable_TranscriptProfileDetail();
-		$dbStudent = new Registration_Model_DbTable_Studentregistration();
+		$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
+		$dbStudent = new App_Model_General_DbTable_Studentregistration();
 		$student = $dbStudent->SearchStudentRegistration(array('IdStudentRegistration'=>$idStudentRegistration));
 		 
 		 if ($idProfile==null ) {
@@ -1297,8 +1297,8 @@ public function getKhsAction(){
 			//echo var_dump($student);
 			//exit;
 			//transcript profile
-			$DbProfile = new GeneralSetup_Model_DbTable_TranscriptProfile();
-			$DbProfileDetail = new GeneralSetup_Model_DbTable_TranscriptProfileDetail();
+			$DbProfile = new App_Model_General_DbTable_TranscriptProfile();
+			$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
 			$idProfile = $DbProfile->getStdTranscriptProfile($idProgram, $idMajor, $idLandscape);
 			//echo var_dump($idProfile);exit;
 			if ($idProfile==array()) $idProfile='*'; else $idProfile=$idProfile[0]['IdProfile'];
@@ -1308,9 +1308,9 @@ public function getKhsAction(){
 		//}
 		if ($idProfile=='*') {
 		
-			$dbLands = new GeneralSetup_Model_DbTable_Landscapesubject();
-			$dbBlock= new GeneralSetup_Model_DbTable_LandscapeBlockSubject();
-			$dbProgReq = new GeneralSetup_Model_DbTable_Programrequirement();
+			$dbLands = new App_Model_General_DbTable_Landscapesubject();
+			$dbBlock= new  App_Model_General_DbTable_LandscapeBlockSubject();
+			$dbProgReq = new App_Model_General_DbTable_Programrequirement();
 			$subject_category = $dbProgReq->getlandscapecoursetype($student['IdProgram'], $student['IdLandscape']);
 		
 			foreach($subject_category as $index=>$category){
