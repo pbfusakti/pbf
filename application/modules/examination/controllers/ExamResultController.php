@@ -5,7 +5,7 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 	public function getSemesterKhsAction(){
 		 
 	
-		$stdid = $this->_getParam('studentId',null);
+		$stdid = $this->_getParam('stdid',null);
 		 
 	
 		$this->_helper->layout->disableLayout();
@@ -23,7 +23,7 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 		->addActionContext('process', 'json')
 		->initContext();
 	
-		$json = Zend_Json::encode($semestersoken);
+		$json = Zend_Json::encode($semesters);
 	
 		echo $json;
 		exit();
@@ -32,8 +32,8 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 	public function getKrsAction(){
 			
 	
-		$stdid = $this->_getParam('studentId',null);
-		$semesterid = $this->_getParam('semesterId',null);
+		$stdid = $this->_getParam('stdid',null);
+		$semesterid = $this->_getParam('semesterid',null);
 	
 		$this->_helper->layout->disableLayout();
 			
@@ -83,8 +83,8 @@ public function getKhsAction(){
 		
     	$dbPublish=new Examination_Model_DbTable_PublishMark();
     	 
-    	$IdStudentRegistration = $this->_getParam('IdStudentRegistration',null);   
-    	$idSemester  = $this->_getParam('IdSemester',null);
+    	$IdStudentRegistration = $this->_getParam('stdid',null);   
+    	$idSemester  = $this->_getParam('semesterid',null);
     	
     	$dbSem=new App_Model_General_DbTable_Semestermaster();
     	$semesterStudi = $dbSem->fnGetSemestermaster($idSemester);
