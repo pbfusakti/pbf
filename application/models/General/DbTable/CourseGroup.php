@@ -402,7 +402,7 @@ class App_Model_General_DbTable_CourseGroup extends Zend_Db_Table_Abstract {
 		->join(array('cgs'=>'course_group_schedule'),'cgs.idGroup=cg.IdCourseTaggingGroup')
 		->join(array('s'=>'tbl_semestermaster'),'s.IdSemesterMaster=cg.IdSemester',array('semester_name'=>'SemesterMainName'))
 		->join(array('pr'=>'course_group_program'),'pr.group_id=cg.IdCourseTaggingGroup')
-		->joinLeft(array('stm'=>'tbl_staffmaster'),'stm.IdStaff=cg.IdLecturer',array('FrontSalutation','coordinator'=>'FullName','BackSalutation'))
+		->joinLeft(array('stm'=>'tbl_staffmaster'),'stm.IdStaff=cg.IdLecturer',array('IdStaff','FrontSalutation','coordinator'=>'FullName','BackSalutation'))
 		->join(array('sm'=>'tbl_subjectmaster'),'sm.IdSubject=cg.IdSubject',array('IdSubject','subject_code'=>'SubCode','subject_name'=>'subjectMainDefaultLanguage','sks'=>'CreditHours'))
 		->order('SubCode')
 		->order('cg.IdCourseTaggingGroup');

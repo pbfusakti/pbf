@@ -14,9 +14,9 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 	
 		$dbStd=new App_Model_General_DbTable_Studentsemesterstatus();
 		$semester=$dbStd->getRegisteredSemester($stdid);
-		
-		$semesters=array("key"=>$semester['IdSemesterMaster'],"value"=>$semester['SemesterMainName']);
-	
+		foreach ($semester as $key=>$value) {
+			$semesters[$key]=array("key"=>$value['IdSemesterMaster'],"value"=>$value['SemesterMainName']);
+		}
 		 
 		$ajaxContext->addActionContext('view', 'html')
 		->addActionContext('form', 'html')
@@ -43,10 +43,11 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 		
 		$course=$dbCoursGroup->getCourseRegisterByStudent($semesterid, $stdid);
 		$dbStaff=new App_Model_General_DbTable_Staffmaster();
-		
+		 //echo var_dump($course);exit;
+		$staffname='';
 		$TableCourses=array();
 		foreach ($course as $index=>$value) {
-			$TableCourses[$index]['SubCode']=$value['sub_code'];
+			$TableCourses[$index]['SubCode']=$value['subject_code'];
 			$TableCourses[$index]['SubjectName']=$value['subject_name'];
 			$TableCourses[$index]['CreditHours']=$value['sks'];
 			$TableCourses[$index]['kelas']=$value['GroupName'];
@@ -55,10 +56,12 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 			$TableCourses[$index]['ended']=$value['sc_end_time'];
 			$TableCourses[$index]['venue']=$value['sc_venue'];
 			//get lecturer name
+			
 			if ($value['coordinator']!='') {
-				$staff=$dbStaff->getData($value['IdLecturer']);
-				if ($staff['BS']!='') $staffname=$staff[''].', '.$staff['BS'];
-				if ($staff['FS']!='') $staffname=$staff['FS'].' '.$staff[''];
+				$staff=$dbStaff->getData($value['IdStaff']);
+				$staffname=$staff['FullName'];
+				if ($staff['BS']!='') $staffname=$staffname.', '.$staff['BS'];
+				if ($staff['FS']!='') $staffname=$staff['FS'].' '.$staffname;
 			} else $staffname="";
 			$TableCourses[$index]['Lecturer']=$staffname;
 				  				 
