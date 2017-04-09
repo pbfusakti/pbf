@@ -55,7 +55,7 @@ class App_Model_General_DbTable_Token extends Zend_Db_Table_Abstract
 		
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$data = array(
-			'dt_entry' => date('Y-m-d HH:mm:ss'),
+			'dt_entry' => date('Y-m-d H:i:s'),
 			'IdLogin' => $data['IdLogin'],
 			'userid' => $data['userid'],
 			'token' => $data['token'],
@@ -68,7 +68,7 @@ class App_Model_General_DbTable_Token extends Zend_Db_Table_Abstract
 	public function updateData($data,$id){
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$data = array(
-			'dt_entry' => $date('Y-m-d hh:mm:ss'),
+			'dt_entry' => $date('Y-m-d H:i:s'),
 			'IdLogin' => $data['IdLogin'],
 			'userid' => $data['userid'],
 			'token' => $data['token'],
