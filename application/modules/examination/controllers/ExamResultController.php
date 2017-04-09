@@ -34,37 +34,47 @@ class Examination_ExamResultController extends Zend_Controller_Action {
 	
 		$stdid = $this->_getParam('stdid',null);
 		$semesterid = $this->_getParam('semesterid',null);
-	
+		$token = $this->_getParam('token',null);
 		$this->_helper->layout->disableLayout();
 			
 		$ajaxContext = $this->_helper->getHelper('AjaxContext');
 	
 		$dbCoursGroup= new App_Model_General_DbTable_CourseGroup();
 		
-		$course=$dbCoursGroup->getCourseRegisterByStudent($semesterid, $stdid);
-		$dbStaff=new App_Model_General_DbTable_Staffmaster();
-		 //echo var_dump($course);exit;
-		$staffname='';
-		$TableCourses=array();
-		foreach ($course as $index=>$value) {
-			$TableCourses[$index]['SubCode']=$value['subject_code'];
-			$TableCourses[$index]['SubjectName']=$value['subject_name'];
-			$TableCourses[$index]['CreditHours']=$value['sks'];
-			$TableCourses[$index]['kelas']=$value['GroupName'];
-			$TableCourses[$index]['day']=$value['sc_day'];
-			$TableCourses[$index]['started']=$value['sc_start_time'];
-			$TableCourses[$index]['ended']=$value['sc_end_time'];
-			$TableCourses[$index]['venue']=$value['sc_venue'];
-			//get lecturer name
+		
+		$dbToken=new App_Model_General_DbTable_Token();
+		 
+		if ($dbToken->isTokenValid($token, $stdid)) {
+		
+		
+			$course=$dbCoursGroup->getCourseRegisterByStudent($semesterid, $stdid);
+			$dbStaff=new App_Model_General_DbTable_Staffmaster();
+			 //echo var_dump($course);exit;
 			
-			if ($value['coordinator']!='') {
-				$staff=$dbStaff->getData($value['IdStaff']);
-				$staffname=$staff['FullName'];
-				if ($staff['BS']!='') $staffname=$staffname.', '.$staff['BS'];
-				if ($staff['FS']!='') $staffname=$staff['FS'].' '.$staffname;
-			} else $staffname="";
-			$TableCourses[$index]['Lecturer']=$staffname;
-				  				 
+			$staffname='';
+			$TableCourses=array();
+			foreach ($course as $index=>$value) {
+				$TableCourses[$index]['SubCode']=$value['subject_code'];
+				$TableCourses[$index]['SubjectName']=$value['subject_name'];
+				$TableCourses[$index]['CreditHours']=$value['sks'];
+				$TableCourses[$index]['kelas']=$value['GroupName'];
+				$TableCourses[$index]['day']=$value['sc_day'];
+				$TableCourses[$index]['started']=$value['sc_start_time'];
+				$TableCourses[$index]['ended']=$value['sc_end_time'];
+				$TableCourses[$index]['venue']=$value['sc_venue'];
+				//get lecturer name
+				
+				if ($value['coordinator']!='') {
+					$staff=$dbStaff->getData($value['IdStaff']);
+					$staffname=$staff['FullName'];
+					if ($staff['BS']!='') $staffname=$staffname.', '.$staff['BS'];
+					if ($staff['FS']!='') $staffname=$staff['FS'].' '.$staffname;
+				} else $staffname="";
+				$TableCourses[$index]['Lecturer']=$staffname;
+					  				 
+			}
+		} else {
+			$TableCourses=array();
 		}
 			
 		$ajaxContext->addActionContext('view', 'html')
@@ -228,7 +238,7 @@ public function getKhsAction(){
 	    	  'NIM'=>$student["registrationId"],
 	    	  'NAME'=>$student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"],    	 
 	    	  'ACADEMIC_ADVISOR'=>$academic_front_salutation["BahasaIndonesia"].' '.$student["AcademicAdvisor"].' '.$academic_back_salutation["BahasaIndonesia"],    	 
-	    	  'PHOTO'=>$photo_url,    	 
+	    	       	 
 			 
 	          'SEMESTER'=>$semesterStudi["SemesterMainName"],
 	    	  'SKS_LULUS'=>$grade["sg_sem_sks_lulus"],
@@ -530,58 +540,66 @@ public function getKhsAction(){
 	public function getTempTranscriptAction(){
 	 
 		$IdStudentRegistration = $this->_getParam('stdid',null);
-		 
-		//To get Student Academic Info
-		$studentRegDB = new Examination_Model_DbTable_StudentRegistration();
-		$student = $studentRegDB->getStudentInfo($IdStudentRegistration);
-		if($student["majoring"]=="common"||$student["majoring"]=="bersama"){
-			$student["majoring"]="-";
-			$student["majoring_english"]="-";
-		}
-		$idProfile=$student['idTranscriptProfile'];
-		 
-		$studentGradeDB = new Examination_Model_DbTable_StudentGrade();
-		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
-		 
-		$student_grade = $studentGradeDB->getStudentGradeInfo($IdStudentRegistration);
-		 
-		 
-		//get cgpa info
-		$gradeDb = new Examination_Model_DbTable_Academicstatus();
-		//echo $student_grade['sg_semesterId']."xx".$student['IdProgram'];exit;
-		$grade = $gradeDb->getListAcademicStatus($student_grade['sg_semesterId'],$student['IdProgram'],$type=1,$basedon='Program');
-	
-		//get dean info
-		$deanDB = new App_Model_General_DbTable_Deanmaster();
-		$dean = $deanDB->getCollegeDean($student['IdCollege']);
 		
-		 
-		//get salutatuion
-		$definationsDb = new App_Model_General_DbTable_Definationms();
-		$FrontSalutation = $definationsDb->getData($dean['FrontSalutation']);
-		$BackSalutation  = $definationsDb->getData($dean['BackSalutation']);
+		$token = $this->_getParam('token',null);
+
+
+		$dbToken=new App_Model_General_DbTable_Token();
+			
+		if ($dbToken->isTokenValid($token, $IdStudentRegistration)) {
+			//To get Student Academic Info
+			$studentRegDB = new Examination_Model_DbTable_StudentRegistration();
+			$student = $studentRegDB->getStudentInfo($IdStudentRegistration);
+			if($student["majoring"]=="common"||$student["majoring"]=="bersama"){
+				$student["majoring"]="-";
+				$student["majoring_english"]="-";
+			}
+			$idProfile=$student['idTranscriptProfile'];
+			 
+			$studentGradeDB = new Examination_Model_DbTable_StudentGrade();
+			$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
+			 
+			$student_grade = $studentGradeDB->getStudentGradeInfo($IdStudentRegistration);
+			 
+			 
+			//get cgpa info
+			$gradeDb = new Examination_Model_DbTable_Academicstatus();
+			//echo $student_grade['sg_semesterId']."xx".$student['IdProgram'];exit;
+			$grade = $gradeDb->getListAcademicStatus($student_grade['sg_semesterId'],$student['IdProgram'],$type=1,$basedon='Program');
 		
-		$deanName=$dean['Fullname'];
-		if (isset($FrontSalutation['DefinitionDesc'])) {
-			$deanName=$FrontSalutation['DefinitionDesc'].' '.$deanName;
+			//get dean info
+			$deanDB = new App_Model_General_DbTable_Deanmaster();
+			$dean = $deanDB->getCollegeDean($student['IdCollege']);
+			
+			 
+			//get salutatuion
+			$definationsDb = new App_Model_General_DbTable_Definationms();
+			$FrontSalutation = $definationsDb->getData($dean['FrontSalutation']);
+			$BackSalutation  = $definationsDb->getData($dean['BackSalutation']);
+			
+			$deanName=$dean['Fullname'];
+			if (isset($FrontSalutation['DefinitionDesc'])) {
+				$deanName=$FrontSalutation['DefinitionDesc'].' '.$deanName;
+			}
+			if (isset($BackSalutation['DefinitionDesc'])) {
+				$deanName=$deanName.', '.$BackSalutation['DefinitionDesc'];
+			}
+			 
+			//transcript profile
+			$DbProfile = new App_Model_General_DbTable_TranscriptProfile();
+			$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
+			$subject_category =$this->getTranscriptList($IdStudentRegistration,$idProfile);
+			 
+			$result=array('item'=>array('dean'=>$deanName,
+										'major'=>$student['majoring'],
+										'ipk'=>$student_grade['sg_cgpa'],
+										'skstotal'=>$student_grade['sg_cum_credithour']
+										),
+					      'courses'=>$subject_category);
+		
+		} else {
+			$result=array();
 		}
-		if (isset($BackSalutation['DefinitionDesc'])) {
-			$deanName=$deanName.', '.$BackSalutation['DefinitionDesc'];
-		}
-		 
-		//transcript profile
-		$DbProfile = new App_Model_General_DbTable_TranscriptProfile();
-		$DbProfileDetail = new App_Model_General_DbTable_TranscriptProfileDetail();
-		$subject_category =$this->getTranscriptList($IdStudentRegistration,$idProfile);
-		 
-		$result=array('Item'=>array('dean'=>$deanName,
-									'major'=>$student['majoring'],
-									'ipk'=>$student_grade['sg_cgpa'],
-									'skstotal'=>$student_grade['sg_cum_credithour']
-									),
-				      'course'=>$subject_category);
-	
-	
 		$this->_helper->layout->disableLayout();
     	
     	$ajaxContext = $this->_helper->getHelper('AjaxContext');
