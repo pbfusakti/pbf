@@ -62,7 +62,7 @@ class App_Model_General_DbTable_Token extends Zend_Db_Table_Abstract
 			'Active' => $data['Active'],
 			 
 		);
-		$db->insert($data);
+		$db->insert($this->_name,$data);
 	}
 	
 	public function updateData($data,$id){
@@ -76,7 +76,7 @@ class App_Model_General_DbTable_Token extends Zend_Db_Table_Abstract
 			 
 		);
 		
-		$db->update($data, $this->_primary . ' = ' . (int)$id);
+		$db->update($this->_name,$data, $this->_primary . ' = ' . (int)$id);
 	}
 	
 	public function deleteData($id){
