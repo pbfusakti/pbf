@@ -92,7 +92,9 @@ public function getKhsAction(){
     	$dbSem=new App_Model_General_DbTable_Semestermaster();
     	$semesterStudi = $dbSem->fnGetSemestermaster($idSemester);
     	$token = $this->_getParam('token',null);
-	    if ($token==$mysession->authtoken) {
+    	$dbToken=new App_Model_General_DbTable_Token();
+    	
+	    if ($dbToken->isTokenValid($token, $IdStudentRegistration)) {
 	    		 
 	    	 //To get Student Academic Info        
 	        $studentRegDB = new Examination_Model_DbTable_StudentRegistration();
@@ -128,7 +130,7 @@ public function getKhsAction(){
 	    	$academic_front_salutation = $defDB->getData($student["FrontSalutation"]);
 	    	$academic_back_salutation  = $defDB->getData($student["BackSalutation"]);
 	    	    	 
-	        //get photo student
+	        /* //get photo student
 	    	$uploadFileDb = new App_Model_General_DbTable_UploadFile();
 	    	$file = $uploadFileDb->getFile($student["transaction_id"],51);
 	    	    	
@@ -141,7 +143,7 @@ public function getKhsAction(){
 	    	}else{
 	    		$photo_url = "/var/www/html/triapp/public/images/no_image.gif";
 	    	}    	
-	    	
+	    	 */
 	    	//get semester regsiter info
 		    $courseRegisterDb = new Examination_Model_DbTable_StudentRegistrationSubject(); 	   	
 	       

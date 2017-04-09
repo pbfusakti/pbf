@@ -29,6 +29,7 @@ class App_Model_Login extends Zend_Db_Table_Abstract {
 			$result=array('token'=>$hash,
 					'IdStudentRegistration'=>$rows['IdStudentRegistration'],
 					'Nim'=>$rows['registrationId'],
+					'userid'=>$rows["appl_id"],
 					'Name'=>$rows['appl_fname'].' '.$rows['appl_mname'].' '.$rows['appl_lname']
 			);
 			
