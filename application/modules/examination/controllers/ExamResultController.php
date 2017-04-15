@@ -1373,6 +1373,169 @@ public function getKhsAction(){
 		//exit;
 		return $subject_category;
 	}
+	
+	public function academicProgressAction() { //Action for the updation and view of the  details
+	
+		$registrationId = $this->_getParam('stdid',null);
+		$token = $this->_getParam('token',null);
+		
+		
+		$dbToken=new App_Model_General_DbTable_Token();
+		
+		if ($dbToken->isTokenValid($token, $registrationId)) {
+			
+			$studentRegistrationDB = new App_Model_General_DbTable_Studentregistration();
+			$studentdetails = $studentRegistrationDB->fetchStudentHistoryDetails($registrationId);
+				
+			//cek landscape
+			$landscapeDb = new App_Model_General_DbTable_Landscape();
+			$landscape = $landscapeDb->getData($studentdetails["IdLandscape"]);
+			
+			if($landscape["LandscapeType"]==43 || $landscape["LandscapeType"]==44) {//Semester Based
+		
+				//get total registered semester
+				$studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
+				$semester = $studentSemesterDB->getRegisteredSemester($registrationId);
+				$this->view->semester = $semester;
+		
+				//Academic Progress
+				$landscapeId = $studentdetails["IdLandscape"];
+				$this->view->landscapeId = $landscapeId;
+				$this->view->landscapeType = $landscape["LandscapeType"];
+				$programId =$studentdetails["IdProgram"];
+				$this->view->programId = $programId;
+					
+				//get landscape info
+				$landscapeDB = new App_Model_General_DbTable_Landscape();
+				$landscape = $landscapeDB->getLandscapeDetails($landscapeId);
+				$this->view->landscape = $landscape;
+					
+				//get program requirement info
+				$progReqDB = new App_Model_General_DbTable_Programrequirement();
+				$programRequirement = $progReqDB->getlandscapecoursetype($programId,$landscapeId);
+				$this->view->programrequirement = $programRequirement;
+					
+				//get majoring for this program
+				$progMajDb = new App_Model_General_DbTable_ProgramMajoring();
+				$majoring = $progMajDb->getData($programId);
+				 
+				//get Landscape Info
+				$landscapeDB = new App_Model_General_DbTable_Landscape();
+				$landscape = $landscapeDB->getLandscapeDetails($landscapeId);
+					
+				$bltakenDb = new App_Model_General_DbTable_Blocktaken();
+				$blocks = $bltakenDb->getNextBlock($registrationId);
+		
+				//get Compulsory Common Course
+				$landscapeSubjectDb =  new App_Model_General_DbTable_Landscapesubject();
+				$compulsory_course = $landscapeSubjectDb->getCommonCourse($programId,$landscapeId,1);
+				 
+					
+				//get Not Compulsory Common Course
+				$landscapeSubjectDb =  new App_Model_General_DbTable_Landscapesubject();
+				$elective_course = $landscapeSubjectDb->getCommonCourse($programId,$landscapeId,2);
+				 
+				//get subjects
+		
+			}elseif($landscape["LandscapeType"]==45){
+		
+				//get registered blocks
+				$studentSemesterDB = new App_Model_General_DbTable_Studentsemesterstatus();
+				$blocks = $studentSemesterDB->getRegisteredBlock($registrationId);
+				 
+		
+				$landscapeId = $studentdetails["IdLandscape"];
+				 
+				$programId =$studentdetails["IdProgram"];
+				//$this->view->idtranscript = $studentdetails["idTranscriptProfile"];
+				 
+					
+				$bltakenDb = new Records_Model_DbTable_Blocktaken();
+				$currentBlock = $bltakenDb->getNextBlock($registrationId);
+		
+				//get landscape info
+				$landscapeDB = new App_Model_General_DbTable_Landscape();
+				$landscape = $landscapeDB->getLandscapeDetails($landscapeId);
+				 
+					
+				//get program requirement info
+				$progReqDB = new App_Model_General_DbTable_Programrequirement();
+				$programRequirement = $progReqDB->getlandscapecoursetype($programId,$landscapeId);
+				 
+			}
+			$recordDb = new App_Model_General_DbTable_Academicprogress();
+			$total_credit_hours=0;
+			foreach ($compulsory_course as $key=>$value) {
+				$total_credit_hours = $total_credit_hours + $value["CreditHours"];
+				$checked="";
+				$grademark=$recordDb->checkcompletedHighest($registrationId,$value["IdSubject"]);
+				if($grademark){
+					$subjectstatus = "COMPLETED";
+					$checktoreg="";
+				}elseif($recordDb->checkregistered($registrationId,$value["IdSubject"])){
+					$subjectstatus = "REGISTERED";
+					$checktoreg="";
+				}elseif($recordDb->checkallowed($registrationId,$value["IdSubject"])){
+					$subjectstatus = "OPEN";
+					$checktoreg="1";
+					$checked = "checked";
+				}else{
+					$subjectstatus = " ";
+					$checktoreg="1";
+				}
+				$compulsory_course[$key]["status"]=$subjectstatus;
+				$compulsory_course[$key]["toreg"]=$checktoreg;
+				if ($grademark)
+					$compulsory_course[$key]["grade_name"]=$grademark;
+				else 
+					$compulsory_course[$key]["grade_name"]="";
+					
+			}
+			foreach ($elective_course as $key=>$value) {
+				$total_credit_hours = $total_credit_hours + $value["CreditHours"];
+				$checked="";
+				$grademark=$recordDb->checkcompletedHighest($registrationId,$value["IdSubject"]);
+				if($grademark){
+					$subjectstatus = "COMPLETED";
+					$checktoreg="";
+				}elseif($recordDb->checkregistered($registrationId,$value["IdSubject"])){
+					$subjectstatus = "REGISTERED";
+					$checktoreg="";
+				}elseif($recordDb->checkallowed($registrationId,$value["IdSubject"])){
+					$subjectstatus = "OPEN";
+					$checktoreg="1";
+					$checked = "checked";
+				}else{
+					$subjectstatus = " ";
+					$checktoreg="1";
+				}
+				$elective_course[$key]["status"]=$subjectstatus;
+				$elective_course[$key]["toreg"]=$checktoreg;
+				if ($grademark)
+					$elective_course[$key]["grade_name"]=$grademark;
+				else
+					$elective_course[$key]["grade_name"]="";
+					
+			}
+			$result=array('skstotal'=>$total_credit_hours,'compulsory'=>$compulsory_course,'elective'=>$elective_course);
+			
+		} else {
+			$result=array();
+		}
+		$this->_helper->layout->disableLayout();
+		
+		$ajaxContext = $this->_helper->getHelper('AjaxContext');
+					
+		$ajaxContext->addActionContext('view', 'html')
+		->addActionContext('form', 'html')
+		->addActionContext('process', 'json')
+		->initContext();
+		
+		$json = Zend_Json::encode($result);
+		
+		echo $json;
+		exit();
+	}
 	public function getTranscriptListAll($idStudentRegistration,$idProfile=null) {
 		//get student profile
 		$regSubjectDB = new Examination_Model_DbTable_StudentRegistrationSubject();
