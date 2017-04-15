@@ -1337,10 +1337,11 @@ public function getKhsAction(){
 			foreach($subject_category as $index=>$category){
 				$subject_list = $dbLands->getlandscapesubjectsPerCategory($student['IdLandscape'],$category["SubjectType"]);
 				if ($subject_list==array()) $subject_list = $dbBlock->getLandscapeCoursePerCategory($student['IdLandscape'],$category["SubjectType"]);
-				unset($subjecthighest);
+				//unset($subjecthighest);
+				$subjecthighest=array();
 				foreach ($subject_list as $key=>$subject) {
 					$subject=$regSubjectDB->getHighestMarkofAllSemester($idStudentRegistration, $subject['IdSubject']);
-					if (!is_bool($subject)) $subjecthighest[$key] = $subject;
+					if (!is_bool($subject)) $subjecthighest[] = $subject;
 				}
 				if (isset($subjecthighest)) $subject_category[$index]["subjects"] = $subjecthighest;
 				else unset($subject_category[$index]);
@@ -1358,10 +1359,10 @@ public function getKhsAction(){
 				$subjecthighest=array();
 				$subject_list = $DbProfileDetail->fnGetTranscriptProfileSubject($idProfile,$category['idGroup']);
 				//echo var_dump($subject_list);exit;
-				unset($subjecthighest);
+				//unset($subjecthighest);
 				foreach($subject_list as $key=>$subject) :
 					$subject=$regSubjectDB->getHighestMarkofAllSemesterProfile($idStudentRegistration, $subject['idSubject'],$idProfile);
-					if (!is_bool($subject)) $subjecthighest[$key] = $subject;
+					if (!is_bool($subject)) $subjecthighest[] = $subject;
 				endforeach;
 				if (isset($subjecthighest)) $subject_category[$index]["subjects"] = $subjecthighest;
 				else unset($subject_category[$index]);
