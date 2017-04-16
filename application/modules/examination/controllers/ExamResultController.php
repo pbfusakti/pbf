@@ -1327,23 +1327,25 @@ public function getKhsAction(){
 		//get category and course list
 		//echo var_dump($idProfile);exit;
 		//}
+		$transkrip=array();
 		if ($idProfile=='*') {
 		
 			$dbLands = new App_Model_General_DbTable_Landscapesubject();
 			$dbBlock= new  App_Model_General_DbTable_LandscapeBlockSubject();
 			$dbProgReq = new App_Model_General_DbTable_Programrequirement();
 			$subject_category = $dbProgReq->getlandscapecoursetype($student['IdProgram'], $student['IdLandscape']);
-		
+			
 			foreach($subject_category as $index=>$category){
+				$transkrip[$index]['kategori']=$category['kategori'];
 				$subject_list = $dbLands->getlandscapesubjectsPerCategory($student['IdLandscape'],$category["SubjectType"]);
 				if ($subject_list==array()) $subject_list = $dbBlock->getLandscapeCoursePerCategory($student['IdLandscape'],$category["SubjectType"]);
 				//unset($subjecthighest);
 				$subjecthighest=array();
 				foreach ($subject_list as $key=>$subject) {
 					$subject=$regSubjectDB->getHighestMarkofAllSemester($idStudentRegistration, $subject['IdSubject']);
-					if (!is_bool($subject)) $subjecthighest[] = $subject;
+					if (!is_bool($subject)) $subjecthighest[] = array('SubCode'=>$subject['ShortName'],'NamaSubjek'=>$subject['NamaSubjek'],'CreditHours'=>$subject['CreditHours'],'grade_name'=>$subject['grade_name'],'grade_point'=>$subject['grade_point']);
 				}
-				if (isset($subjecthighest)) $subject_category[$index]["subjects"] = $subjecthighest;
+				if (isset($subjecthighest)) $transkrip[$index]["subjects"] = $subjecthighest;
 				else unset($subject_category[$index]);
 				//echo var_dump($subject_category);
 				//exit;
@@ -1358,20 +1360,22 @@ public function getKhsAction(){
 			foreach($subject_category as $index=>$category){
 				$subjecthighest=array();
 				$subject_list = $DbProfileDetail->fnGetTranscriptProfileSubject($idProfile,$category['idGroup']);
+				$transkrip[$index]['kategori']=$category['kategori'];
+				
 				//echo var_dump($subject_list);exit;
 				//unset($subjecthighest);
 				foreach($subject_list as $key=>$subject) :
 					$subject=$regSubjectDB->getHighestMarkofAllSemesterProfile($idStudentRegistration, $subject['idSubject'],$idProfile);
-					if (!is_bool($subject)) $subjecthighest[] = $subject;
+					if (!is_bool($subject)) $subjecthighest[] =array('SubCode'=>$subject['ShortName'],'NamaSubjek'=>$subject['NamaSubjek'],'CreditHours'=>$subject['CreditHours'],'grade_name'=>$subject['grade_name'],'grade_point'=>$subject['grade_point']);;
 				endforeach;
-				if (isset($subjecthighest)) $subject_category[$index]["subjects"] = $subjecthighest;
+				if (isset($subjecthighest)) $transkrip[$index]["subjects"] = $subjecthighest;
 				else unset($subject_category[$index]);
 				 
 			}
 		}
 		//echo var_dump($subject_category);
 		//exit;
-		return $subject_category;
+		return $transkrip;
 	}
 	
 	public function academicProgressAction() { //Action for the updation and view of the  details
