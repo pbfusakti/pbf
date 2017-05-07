@@ -1362,19 +1362,17 @@ public function getKhsAction(){
 				$subject_list = $DbProfileDetail->fnGetTranscriptProfileSubject($idProfile,$category['idGroup']);
 				$transkrip[$index]['kategori']=$category['kategori'];
 				
-				//echo var_dump($subject_list);exit;
-				//unset($subjecthighest);
+				 
 				foreach($subject_list as $key=>$subject) :
 					$subject=$regSubjectDB->getHighestMarkofAllSemesterProfile($idStudentRegistration, $subject['idSubject'],$idProfile);
 					if (!is_bool($subject)) $subjecthighest[] =array('SubCode'=>$subject['ShortName'],'NamaSubjek'=>$subject['NamaSubjek'],'CreditHours'=>$subject['CreditHours'],'grade_name'=>$subject['grade_name'],'grade_point'=>$subject['grade_point']);;
 				endforeach;
-				if (isset($subjecthighest)) $transkrip[$index]["subjects"] = $subjecthighest;
+				if (isset($subjecthighest) && ($subjecthighest != array()) ) $transkrip[$index]["subjects"] = $subjecthighest;
 				else unset($subject_category[$index]);
 				 
 			}
 		}
-		//echo var_dump($subject_category);
-		//exit;
+		 
 		return $transkrip;
 	}
 	
