@@ -42,10 +42,10 @@ class App_Model_General_DbTable_Token extends Zend_Db_Table_Abstract
 			->from(array('v'=>$this->_name))
 			->where('v.token=?',$token)
 			->where('v.IdLogin=?',$Id)
-			->where('DATE_ADD( v.dt_entry, INTERVAL 30 MINUTE ) >= NOW()')
+			//->where('DATE_ADD( v.dt_entry, INTERVAL 30 MINUTE ) >= NOW()')
 			->where('v.Active="1"');
 	
-			 
+			 //echo $select;exit;
 			$row = $db->fetchRow($select);
 			if ($row) return true; else return false;
 	}
