@@ -90,7 +90,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	 
 	
 	 
-	protected function _initDatabase(){
+	 protected function _initDatabase(){
 		$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', 'development');		
 		$parameters = array('host'=>$config->resources->db->params->host,
 					'username' => $config->resources->db->params->username,
@@ -117,7 +117,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
       	 Zend_Registry::set("multidb", $resource);	
       	 
     }
-     
+      
     
 	/* protected function _initDomPdf(){
 		//set_include_path(APPLICATION_PATH . "/../../library/dompdf" . PATH_SEPARATOR . get_include_path());
