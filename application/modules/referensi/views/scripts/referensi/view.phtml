@@ -1,0 +1,76 @@
+<form name = "datamhsform" method="post">
+<fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
+
+<div class="topnav">
+  <a href="/pelajaran/pelajaran/view">Matakuliah</a>
+  <a href="#mahasiswa">Mahasiswa</a>
+  <a href="#dosen">Dosen</a>
+  <a href="#ruangan">Ruangan</a>
+  <a href="#tahunakademik">Tahun Akademik</a>
+  <a href="#bataspengisiankrs">Batas Pengisian Krs</a>
+  <a href="#penjadwalanaktivasi">Penjadwalan Aktivasi</a>
+</div>
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid red;
+}
+
+.topnav a.active {
+  border-bottom: 3px solid red;
+}
+</style>
+<br><br>
+
+<input type = "hidden" id= "id" name="id" value="<?php echo $this->referensi['id']?>">
+<table>
+<tr><th>Dosen</th>
+<td><input type="text" name="dosen" id= "dosen" value="<?php echo $this->referensi['dosen']?>">
+
+<tr><th>Alamat</th>
+<td><input type="text" name="alamat" id= "alamat" value="<?php echo $this->referensi['alamat']?>">
+
+<tr><th>NIK</th>
+<td><input type="text" name="nik" id= "nik" value="<?php echo $this->referensi['nik']?>">
+
+<tr><th>Nama Matkul</th>
+<td><input type="text" name="namamatkul" value="<?php echo $this->referensi['namamatkul']?>">
+
+<tr><th>KodeMK</th>
+<td><input type="text" name = "kodemk" id="kodemk" value="<?php echo $this->referensi['kodemk']?>" >
+
+<br><br>
+<tr><td colspan="2">
+<input type="submit" name = "save" value="save">
+<input type="submit" name = "delete" value="delete">
+<input type="submit" name = "update" value="update">
+<input type="submit" name = "search" value="search">
+</td></tr>
+</table>
+</form>
+</fieldset>
+
+<table class="table" border="1"><h1> Dosen</h1><tr><th>Matakuliah</th><th>Kode MK</th><th>SKS</th><?php foreach($this->refmhs as $mhs) {?> 
+<tr><td><?php echo $mhs['matakuliah'];?></td></th> 
+<td><?php echo $mhs['kodemk'];?></td> 
+<td><?php echo $mhs['sks'];?></td>
+<?php }?>
+
+  </table>
