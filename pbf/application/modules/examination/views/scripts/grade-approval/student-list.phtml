@@ -1,0 +1,251 @@
+<script type="text/javascript">
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').prop('checked', true);
+			 $('.chk2').removeAttr("disabled"); 
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+			 $('.chk2').attr("disabled", "disabled"); 
+		 }
+	 });
+
+
+	 $( "#dialog-search" ).dialog({
+	        autoOpen: false,
+	        width: 500,
+	        modal: true,
+	        buttons: {
+	            "Cari": function() {	               
+	                $('#searchForm').submit();
+	            }
+	        }
+	    });
+
+	 $( "#dialog-box" ).dialog({
+	        autoOpen: false,
+	        width: 650,
+	        modal: true,
+	        buttons: {
+	            "Confirm": function() {
+	            	
+	    			url="<?php echo $this->url(array('module'=>'examination','controller'=>'grade-approval','action'=>'save-approval'), 'default', true);?>";
+	    			$("#formApproval").attr('action',url);	
+					
+            		var approver = $("#approveby option:selected").val();
+                 	if(approver==0){
+                		alert('Please select Approved by');
+                 	}else{
+
+                 		$("#ApprovedBy").val(approver);	
+                 		$("#formApproval").submit();                 		
+                 	}         	
+	            },
+	            Cancel: function() {
+	                $( this ).dialog( "close" );
+	            }
+	        }
+	    });
+	 
+});
+
+function searchStudent(){
+	$( "#dialog-search" ).dialog('open');	
+}
+
+
+function approve(){
+
+	 var isChecked = $('.chk').is(':checked');
+
+	 if(isChecked==true){		 
+		 $( "#dialog-box" ).dialog('open');
+	 }else{
+		alert("You did not select any student. Please select.");
+	 }
+	 
+	
+}
+
+
+function check(element,index){
+
+	var exam_status = "#exam_status"+index;		
+	
+	if($(element).is(":checked")){		
+		$(exam_status).removeAttr("disabled"); 
+	}else{	
+		$(exam_status).attr("disabled", "disabled"); 
+	}
+	
+}
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>			
+			<li>
+				<a href="#" onclick="approve();">
+					<span class='process'></span>
+					<?php echo $this->translate('Approve');?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="searchStudent();">
+					<span class='search'></span>
+					<?php echo $this->translate('Search');?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>
+				<a href="/examination/grade-approval/index">
+					<span class='back'></span>
+					<?php echo $this->translate('Back');?>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<fieldset>
+	<legend><?php echo $this->translate('Course Group Info');?></legend>
+	
+<table>
+		<tr>
+					<td><?php echo $this->translate("Subject"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->subject['subjectMainDefaultLanguage'];?> - <?php echo $this->subject['SubCode'];?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupName"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupCode"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupCode']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Coordinator"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['FullName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Semester"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['semester_name']; ?></td>
+				</tr>
+			
+</table>
+
+</fieldset>
+
+
+<h2><?php echo $this->translate("Student List");?></h2>
+<form id="formApproval" method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-approval','action'=>'approve-mark'), 'default', true);?>">
+<input type="hidden" name="idSemester" value="<?php echo $this->idSemester;?>">
+<input type="hidden" name="idSubject" value="<?php echo $this->idSubject;?>">
+<input type="hidden" name="idGroup" value="<?php echo $this->idGroup;?>">
+<input type="hidden" name="ApprovedBy" id="ApprovedBy" value="">
+
+<table class="table" width="100%">
+	<tr>
+		<th width="20px"><?php echo $this->translate('Bil');?></th>
+		<th><?php echo $this->translate('Name');?></th>
+		<th><?php echo $this->translate('NIM');?></th>	
+		<th><?php echo $this->translate('Student Mark');?></th>	
+		<th><?php echo $this->translate('Grade Point');?></th>
+		<th><?php echo $this->translate('Grade Name');?></th>	
+		<th><?php echo $this->translate('Grade Desc');?></th>	
+		<th><?php echo $this->translate('Grade Status');?></th>	
+		<th><?php echo $this->translate('Exam Status');?></th>				
+		<th><?php echo $this->translate('Action - Approve?');?><br><input type="checkbox" name="checkall" id="checkall" >&nbsp;<?php echo $this->translate("Check All ?")?></th>
+	</tr>
+	<?php
+	if(count($this->student_list)>0) {
+		foreach($this->student_list as $index=>$student){
+	?>
+	<tr>
+		<td><?php echo $index+1;?>.</td>
+		<td>
+			<?php echo $student['appl_fname']!=null?$student['appl_fname']." ":"";?>
+			<?php echo $student['appl_mname']!=null?$student['appl_mname']." ":"";?>
+			<?php echo $student['appl_lname']!=null?$student['appl_lname']." ":"";?>
+		</td>
+		<td><?php echo $student['registrationId'];?></td>	
+		<td align="center"><?php echo $student['student_mark'];?></td>	
+		<td align="center"><?php echo $student['grade_point'];?></td>
+		<td align="center"><?php echo $student['grade_name'];?></td>	
+		<td align="center"><?php echo $student['grade_desc'];?></td>	
+		<td align="center">
+		 <?php if(isset($student['grade_status'])){
+		          if($student['grade_status']=='Pass') echo 'Lulus';
+		          if($student['grade_status']=='Fail') echo 'Tidak Lulus';
+		     }?>
+		</td>	
+		<td align="center"><?php echo $student['exam_status'];?></td>		
+		<td>
+		<?php if(isset($student["approvedby"]) && $student["approvedby"]!=0){ echo $this->translate("Approved").'<br>'.date("d-m-Y",strtotime($student["approveddt"])); }else{?>
+		<input type="hidden" class='chk2' name="exam_status[<?php echo $student["IdStudentRegSubjects"];?>]" id="exam_status<?php echo $index;?>" value="<?php echo $student["exam_status"];?>" disabled>
+		<input type="checkbox" id="idStudentRegSub[]" name="idStudentRegSub[]" class='chk' value="<?php echo $student["IdStudentRegSubjects"];?>" onclick="check(this,<?php echo $index;?>)">
+		<?php } ?>
+		</td>
+	</tr>
+	<?php
+	} }
+	?>
+</table>
+</form>
+<br>
+<div id="dialog-box" title="<?php echo $this->translate("Approval Information"); ?>">
+  <table>
+  <tr>
+  		<td>Approved By</td>
+  		<td width="5px">:</td>
+  		<td>
+  		<select name="approveby" id="approveby">
+  			<option value=0><?php echo $this->translate("Please Select"); ?></option>
+  			<?php foreach($this->staff as $staff){
+  				$select='';
+  			if ($staff['IdStaff']==$this->idstaff) $select="selected";?>
+  			<option value='<?php echo $staff["IdStaff"];?>' <?php  echo $select;?>><?php echo $staff["FullName"];?></option>
+  			<?php } ?>
+  		</select>
+  		</td>
+  	</tr>
+    </table>
+</div>
+
+
+
+
+<div id="dialog-search" title="<?php echo $this->translate("Search Student"); ?>">
+<form id="searchForm" method="post">
+<table>
+	<tr><td><?php echo $this->translate('Student Name/NIM');?></td><td>:<input type="text" name="student" id="student"></td></tr>
+</table>
+</form>  
+</div>

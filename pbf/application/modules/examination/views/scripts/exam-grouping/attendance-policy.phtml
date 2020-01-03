@@ -1,0 +1,186 @@
+<script>
+var ass_list = <?php echo $this->ass_list_json; ?>;
+var ass = <?php echo $this->ass_json; ?>;
+
+$(function() {
+
+	$( "#dialog-edit-policy" ).dialog({
+	    autoOpen: false,
+		resizable: false,
+		width: 550,
+	    modal: true,
+	    buttons: {
+	    	"Save": function() {
+
+		    	if($('#percentage').val()!="" && !isInt(parseInt($('#percentage').val(), 10))){
+			    	alert('<?php echo $this->translate('Please insert only digit in percentage');?>');
+			    	$('#percentage').focus();
+		    	}else
+	    		if($('#count').val()!="" && !isInt(parseInt($('#count').val(), 10))){
+			    	alert('<?php echo $this->translate('Please insert only digit in attendance count');?>');
+			    	$('#count').focus();
+		    	}else{
+	    			$('#form_edit_policy').submit();
+		    	}
+	      	},
+	      	Cancel: function() {
+	        	$( this ).dialog( "close" );
+	      	}
+	    }
+	});
+
+	$('#percentage').change(function(){
+		$('#count').val("");
+	});
+
+	$('#count').change(function(){
+		$('#percentage').val("");
+	});
+
+	$('#assessment_type').multiSelect();
+});
+
+function edit_policy(program_id,element){
+
+	var percentage = $(element).parent().prev().prev().html();
+	var count = $(element).parent().prev().html();
+
+	$('#program_id').val(program_id);
+
+	if(percentage!='-'){
+		$('#percentage').val(percentage);
+	}else{
+		$('#percentage').val("");
+	}
+
+	if(count!='-'){
+		$('#count').val(count);
+	}else{
+		$('#count').val("");
+	}
+
+	ass = eval(ass);	
+	$('#assessment_type').multiSelect('deselect_all');
+	
+	if(ass.hasOwnProperty(program_id)){
+
+		
+		
+		var arr_selected = new Array();
+		for(var i=0; i<ass[program_id].length; i++){
+			arr_selected.push(ass[program_id][i]['IdExaminationAssessmentType']);
+		} 
+		
+		$('#assessment_type').multiSelect('select',arr_selected);
+
+	}
+	
+	$( "#dialog-edit-policy" ).dialog('open');
+}
+
+function isInt(n) {
+    return +n === n && !(n % 1);
+}
+</script>
+
+<table class="table" width="100%">
+	<tr>
+		<th rowspan="2"><?php echo $this->translate("Faculty");?></th>
+		<th rowspan="2"><?php echo $this->translate("Program");?></th>
+		<th rowspan="2"><?php echo $this->translate("Assessment Type");?></th>
+		<th colspan="2"><?php echo $this->translate("Minimum Attendance");?></th>
+		<th rowspan="2">&nbsp;</th>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Percentage");?></th>
+		<th><?php echo $this->translate("Attendance Count");?></th>
+	</tr>
+	<?php
+	$cnt = 0; 
+	foreach ($this->data as $index=>$data):
+	?>
+	<tr <?php echo $cnt%2==0?"class='shade'":""?>>
+		<td rowspan="<?php echo sizeof($data['program'])==0?1:sizeof($data['program']);?>">
+			<?php echo $data['faculty']['ArabicName'];?> (<?php echo $data['faculty']['CollegeCode'];?>)
+		</td>
+		<td><?php echo isset($data['program']) && sizeof($data['program'])>0?$data['program'][0]['ArabicName']." (".$data['program'][0]['ProgramCode'].")":"";?></td>
+		<td>
+			<?php 
+				if(isset($data['program']) && sizeof($data['program'])>0 && isset($data['program'][0]['assessment']) && sizeof($data['program'][0]['assessment']>0) ){
+					echo "<ul style='padding:0; margin:0 0 0 10px;'>";
+					foreach ($data['program'][0]['assessment'] as $assessment){
+						echo "<li>".$assessment['DescriptionDefaultlang']."</li>";
+					}
+					echo "</ul>";
+				}
+			?>
+		</td>
+		<td align="center"><?php echo isset($data['program'][0]['policy']['esap_percentage'])?$data['program'][0]['policy']['esap_percentage']:"-";?></td>
+		<td align="center"><?php echo isset($data['program'][0]['policy']['esap_count'])?$data['program'][0]['policy']['esap_count']:"-";?></td>
+		<td align="center">
+			<?php if(isset($data['program']) && sizeof($data['program'])>0){?>
+			<a href="#" onclick="edit_policy(<?php echo $data['program'][0]['IdProgram'];?>,this); return false;"><?php echo$this->translate("Edit");?></a>
+			<?php }?>
+		</td>
+	</tr>
+	<?php 
+		for($i=1; $i<sizeof($data['program']); $i++):
+			$program = $data['program'][$i];
+	?>
+	<tr <?php echo $cnt%2==0?"class='shade'":""?>>
+		<td><?php echo $program['ArabicName'];?> (<?php echo $program['ProgramCode'];?>)</td>
+		<td>
+		<?php 
+			if(isset($program['assessment']) && sizeof($program['assessment']>0) ){
+				echo "<ul style='padding:0; margin:0 0 0 10px;'>";
+				foreach ($program['assessment'] as $assessment){
+					echo "<li>".$assessment['DescriptionDefaultlang']."</li>";
+				}
+				echo "</ul>";
+			}
+		?>
+		</td>
+		<td align="center"><?php echo isset($program['policy']['esap_percentage'])?$program['policy']['esap_percentage']:"-";?></td>
+		<td align="center"><?php echo isset($program['policy']['esap_count'])?$program['policy']['esap_count']:"-";?></td>
+		<td align="center"><a href="#" onclick="edit_policy(<?php echo  $program['IdProgram'];?>,this); return false;"><?php echo$this->translate("Edit");?></a></td>
+	</tr>
+	<?php
+		endfor;
+		$cnt++;
+	endforeach;
+	?>
+</table>
+
+<div id="dialog-edit-policy" title="<?php echo $this->translate("Attendance Policy");?>">
+	<form name="form_edit_policy" id="form_edit_policy" method="post" action="/examination/exam-grouping/attendance-policy">
+		<input type="hidden" name="program_id" id="program_id" value="" />
+		<table>
+			<tr>
+				<td><?php echo $this->translate("Percentage");?></td>
+				<td>:</td>
+				<td>
+					<input type="text" name="percentage" id="percentage" value="" maxlength="3" />
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Attendance Count");?></td>
+				<td>:</td>
+				<td>
+					<input type="text" name="count" id="count" value="" maxlength="2" />
+				</td>
+			</tr>
+			<tr>
+				<td valign="top"><?php echo $this->translate("Assessment Type");?></td>
+				<td valign="top">:</td>
+				<td>
+					<select multiple="multiple" id="assessment_type" name="assessment_type[]">
+						<?php foreach ($this->assessment_list as $list){?>
+						<option value="<?php echo $list['IdExaminationAssessmentType']; ?>"><?php echo $list['DescriptionDefaultlang']; ?></option>
+						<?php }?>
+				    </select>
+				</td>
+			</tr>
+		</table>
+		
+	</form>
+</div>

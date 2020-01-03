@@ -1,0 +1,480 @@
+<head>
+<style>
+.makebold {
+	font-weight: bold;
+}
+</style>
+<script>
+dojo.addOnLoad(function(){
+	dijit.byId('field23').set('value','');
+	dijit.byId('field23').set('placeHolder','Select');
+    dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');
+	dijit.byId('field24').set('value','');
+	dijit.byId('field24').set('placeHolder','Select');
+    //dijit.byId("field24").attr('readOnly','true');
+
+	var thisdialog;
+    dojo.require("dijit.Dialog");
+});
+
+
+function displayWait(txtContent) {
+    txtContent = "Please wait...";
+    txtContent = "<img src='<?php echo $this->baseUrl();?>/images/loading.gif'/> " + txtContent;
+    thisdialog = new dijit.Dialog({ title: "", content: txtContent });
+    dojo.body().appendChild(thisdialog.domNode);
+    //thisdialog.closeButtonNode.style.display='none';
+    thisdialog.titleBar.style.display='none';
+    thisdialog.startup();
+    thisdialog.show();
+
+}
+
+
+function hideWait(){
+	setTimeout(function() { thisdialog.hide(); }, 500);
+}
+
+var rowid=1;
+
+
+function showProgram() {
+
+   var studentID =  dijit.byId('field2').value;
+   if(studentID != "") {
+            var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/remarkappeal/getprogramlist/studentID/"+studentID,
+                            handleAs:'json',
+                            load:function(data){
+                                   if(data=='') {
+										dijit.byId('field2').set('value','');
+										alert('Sorry, Student Profile Status is not Eligible for Remark Appeal');
+                                   } else {
+                                   	 AutoFillNextEditableDropDown("field24",data);
+                                   }
+                            }
+            }
+            dojo.xhrGet(xhrArgs);
+   }
+
+}
+
+
+
+
+function showcourses() {
+ var studentID =  dijit.byId('field2').value;
+ var semester =  dijit.byId('field27').value;
+
+ if(studentID != "" && semester!= "" )
+	{
+            var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/remarkappeal/getcourselist/studentID/"+studentID+"/semester/"+semester,
+                            handleAs:'json',
+                            load:function(data){
+                                    AutoFillNextEditableDropDown("field23",data);
+                            }
+               }
+            dojo.xhrGet(xhrArgs);
+	}
+
+}
+
+function showcomponent(){
+
+    var course = dijit.byId('field23').value;
+
+
+
+    if(course != "")
+    {
+	var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/remarkappeal/getcomponentlist/course/"+course,
+                            handleAs:'json',
+                            load:function(data){
+                                    AutoFillNextEditableDropDown("field25",data);
+                            }
+               }
+            dojo.xhrGet(xhrArgs);
+
+    }
+}
+
+function showdetailcomponent(){
+
+    var course = dijit.byId('field23').value;
+    var studentID =  dijit.byId('field2').value;
+    var component =  dijit.byId('field25').value;
+
+    if(course != "" && studentID!= "" && component!="")
+
+    {
+//	var xhrArgs = {
+//                            url: "<?php echo $this->baseUrl();?>"+"/examination/remarkappeal/getdetailcomponentlist/studentID/"+studentID+"/component/"+component+"/course/"+course,
+//                            handleAs:'json',
+//                            load:function(data){
+//                                    AutoFillNextEditableDropDown("field26",data);
+//                            }
+//               }
+//            dojo.xhrGet(xhrArgs);
+    }
+}
+
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+        var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+function checkSave(){
+
+	var a = batchArray;
+	//console.log(a);
+	if(a==""){
+		alert("Blank Value can not be saved, click on add");
+		return false;
+	}
+}
+
+ var batchArray  = new Array();
+ var component = 0;
+
+ function remarkValidation() {
+	var flag = true;
+        var studentID =  dijit.byId('field2').value;
+	var course = dijit.byId('field23').value;
+	var component =  dijit.byId('field25').value;
+	//var detailcomponent = dijit.byId('field26').value;
+	var semester =  dijit.byId('field27').value;
+
+	if(studentID==''){
+              dijit.byId("field2").set( "state", "Error" );
+              flag = false;
+	}
+	if(course==''){
+              dijit.byId("field23").set( "state", "Error" );
+              flag = false;
+	}
+	if(component==''){
+              dijit.byId("field25").set( "state", "Error" );
+              flag = false;
+	}
+//	if(detailcomponent==''){
+//              dijit.byId("field26").set( "state", "Error" );
+//              flag = false;
+//	}
+	if(semester==''){
+              dijit.byId("field27").set( "state", "Error" );
+              flag = false;
+	}
+
+        if(studentID=='' || course=='' || component=='' || semester=='') {
+                var flag = false;
+        }
+
+	if(flag == true) {
+		RemarkdetailsInsertOnce();
+	}
+	return flag;
+}
+
+function RemarkdetailsInsertOnce() {
+
+     var studentID =  dijit.byId('field2').value;
+     var course = dijit.byId('field23').value;
+     var Component = dijit.byId("field25").value;
+     var ComponentDV = dijit.byId("field25").displayedValue;
+
+    if(course != "" && studentID!= "" && Component!="")
+    {
+	var xhrArgs = {
+                            url: "<?php echo $this->baseUrl();?>"+"/examination/remarkappeal/getdetailcomponentlist/studentID/"+studentID+"/component/"+Component+"/course/"+course,
+                            handleAs:'json',
+                            load:function(data){
+                                    //AutoFillNextEditableDropDown("field26",data);
+                                    var TotalJosnData = data.length;
+                                    if(TotalJosnData>0) {
+
+                                    displayWait('show');
+
+                                    $.each(data, function(i, item){
+                                    //alert("Mine is " + i + "|" + item.name + "|" + item.key);
+
+                                           if(item.value==null) { item.value = ''; }
+                                           if(item.key==null) { item.key = ''; }
+
+                                            var nameItem   = item.MainCompName+'-'+item.MainCompItemName;
+                                            var nameItemID   = item.Component+'-'+item.ComponentItem;
+
+                                            batchArray.push(nameItemID);//component plus detail
+                                            var trow = document.getElementById('hor').insertRow(rowid);
+                                            var tcol1=trow.insertCell(0);
+                                            var tcol2=trow.insertCell(1);
+                                            var tcol3=trow.insertCell(2);
+
+                                            tcol1.innerHTML="<input type='hidden' value='"+nameItemID+"' name=ComponentGrid[]>"+nameItem;
+                                            tcol2.innerHTML="<input type='hidden' value='"+item.key+"' name=DetailComponentGrid[]>"+item.value;
+                                            tcol3.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+                                            rowid++;
+                                            makefieldsReadonly();
+
+                                    });
+                                    } else {
+                                    alert('Sorry, No MarksEntry found for the selected Component');
+                                    }
+
+                            }
+               }
+            dojo.xhrGet(xhrArgs);
+    }
+
+
+
+
+}
+
+
+
+
+
+function RemarkdetailsInsert() {
+	var ComponentDV = dijit.byId("field25").displayedValue;
+	var Component = dijit.byId("field25").value;
+
+	var DetailComponentDV = dijit.byId("field26").displayedValue;
+	var DetailComponent = dijit.byId("field26").value;
+	if(rowid == 1){
+		component = dijit.byId("field25").value;
+	}
+
+	batchArray.push(Component+'_'+DetailComponent);//component plus detail
+	if(component==dijit.byId("field25").value){
+		if(arrHasDupes(batchArray))
+		{
+			batchArray= batchArray.unique();
+			alert("Detail component cannot be same");
+		}
+		else{
+
+
+
+			var trow = document.getElementById('hor').insertRow(rowid);
+			var tcol1=trow.insertCell(0);
+			var tcol2=trow.insertCell(1);
+			var tcol3=trow.insertCell(2);
+
+			tcol1.innerHTML="<input type='hidden' value='"+Component+"' name=ComponentGrid[]>"+ComponentDV;
+			tcol2.innerHTML="<input type='hidden' value='"+DetailComponent+"' name=DetailComponentGrid[]>"+DetailComponentDV;
+			tcol3.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this,\''+Component+'\',\''+DetailComponent+'\'); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+			rowid++;
+                        makefieldsReadonly();
+		}
+	}
+	else{
+		//onlyCompArray = onlyCompArray.unique();
+		alert("One Appliation can have only one component");
+	}
+
+}
+
+
+function makefieldsReadonly() {
+    dijit.byId("field2").attr('readOnly','true');
+    dijit.byId("field27").attr('readOnly','true');
+    dijit.byId("field23").attr('readOnly','true');
+    dijit.byId("field24").attr('readOnly','true');
+    dijit.byId("field25").attr('readOnly','true');
+    dijit.byId("Add").setDisabled('disabled', true);
+    hideWait();
+
+}
+
+function makefieldsActive() {
+
+    dijit.byId('field2').set('value','');
+
+    dijit.byId('field27').reset();
+    dijit.byId('field27').set('value','');
+    dijit.byId('field27').set('placeHolder','Select');
+
+    dijit.byId('field23').reset();
+    dijit.byId('field23').set('value','');
+    dijit.byId('field23').set('placeHolder','Select');
+
+    dijit.byId('field24').reset();
+    dijit.byId('field24').set('value','');
+    dijit.byId('field24').set('placeHolder','Select');
+
+    dijit.byId('field25').reset();
+    dijit.byId('field25').set('value','');
+    dijit.byId('field25').set('placeHolder','Select');
+
+
+    //dijit.byId('field26').reset();
+    //dijit.byId('field26').set('value','');
+    //dijit.byId('field26').set('placeHolder','Select');
+
+    dijit.byId("field2").attr('readOnly',false);
+    dijit.byId("field27").attr('readOnly',false);
+    dijit.byId("field23").attr('readOnly',false);
+    dijit.byId("field24").attr('readOnly',false);
+    dijit.byId("field25").attr('readOnly',false);
+    dijit.byId("Add").setAttribute('disabled', false);
+
+}
+
+
+
+function deleteRow(r)
+{
+	var dStat = confirm("Are you sure to delete the Component?");
+        if(dStat == true){
+        rowid--;
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+	if(rowid == 1){
+		component = 0;
+                makefieldsActive();
+	}
+
+        }
+
+}
+
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+		var i, j, n;
+		n=A.length;   						// to ensure the fewest possible comparisons
+		for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+			for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+				if (A[i]==A[j])
+					return true;
+			}
+		}
+		return false;
+	}
+
+	Array.prototype.unique = function () {
+	    var r = new Array();
+	    o:for(var i = 0, n = this.length; i < n; i++) {
+	        for(var x = 0, y = r.length; x < y; x++) {
+	        	if(r[x]==this[i]) {
+	                	continue o;
+	              }
+	        }
+	        r[r.length] = this[i];
+	    }
+	    return r;
+	}
+
+</script>
+</head>
+
+
+<div id="target">
+	<Form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+		    return true;
+                }
+		else {
+                    return false;
+                }
+</script>
+		<input type="hidden" name="savedata" id="savedata" value="searchdata">
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Remarking Against Appeal - Add");?>
+			</legend>
+
+			<table class="table" width="100%">
+
+				<tr>
+					<td><?php echo $this->translate("Student ID");?>
+						<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjform->field2;?></td>
+
+					<td><?php echo $this->translate('Semester');?> <span
+						class="reqMark">*</span></td>
+					<td><?php echo $this->lobjform->field27;?></td>
+
+					<td><?php echo $this->translate('Course');?> <span class="reqMark">*</span>
+					</td>
+					<td><?php echo $this->lobjform->field23;?></td>
+
+				</tr>
+
+				<tr>
+					<td><?php echo $this->translate('Program');?>
+
+					<td><?php echo $this->lobjform->field24;?></td>
+
+					<td><?php echo $this->translate('Component');?> <span
+						class="reqMark">*</span></td>
+					<td><?php echo $this->lobjform->field25;?></td>
+
+
+
+
+
+				</tr>
+
+				<tr>
+					<td align="center" colspan="6"><?php echo $this->lobjform->Add;?> <input
+						type='button' class="NormalBtn" dojotype="dijit.form.Button"
+						label="<?php echo $this->translate('Clear') ?>" value='click'
+						onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'remarkappeal', 'action' => 'addremarkappeal'), 'default', true); ?>';" />
+
+
+					</td>
+				</tr>
+			</table>
+
+		</fieldset>
+		<br />
+
+
+		<fieldset>
+
+			<table class="table" width="100%" id="hor" cellpadding="5"
+				cellspacing="1">
+
+
+
+				<?php if($this->errMsg=='1') { ?>
+				<tr>
+					<td colspan="3" style="color: red;" align="center"><?php echo $this->translate("Sorry, you
+						cannot add more as you have already exceeded your Max Appeal");?></td>
+				</tr>
+				<?php } ?>
+
+				<tr>
+					<th><?php echo $this->translate('Component');?></th>
+					<th><?php echo $this->translate('Component Detail');?>
+					</th>
+					<th><?php echo $this->translate("Delete");?></th>
+				</tr>
+
+				<tr>
+					<td align="right" colspan="4"><?php echo $this->lobjform->Save; ?>
+						<input type='button' class="NormalBtn"
+						dojotype="dijit.form.Button"
+						label="<?php echo $this->translate('Back') ?>" value='click'
+						onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'remarkappeal', 'action' => 'index'), 'default', true); ?>';" />
+					</td>
+				</tr>
+
+			</table>
+
+		</fieldset>
+
+	</form>
+</div>

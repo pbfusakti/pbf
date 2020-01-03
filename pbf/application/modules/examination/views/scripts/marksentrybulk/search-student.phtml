@@ -1,0 +1,70 @@
+<script>
+
+function getSemester(){
+	var idProgram = $('#IdProgram').val();
+	var idIntake= $('#IdIntake').val();
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'examination','controller'=>'marksentrybulk', 'action'=>'ajax-get-semester'),'default',true);?>",
+		data: {'idProgram':idProgram,'idIntake':idIntake},
+		type: 'POST',
+		dataType: 'json'	
+	}).done(function ( data ) {
+		
+		$('#idSemester').empty().append('<option value="0"> <?php echo $this->translate("-- Please Select --"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$('#idSemester').append('<option value="'+data[index].IdSemesterMaster+'"> '+data[index].SemesterMainName+' </option>');
+		});
+	});
+}
+
+function getCourse(){
+	var idProgram = $('#IdProgram').val();
+	var idIntake= $('#IdIntake').val();
+	var idSemester= $('#idSemester').val();
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'examination','controller'=>'marksentrybulk', 'action'=>'ajax-get-subject'),'default',true);?>",
+		data: {'idProgram':idProgram,'idIntake':idIntake,'idSemester':idSemester},
+		type: 'POST',
+		dataType: 'json'	
+	}).done(function ( data ) {
+		
+		$('#idSubject').empty().append('<option value="0"> <?php echo $this->translate("-- Please Select --"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$('#idSubject').append('<option value="'+data[index].IdSubject+'"> '+data[index].SubjectName+' </option>');
+		});
+	});
+}
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>					
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+
+
+<div style="width:100%;">
+
+<?php echo $this->form; ?>
+</div>

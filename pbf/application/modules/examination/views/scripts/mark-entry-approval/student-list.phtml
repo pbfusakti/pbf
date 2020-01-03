@@ -1,0 +1,211 @@
+<script>
+
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').each(function() {
+				    if(this.disabled==false){
+				    	$(this).prop('checked',true);
+				    }
+			 });
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+		 }
+	 });
+	
+	 
+});
+
+
+
+function checkboxValidate(){
+	flag = false;
+	$('input[type=checkbox]:checked').each(function()
+		{
+		   flag = true;
+		});
+	return flag;
+}
+
+function validate(){
+
+	
+	flag = checkboxValidate();
+	if(flag){
+		  
+		 msg = confirm("Are you sure you want to approve all these marks?");
+		 if(msg){
+			    url="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry-approval','action'=>'save-mark-approval'), 'default', true);?>";
+				$("#form1").attr('action',url);
+				$("#form1").submit();
+		 }else{
+			return false;
+		 }
+		
+	}else{     
+		alert("Please select at least one student for mark approval.");             	
+		return false;
+	}		
+}
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry-approval','action'=>'view-component','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject), 'default', true);?>";
+}
+
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>			   
+			 <li>							
+					<a href="#" onClick="validate()">
+						<span class='save'></span>Save</a>				
+			</li>	
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+
+<fieldset><legend><?php echo $this->translate("Search Student");?></legend>
+<?php echo $this->form; ?>
+</fieldset>
+
+<br>
+
+
+<?php 
+if(count($this->students)>0) {
+
+	 if(count($this->component_item)>0){
+	 	$rowspan= 'rowspan=2';
+	 }else{
+	 	$rowspan = '';
+	 }
+?>
+
+<form id="form1" method="post" action="">
+<input type="hidden" name="IdMarksDistributionMaster" id="IdMarksDistributionMaster" value="<?php echo $this->IdMarksDistributionMaster;?>">
+<input type="hidden" name="idSemester" id="idSemester" value="<?php echo $this->idSemester;?>"></input>
+<input type="hidden" name="idProgram" id="idProgram" value="<?php echo $this->idProgram;?>"></input>
+<input type="hidden" name="idSubject" id="idSubject" value="<?php echo $this->idSubject;?>"></input>
+<input type="hidden" name="MarksEntryStatus" id="MarksEntryStatus" value=""></input>
+ 
+	<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	  
+	  
+	  <tr>
+	    <th <?php echo $rowspan; ?> width="25px">&nbsp;</th>
+	    <th <?php echo $rowspan; ?> >Approve?<br><input type="checkbox" id="checkall"  value="" > <?php echo $this->translate("Check All"); ?></th>
+	    <th <?php echo $rowspan; ?>><?php echo $this->translate("Studen Name")?></th>
+	    <th <?php echo $rowspan; ?>><?php echo $this->translate("Student ID/NIM")?></th>		
+	    <th  align="center" colspan="<?php echo $this->total_item; ?>">
+	    	<?php echo $this->main_component["component_name"]?>
+	    	/ (Total Mark :<?php echo $this->main_component["Marks"];?>)
+	    </th>
+	    
+	  </tr>
+	  
+	  
+	  
+	  <?php  if(count($this->component_item)>0){?>
+	  <tr>
+	     <?php 	    
+	      foreach($this->component_item as $item){?>	
+	      <th  align="center">
+	      <?php echo $item["ComponentName"];?> (<?php echo $item["Weightage"];?>)	     
+	      </th>
+	      
+	     <?php }//end foreach ?>
+	  </tr>
+	  <?php }//end if ?>
+	  
+	  
+	  
+	  <?php 
+		$i=1;	
+		foreach($this->students as $student){		
+	  ?>
+	  <tr>
+	    <td><?php echo $i;?></td>
+	    <td><input type="checkbox" class="chk" id="IdStudentMarksEntry[]" value="<?php echo $student['IdStudentMarksEntry'];?>" ></td>
+		<td><?php echo $student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"];?></td>
+		<td><?php echo $student["registrationId"];?></td>
+		
+	    <?php 	   
+	    if(count($this->component_item)>0){
+		    foreach($this->component_item as $item){
+		  
+		    	//cari dalam mark details IdStudentMarksEntry
+		    	if(isset($student["IdStudentMarksEntry"]) && $student["IdStudentMarksEntry"]!=''){
+			    	$detailsMarkDB = new Examination_Model_DbTable_StudentDetailsMarkEntry();
+			    	$itemMark = $detailsMarkDB->getItemMark($student["IdStudentMarksEntry"],$item["IdMarksDistributionDetails"]);
+			    	$itemMarkObtained = $itemMark["MarksObtained"];
+		    	}else{
+		    		$itemMarkObtained='';
+		    	}
+		?>	
+		    <td align="center">
+		    	<input type="text" size="3" class="entry" name="mark[<?php echo $student["IdStudentMarksEntry"]; ?>][<?php echo $item["IdMarksDistributionDetails"];?>]" id="mark" value="<?php echo $itemMarkObtained;?>" readonly>
+		    	
+		     </td>
+	    <?php }//end foreach
+	    }else{ ?>
+	    
+	        <td align="center">
+		    	<input type="text" size="3" class="entry" name="mark[<?php echo $student["IdStudentMarksEntry"]; ?>][<?php echo $this->main_component["IdMarksDistributionMaster"];?>]" id="mark" value="<?php echo $student["TotalMarkObtained"]?>" readonly>
+		    	
+		    </td>
+	    <?php }//end if else count item?>
+	  
+	  </tr>
+	  
+	  <?php 
+		$i++; }
+	  ?>
+	</table>
+</form>
+
+<?php } //end if?>
+
+
+
+</div>

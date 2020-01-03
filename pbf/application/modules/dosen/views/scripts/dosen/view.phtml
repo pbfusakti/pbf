@@ -1,0 +1,122 @@
+<form name = "datamhsform" method="post">
+
+<style>
+.sisi {
+  background-color: #C4B65C;
+  width: 900px;
+  margin: auto;
+  padding: 30px;
+  opacity: 0.95;
+  font-size: 16px;
+}
+</style>
+
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid red;
+}
+
+.topnav a.active {
+  border-bottom: 3px solid red;
+}
+</style>
+<br><br>
+
+<div class="topnav">
+  <a href="/pelajaran/pelajaran/view">Matakuliah</a>
+  <a href="#mahasiswa">Mahasiswa</a>
+  <a href="/dosen/dosen/view">Dosen</a>
+  <a href="/ruangan/ruangan/view">Ruangan</a>
+  <a href="/akademik/akademik/view">Tahun Akademik</a>
+  <a href="/pengisian/pengisian/view">Batas Pengisian Krs</a>
+  <a href="/penjadwalan/penjadwalan/view">Penjadwalan Aktivasi</a>
+</div>
+
+<br><br><div class="sisi">
+<fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid red;
+}
+
+.topnav a.active {
+  border-bottom: 3px solid red;
+}
+</style>
+<br><br>
+
+
+
+
+<input type = "hidden" id= "id" name="id" value="<?php echo $this->datapersonal['id']?>">
+<table>
+<tr><th>Dosen</th>
+<td><input type="text" name="dosen" id="dosen" value="<?php echo $this->datapersonal['dosen']?>">
+<tr><th>Alamat</th>
+<td><input type="text" name = "alamat" id="alamat" value="<?php echo $this->datapersonal['alamat']?>" >
+<tr><th>NIK</th>
+<td><input type="text" name = "nik" id="nik" value="<?php echo $this->datapersonal['nik']?>" >
+<tr><th>Nama Matakuliah</th>
+<td><input type="text" name = "matakuliah" id="matakuliah" value="<?php echo $this->datapersonal['matakuliah']?>" >
+<tr><th>Kode Mk</th>
+<td><input type="text" name = "kodemk" id="kodemk" value="<?php echo $this->datapersonal['kodemk']?>" >
+
+
+<br><br>
+<tr><td colspan="2">
+<input type="submit" name = "save" value="save">
+<input type="submit" name = "delete" value="delete">
+<input type="submit" name = "update" value="update">
+<input type="submit" name = "search" value="search">
+</td></tr>
+</table>
+</form>
+</div>
+</fieldset>
+
+<br><br><div class="sisi">
+<fieldset><legend><table class="table" border="1"><h1> Data Dosen</h1><tr><th>Dosen</th><th>Alamat</th><th>NIK</th><th>Nama Matakuliah</th><th>Kode Mk</th></legend><?php foreach($this->refmhs as $mhs) {?> 
+<tr><td><?php echo $mhs['dosen'];?></td></th> 
+<td><?php echo $mhs['alamat'];?></td> 
+<td><?php echo $mhs['nik'];?></td>
+<td><?php echo $mhs['matakuliah'];?></td>
+<td><?php echo $mhs['kodemk'];?></td>
+<?php }?>
+
+  </table>

@@ -1,0 +1,121 @@
+<form name = "datamhsform" method="post">
+
+<style>
+.sisi {
+  background-color: #C4B65C;
+  width: 900px;
+  margin: auto;
+  padding: 30px;
+  opacity: 0.95;
+  font-size: 16px;
+}
+</style>
+
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid red;
+}
+
+.topnav a.active {
+  border-bottom: 3px solid red;
+}
+</style>
+<br><br>
+
+<div class="topnav">
+  <a href="/pelajaran/pelajaran/view">Matakuliah</a>
+  <a href="/siswa/siswa/view">Mahasiswa</a>
+  <a href="/dosen/dosen/view">Dosen</a>
+  <a href="/ruangan/ruangan/view">Ruangan</a>
+  <a href="/akademik/akademik/view">Tahun Akademik</a>
+  <a href="/pengisian/pengisian/view">Batas Pengisian Krs</a>
+  <a href="/penjadwalan/penjadwalan/view">Penjadwalan Aktivasi</a>
+</div>
+
+<br><br><div class="sisi">
+<fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
+
+<style>
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+
+.topnav a:hover {
+  border-bottom: 3px solid red;
+}
+
+.topnav a.active {
+  border-bottom: 3px solid red;
+}
+</style>
+<br><br>
+
+<input type = "hidden" id= "id" name="id" value="<?php echo $this->datapersonal['id']?>">
+<table>
+<tr><th>Mahasiswa</th>
+<td><input type="text" name="siswa" id= "siswa" value="<?php echo $this->datapersonal['siswa']?>">
+<tr><th>Nim</th>
+<td><input type="text" name="nim" value="<?php echo $this->datapersonal['nim']?>">
+<tr><th>Jurusan</th>
+<td><input type="text" name = "jurusan" id="jurusan" value="<?php echo $this->datapersonal['jurusan']?>" >
+<tr><th>Alamat</th>
+<td><input type="text" name = "alamat" id="alamat" value="<?php echo $this->datapersonal['alamat']?>" >
+<tr><th>Jumlah Sks</th>
+<td><input type="text" name = "jumlahsks" id="jumlahsks" value="<?php echo $this->datapersonal['jumlahsks']?>" >
+
+
+<br><br>
+<tr><td colspan="2">
+<input type="submit" name = "save" value="save">
+<input type="submit" name = "delete" value="delete">
+<input type="submit" name = "update" value="update">
+<input type="submit" name = "search" value="search">
+</td></tr>
+</table>
+</form>
+</div>
+</fieldset>
+
+<br><br><div class="sisi">
+<fieldset><legend><table class="table" border="1"><h1> Data Mahasiswa</h1><tr><th>Mahasiswa</th><th>Nim</th><th>Jurusan</th><th>Alamat</th><th>Jumlah Sks</th></legend><?php foreach($this->refmhs as $mhs) {?> 
+<tr><td><?php echo $mhs['siswa'];?></td></th> 
+<td><?php echo $mhs['nim'];?></td> 
+<td><?php echo $mhs['jurusan'];?></td>
+<td><?php echo $mhs['alamat'];?></td>
+<td><?php echo $mhs['jumlahsks'];?></td>
+<?php }?>
+
+  </table>
+

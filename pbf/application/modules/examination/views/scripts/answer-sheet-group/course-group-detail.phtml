@@ -1,0 +1,292 @@
+<script type="text/javascript">
+
+function getExamGroup(assessmentId){
+	
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group', 'action'=>'get-exam-group'),'default',true);?>",
+		data: {'assessmentId':assessmentId,'idSemester':<?php echo $this->idSemester;?>,'idSubject':<?php echo $this->idSubject;?>,'idgroup':<?php echo $this->group_id;?>},
+		type: 'POST',
+		dataType: 'json'	
+	}).done(function ( data ) {
+		
+		$('#egroupId').empty().append('<option value=""> <?php echo $this->translate('please_select'); ?> </option>');
+		
+		$.each(data, function(index) {
+			$('#egroupId').append('<option value="'+data[index].eg_id+'"> '+data[index].eg_group_name+' </option>');
+		});
+	});
+
+	
+}
+
+$(function() {
+	
+	$( "#dialog-answer" ).dialog({
+        autoOpen: false,
+        width: 650,
+        height: 400,
+        modal: true,
+        buttons: {          
+            "Close": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
+	$( "#dialog-upload" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Upload": function() {
+                //$( this ).dialog( "close" );
+                $('#upload').submit();
+
+            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+    
+	
+});
+
+function openDialog(IdStudentRegistration,egid){
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'student-answer'), 'default', true);?>/IdStudentRegistration/"+IdStudentRegistration+"/gid/"+egid;
+	$( "#dialog-answer" ).load(url).dialog('open');	
+}
+
+function uploadOMR(){
+	$( "#dialog-upload" ).dialog('open');	
+}
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'index'), 'default', true);?>";
+}
+
+function omrProcessing(){
+
+	 var isChecked = $('.chk').is(':checked');
+    
+	 if(isChecked==true){
+		 $("#form1").submit();
+	 }else{
+		alert("You did not select any student. Please select.");
+	 }
+}
+
+function assignStudent(){
+
+	 var isChecked = $('.chk').is(':checked');
+
+	 if(isChecked==true){
+			$("#assignForm").submit();
+	 }else{
+		alert("You did not select any student. Please select.");
+	 }
+}
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').prop('checked', true);
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+		 }
+	 });
+	
+	 
+});
+
+
+
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onclick="uploadOMR();">
+					<span class='upload'></span>
+					<?php echo $this->translate('Upload OMR');?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="omrProcessing();">
+					<span class='process'></span>
+					<?php echo $this->translate('OMR Processing');?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>
+				<a href="/examination/exam-sheet-group/index">
+					<span class='back'></span>
+					<?php echo $this->translate('Back');?>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<fieldset>
+	<legend><?php echo $this->translate('Course Group Info');?></legend>
+	<form name="form1" id="form1" method="post">
+<table>
+		<tr>
+					<td><?php echo $this->translate("Subject"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->subject['subjectMainDefaultLanguage'];?> - <?php echo $this->subject['SubCode'];?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupName"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupCode"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupCode']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Coordinator"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['FullName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Semester"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['semester_name']; ?></td>
+				</tr>
+				<!--<tr>
+					<td><?php echo $this->translate("Total Student"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['total_student']; ?></td>
+				</tr>
+				-->
+				<tr>
+					<td><?php echo $this->translate("Assessment"); ?></td>
+					<td>:</td>
+					<td>
+						<select name="assessmentId" id="assessmentId" onChange="getExamGroup(this.value)">
+						<option value=''><?php echo $this->translate("Please Select");?></option>
+						<?php 
+						foreach($this->assessment as $assessment){
+							if($this->assessmentId==$assessment["assessment_id"]){
+								$selected = 'selected';
+							}
+						?>
+							<option <?php  echo $selected; ?> value="<?php echo $assessment["assessment_id"];?>"><?php echo $assessment["assessment_name"];?></option>
+						<?php } ?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><?php  echo $this->translate("Exam Group"); ?></td>
+					<td>:</td>
+					<td>
+					<select name="egroupId" id="egroupId" onChange="form.submit();">
+						<option value=''><?php echo $this->translate("Please Select");?></option>
+						<?php  
+						foreach($this->exam_group as $eg){
+							if($this->egroupId==$eg["eg_id"]){
+								$selected = 'selected';
+							}
+						?>
+							<option <?php  echo $selected; ?> value="<?php echo $eg["eg_id"];?>"><?php echo $eg["eg_group_name"];?></option>
+						<?php } ?>
+					</select>
+					</td>
+				</tr>
+				<tr><td><input type="submit" name="submit"></td>
+</table>
+</form>
+</fieldset>
+
+
+<h2><?php echo $this->translate("Student List");?></h2>
+<form id="form1" method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'mark-processing'), 'default', true);?>">
+<input type="hidden" name="idSemester" value="<?php echo $this->idSemester;?>">
+<input type="hidden" name="idSubject" value="<?php echo $this->idSubject;?>">
+<input type="hidden" name="group_id" value="<?php echo $this->group_id;?>">
+
+<table class="table" width="100%">
+	<tr>
+		<th width="20px"><?php echo $this->translate('Bil');?></th>
+		<th><?php echo $this->translate('Name');?></th>
+		<th><?php echo $this->translate('NIM');?></th>
+		<th><?php echo $this->translate('Program');?></th>
+		<!--<th><?php echo $this->translate('Exam Group');?></th>
+		--><th><?php echo $this->translate('Set Code');?></th>
+		<th><?php echo $this->translate('Mark Processing Status');?></th>
+		<th><?php echo $this->translate('Action - Process Mark?');?><br><input type="checkbox" name="checkall" id="checkall" >&nbsp;<?php echo $this->translate("Check All ?")?></th>
+	</tr>
+	<?php
+	if($this->student_list) {
+		foreach($this->student_list as $index=>$student):
+	?>
+	<tr>
+		<td><?php echo $index+1;?>.</td>
+		<td>
+			<?php echo $student['appl_fname']!=null?$student['appl_fname']." ":"";?>
+			<?php echo $student['appl_mname']!=null?$student['appl_mname']." ":"";?>
+			<?php echo $student['appl_lname']!=null?$student['appl_lname']." ":"";?>
+		</td>
+		<td><?php echo $student['registrationId'];?></td>
+		<td><?php echo $student['ProgramName'];?> - <?php echo $student['ProgramCode'];?></td>
+		<!--<td></td>
+		--><td>
+		<?php if(isset($student["set_code"])) {?>
+		<a href="#" onclick="openDialog(<?php echo $student["IdStudentRegistration"];?>,<?php echo $this->group_id;?>);"><?php echo $student["set_code"];?></a>
+		<?php } else { echo $this->translate("Not Available"); } ?></td>
+		<td><?php echo ($student["soa_status"]==1) ? $this->translate("Yes"):$this->translate("No");?></td>
+		<td>
+		<?php if(isset($student["soa_id"])) {?>
+		<input type="checkbox" id="soa_id" name="soa_id[]" class='chk' value="<?php echo $student["soa_id"];?>">			
+		<?php } ?>
+		</td>
+	</tr>
+	<?php
+		endforeach;
+	}else{
+		echo '<tr><td colspan=7>'.$this->translate("Please select Assessment and Exam Group to view student OMR answers or to do Mark Processing").'</td></tr>';
+	}
+	?>
+	<tr><td colspan="6"><td>
+	<input type="submit" name="submit" >
+	</td></tr>
+</table>
+</form>
+
+<br>
+<div id="dialog-answer" title="<?php echo $this->translate("Student Answer"); ?>">
+  
+</div>
+
+<div id="dialog-upload" title="<?php echo $this->translate("Upload OMR"); ?>">
+    <?php echo $this->form; ?> 
+</div>

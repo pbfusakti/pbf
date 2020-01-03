@@ -1,0 +1,150 @@
+<script type="text/javascript">
+	
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			   			 $select ='';
+			    		if( isset($this->semester) && $this->semester== $semester["key"] ){
+							$select = 'selected="selected"';
+						} ?>
+			    		<option value="<?php echo $semester["key"];?>" <?php echo $select; ?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program Study"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdProgram" name="IdProgram" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		$select ='';
+			    		if( isset($this->program) && $this->program== $program["IdProgram"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>" <?php echo $select; ?>><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+			
+		</dd>
+		<dt></dt>
+		
+		<dd> <input type="submit" name="submit">
+			
+		</dd>
+				
+	</dl>
+</form>
+<form name=verify" method="post" action="/examination/grade-approval/repair">
+<table class="table" id="result" width="100%">
+	<thead>
+		<th><?php echo $this->translate('No')?></th>
+		<th><?php echo $this->translate('Student Id')?></th>
+		<th><?php echo $this->translate('Student Name')?></th>
+		<th><?php echo $this->translate('Subject Code')?></th>
+		<th><?php echo $this->translate('Subject Name')?></th>
+		<th><?php echo $this->translate('Credit Hours')?></th>
+		
+		<th><?php echo $this->translate('Status')?></th>
+		<th><?php echo $this->translate('Remark')?></th>
+		<th><?php echo $this->translate('Repair')?></th>
+	</thead>
+	<tbody>
+
+	<input type="hidden" name="IdSemester" value="<?php echo $this->semester;?>">
+	<input type="hidden" name="IdProgram" value="<?php echo $this->program;?>">
+	<?php 
+	if (count($this->courses) > 0) {
+	$coun=1;
+	foreach ($this->courses as $key=>$course) {
+		$status=$course['StatusVerify'];
+		$idGroup=$course['IdCourseTaggingGroup'];
+		$idsemester=$this->idsemester;
+		$idsubject=$course['IdSubject'];?>
+	<input type="hidden" name="IdSubject<?php echo $course['IdStudentRegSubjects'];?>" value="<?php echo $course['IdSubject'];?>"
+	<tr><td><?php echo $coun;?></td>	
+	<td><?php echo $course['registrationId'];?></td>
+	<td width="25%"><?php echo $course['StudentName'];?></td>
+	<td><?php echo $course['SubCode'];?></td>
+	<td width="25%"><?php echo $course['SubName'];?></td>
+	<td><?php echo $course['CreditHours'];?></td>
+	<td><?php echo $status;?></td>
+	<?php if ($course['StatusVerify']=='Mark Percentage') {
+			$marks=$course['Components']; ?>
+			<input type="hidden" name="Status<?php echo  $course['IdStudentRegSubjects'];?>" value="Mark Percentage">
+			<td>
+			<?php 
+			foreach ($marks as $mrkid=>$mark) {?>
+				<input type="hidden" name="mark[<?php echo $course['IdStudentRegSubjects']?>][<?php echo $mrkid?>]" value="<?php echo $mark['IdStudentMarksEntry'];?>">
+			<?php echo $mark['TotalMarkObtained'].'*'.$mark['Percentage'].'='.$mark['FinalTotalMarkObtained']; ?>
+	<?php } ?></td><?php 
+		}?>
+	<?php if  ($course['StatusVerify']=='Total Mark') {?>
+		<input type="hidden" name="Status<?php echo  $course['IdStudentRegSubjects'];?>" value="Total Mark">
+		<td><?php echo $course['final_course_mark'].'=>'.$course['marks'];?></td>
+	<?php }?>
+	<?php if  ($course['StatusVerify']=='Grade Name') {?>
+		<input type="hidden" name="Status<?php echo  $course['IdStudentRegSubjects'];?>" value="Grade Name">
+		<td><?php echo $course['final_course_mark']."=>".$course['grade_name'];?></td>
+	<?php }?>
+	<?php if  ($course['StatusVerify']=='Grade Status') {?>
+		<input type="hidden" name="Status<?php echo  $course['IdStudentRegSubjects'];?>" value="Grade Status">
+		<td><?php echo $course['grade_status']."=>".$course['grade_status2'];?></td>
+	<?php }?>
+	<?php if  ($course['StatusVerify']=='Exam Status') {?>
+		<input type="hidden" name="Status<?php echo  $course['IdStudentRegSubjects'];?>" value="Exam Status">
+		<td><?php echo $course['exam_status']."=>".$course['exam_status2'];?></td>
+	<?php }?>
+		<td>
+		<input type="checkbox" id="idStudentRegSub" name="idStudentRegSub[]" class='chk' value="<?php echo $course["IdStudentRegSubjects"];?>" /></td></tr>
+	<?php 
+		$coun++;}
+	}?>
+	
+	</tbody>
+	
+	
+</table>
+<input type="submit" name="submit">
+</form>

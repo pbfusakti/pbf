@@ -1,0 +1,368 @@
+<script>
+
+$(function() {
+	
+	$( "#dialog-box" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Confirm": function() {
+            	
+            	var mark_entry_status = $("#mark_entry_status").val();	
+
+            	$("#MarksEntryStatus").val(mark_entry_status);	
+            	$("#Remarks").val($("#remarks").val());	
+            	
+    			url="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry','action'=>'save-mark'), 'default', true);?>";
+    			$("#form1").attr('action',url);	
+				
+            	if(mark_entry_status==411){
+            		var approver = $("#approveby option:selected").val();
+                 	if(approver==0){
+                		alert('Please select Approved by');
+                 	}else{
+
+                 		$("#ApprovedBy").val(approver);	
+                 		$("#form1").submit();                 		
+                 	}
+					
+            	}else{
+	            			
+	    			$("#form1").submit();
+            	}
+
+            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
+	
+});
+
+function check(i,element){
+
+	var entrymark = $(element).val();
+
+	if($.isNumeric( entrymark )==true){ 
+
+		if($('#idDetail').val()==0){
+			var Total = $("#MarksTotal").val();
+		}else{
+			var Total = $("#TotalMarks").val();
+		}
+
+		var markEnter = Math.abs(entrymark);
+		var markTotal = Math.abs(Total);
+		
+		if( markEnter > markTotal){
+			alert('Mark that you have entered exceeded the Total Mark');
+			$(element).val('');
+		}
+	}else{
+		alert('Please enter a Numeric Value');
+		$(element).val('');
+	}
+}
+
+function validate(){
+	var valid = true;	
+	$('input[class="entry"]').each(function(){	   
+		 if($(this).val()==''){			 
+			 return valid = false;
+		 }	    
+	});
+
+	
+}
+
+function validate_numeric(){
+	var valid = true;	
+	$('input[class="entry"]').each(function(){	
+		entrymark = $(this).val();
+		if(entrymark != ''){
+		if($.isNumeric( entrymark )==false){ 
+			return valid = false;
+		}}
+	});
+	return valid;	
+}
+
+function save(status){
+	
+	entry = validate_numeric();	
+	if(entry==1){		
+
+		emptyVal = validate();
+
+			
+		if(emptyVal==1){			
+			msg = confirm('Are sure you want to submit this form?');
+		}else{
+			msg = confirm('Empty value found. Are sure you want to submit this form?');
+		}
+
+		
+		if(msg){
+			$( "#dialog-box" ).dialog('open');
+		}
+		
+		
+		
+	}else{
+		alert('Please enter a Numeric Value');		
+	}
+}
+
+function approve(){
+	$( "#dialog-box" ).dialog('open');
+}
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry','action'=>'group-list','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'id'=>$this->IdMarksDistributionMaster,'idDetail'=>$this->idDetail), 'default', true);?>";
+}
+
+function enable(value){
+	
+	if(value==411){
+		 $('#approveby').prop('disabled', false);
+	}else{
+		 $('#approveby').prop('disabled', 'disabled');
+	}
+}
+
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul><!--	
+		    <li>							
+					<a href="#" onClick="save(407)">
+						<span class='save'></span>Save AS Entry</a>				
+			</li>
+			 <li>							
+					<a href="#" onClick="save(409)">
+						<span class='save'></span>Save AS Submmitted</a>				
+			</li>	
+			 -->
+			 <li>							
+					<a href="#" onClick="save()">
+						<span class='save'></span>Save</a>				
+			</li>	
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Course Group Name "); ?></th>   
+		    <td><?php echo $this->group["GroupName"].' - '.$this->group["GroupCode"];;?></td>   
+	</tr>
+	<tr>
+		    <th width="25%"><?php echo $this->translate("Coordinator"); ?></th>   
+		    <td><?php echo $this->group["FullName"];?></td>   
+	</tr>
+</table>
+<br>
+
+<fieldset><legend><?php echo $this->translate("Search Student");?></legend>
+<?php echo $this->form; ?>
+</fieldset>
+
+<br>
+
+
+<?php 
+if(count($this->students)>0) {
+
+	 if(count($this->component_item)>0){
+	 	$rowspan= 'rowspan=2';
+	 }else{
+	 	$rowspan = '';
+	 }
+?>
+
+<form id="form1" method="post" action="">
+<input type="hidden" name="IdMarksDistributionMaster" id="IdMarksDistributionMaster" value="<?php echo $this->IdMarksDistributionMaster;?>">
+<input type="hidden" name="idDetail" id="idDetail" value="<?php echo $this->idDetail;?>">
+<input type="hidden" name="idSemester" id="idSemester" value="<?php echo $this->idSemester;?>"></input>
+<input type="hidden" name="idProgram" id="idProgram" value="<?php echo $this->idProgram;?>"></input>
+<input type="hidden" name="idSubject" id="idSubject" value="<?php echo $this->idSubject;?>"></input>
+<input type="hidden" name="MarksEntryStatus" id="MarksEntryStatus" value=""></input>
+<input type="hidden" name="ApprovedBy" id="ApprovedBy" value=""></input>
+<textarea name="Remarks" id="Remarks" style="display:none;"></textarea>
+	<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	  
+	  
+	  <tr>
+	    <th <?php echo $rowspan; ?> width="25px">&nbsp;</th>
+	    <th <?php echo $rowspan; ?>><?php echo $this->translate("Studen Name")?></th>
+	    <th <?php echo $rowspan; ?>><?php echo $this->translate("Student ID/NIM")?></th>	
+	    <th <?php echo $rowspan; ?>><?php echo $this->translate("Mark Entry Status")?></th>		
+	    <th  align="center">
+	    	<?php echo $this->main_component["component_name"]?> (Total Mark : <?php echo $this->main_component["Marks"];?>)
+	    	<input type="hidden" size="3" name="MarksTotal" id="MarksTotal" value="<?php echo $this->main_component["Marks"];?>">
+	    	<?php  if(isset($this->idDetail) && $this->idDetail!=0){ ?>
+	    	<br>
+	    	<?php echo $this->item["ComponentName"];?> (Total Mark : <?php echo $this->item["Weightage"];?>)
+	    	 <input type="hidden" size="3" name="TotalMarks" id="TotalMarks" value="<?php echo $this->item["Weightage"];?>">
+	    	 <?php } ?>
+	    </th>
+	    
+	  </tr><?php 
+		$i=1;	
+		foreach($this->students as $student){		
+	  ?>
+	  <tr>
+	    <td><?php echo $i;?></td>
+		<td><?php echo $student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"];?></td>
+		<td>
+		<?php echo $student["registrationId"];?>		
+		<input type="hidden" name="IdStudentRegistration[]"  value="<?php echo $student["IdStudentRegistration"]; ?>">
+		<input type="hidden" name="IdStudentMarksEntry[<?php echo $student["IdStudentRegistration"]; ?>]"  value="<?php echo $student["IdStudentMarksEntry"]; ?>">
+	    <input type="hidden" name="IdStudentRegSubjects[<?php echo $student["IdStudentRegistration"]; ?>]" id="" value="<?php echo $student["IdStudentRegSubjects"]; ?>">
+		</td>
+		<td><?php 
+					if(isset($student["MarksEntryStatus"])){
+					 		if($student["MarksEntryStatus"]==407){
+					 			echo $this->translate('Entry');
+					 		}else if($student["MarksEntryStatus"]==409){
+					 			echo $this->translate('Submitted');
+					 		}else if($student["MarksEntryStatus"]==411){
+					 			echo $this->translate('Approved');
+					 		}else{
+					 			echo $this->translate('No Mark Entered');
+					 		}
+				}else{
+							echo $this->translate('No Mark Entered');
+				}?>
+		</td>
+		
+	    <?php 	   
+	    if(isset($this->idDetail) && $this->idDetail!=0){
+	    	
+		    	//cari dalam mark details IdStudentMarksEntry
+		    	if(isset($student["IdStudentMarksEntry"]) && $student["IdStudentMarksEntry"]!=''){
+			    	$detailsMarkDB = new Examination_Model_DbTable_StudentDetailsMarkEntry();
+			    	$itemMark = $detailsMarkDB->getItemMark($student["IdStudentMarksEntry"],$this->item["IdMarksDistributionDetails"]);
+			    	$itemMarkObtained = $itemMark["MarksObtained"];
+		    	}else{
+		    		$itemMarkObtained='';
+		    	}
+		?>	
+		    <td align="center">
+		     <?php if(isset($student["attendance"])){ echo $student["attendance"];?>
+	            
+	            <?php }else{
+	            
+	            	if(isset($student["MarksEntryStatus"]) && $student["MarksEntryStatus"]==411){ //approve x boleh ubah lagi markah
+						$disabled = 'disabled';
+	            	}else{
+	            		$disabled ='';
+	            	}
+	            ?>
+		    	<input type="text" size="3" class="entry" name="mark[<?php echo $student["IdStudentRegistration"]; ?>]" id="mark<?php echo $i?>" value="<?php echo $itemMarkObtained;?>" onblur="check(<?php echo $i?>,this);">
+		    	<?php } ?>
+		    	
+		    	
+		    	
+		     </td>
+	    <?php 
+	    }else{ ?>
+	    
+	        <td align="center">
+	            <?php if(isset($student["attendance"])){ echo $student["attendance"];?>
+	            
+	            <?php }else{
+	            
+	            	if(isset($student["MarksEntryStatus"]) && $student["MarksEntryStatus"]==411){ //approve x boleh ubah lagi markah
+						$disabled = 'disabled';
+	            	}else{
+	            		$disabled ='';
+	            	}
+	            ?>
+		    	<input type="text" size="3" <?php echo $disabled; ?> class="entry" name="mark[<?php echo $student["IdStudentRegistration"]; ?>]" id="mark<?php echo $i?>" value="<?php echo (isset($student["TotalMarkObtained"]) ? $student["TotalMarkObtained"]:'');?>" onblur="check(<?php echo $i?>,this);">
+		    	<?php } ?>
+		    	
+		    </td>
+	    <?php }//end if else count item?>
+	  
+	  </tr>
+	  
+	  <?php 
+		$i++; }
+	  ?>
+	</table>
+</form>
+
+<?php }else{ //end if? 
+echo $this->translate("No record of student attended this Exam");
+}?>
+
+
+
+</div>
+<br>
+
+<div id="dialog-box" title="<?php echo $this->translate("Approval Information"); ?>">
+  <table>
+  <tr>
+  		<td>Status</td>
+  		<td width="5px">:</td>
+  		<td>
+  			<select name="mark_entry_status"  id="mark_entry_status" onchange="enable(this.value);">
+  				<option value="407"><?php echo $this->translate("Entry");?></option>
+  				<option value="409"><?php echo $this->translate("Submitted");?></option>  				
+  			</select>
+  		</td>
+  	</tr><!--
+  	<tr>
+  		<td>Approved By</td>
+  		<td width="5px">:</td>
+  		<td>
+  		<select name="approveby" id="approveby" disabled>
+  			<option value=0>Please Select</option>
+  			<option value=1>Lecturer 1</option>
+  		</select>
+  		</td>
+  	</tr>
+  	--><tr>
+  		<td>Remarks</td>
+  		 <td width="5px">:</td>
+  		<td><textarea id='remarks' name='remarks'></textarea></td>
+  	</tr>
+  </table>
+</div>

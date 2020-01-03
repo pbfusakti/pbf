@@ -1,0 +1,92 @@
+<?php 
+$studentdet = array();
+if(!empty($this->studdet)){
+	$studentdet = $this->studdet;
+}
+
+$studentgpacgpadet = array();
+if(!empty($this->studentgpa)){
+	$studentgpacgpadet = $this->studentgpa;
+}
+
+$stdcoursemarksdet = array();
+if(!empty($this->stdcoursemarksdet)){
+	$stdcoursemarksdet = $this->stdcoursemarksdet;
+}
+
+
+?>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Student Assessment"); ?>
+	</legend>	
+		<table width="900px">
+			<tr>
+				<td><b><?php echo $this->translate("Student Id");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['registrationId'] : '';?></td>
+				<td><b><?php echo $this->translate("Student Name");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['name'] : '';?></td>
+			</tr>
+			<tr>
+				<td><b><?php echo $this->translate("Program");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['ProgramName'] : '';?></td>
+				<td><b><?php echo $this->translate("Intake");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['IntakeId'].'-'.$studentdet['IntakeDesc'] : '';?></td>
+			</tr>			
+			</tr>
+		</table>
+		<br>
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("GPA / CGPA"); ?>
+			</legend>	
+				<table width="900px" class='table'>
+					<tr>
+						<td><b><?php echo $this->translate("GPA Mark");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['cgpagpadet'])) && (!empty($studentgpacgpadet[0]['cgpagpadet']))) ? $studentgpacgpadet[0]['cgpagpadet'][0]['Gpa'] : '';?></td>
+						<td><b><?php echo $this->translate("CGPA Mark");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['cgpagpadet'])) && (!empty($studentgpacgpadet[0]['cgpagpadet']))) ? $studentgpacgpadet[0]['cgpagpadet'][0]['Cgpa'] : '';?></td>
+					</tr>
+					<tr>
+						<td><b><?php echo $this->translate("GPA Point");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['gpaGradepoint'])) && $studentgpacgpadet[0]['gpaGradepoint']!='') ? $studentgpacgpadet[0]['gpaGradepoint'] : '';?></td>
+						<td><b><?php echo $this->translate("CGPA Point");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['cgpaGradepoint'])) && $studentgpacgpadet[0]['cgpaGradepoint']!='') ? $studentgpacgpadet[0]['cgpaGradepoint'] : '';?></td>
+					</tr>
+					<tr>
+						<td><b><?php echo $this->translate("GPA Grade");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['gpaGradevalue'])) && $studentgpacgpadet[0]['gpaGradevalue']!='') ? $studentgpacgpadet[0]['gpaGradevalue'] : '';?></td>
+						<td><b><?php echo $this->translate("CGPA Grade");?></td>
+						<td><?php echo (isset($studentgpacgpadet) && (isset($studentgpacgpadet[0]['cgpaGradevalue'])) && $studentgpacgpadet[0]['cgpaGradevalue']!='') ? $studentgpacgpadet[0]['cgpaGradevalue'] : '';?></td>
+					</tr>
+				</table>
+				<br>
+		</fieldset>
+		</br>
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Course Registration"); ?>
+			</legend>	
+				<table width="900px" class="table">
+					<tr>
+						<th><b><?php echo $this->translate("Course");?></th>
+						<th><b><?php echo $this->translate("Course Code");?></th>
+						<th><b><?php echo $this->translate("Credit Hours");?></th>
+						<th><b><?php echo $this->translate("Mark");?></th>
+						<th><b><?php echo $this->translate("Point");?></th>
+						<th><b><?php echo $this->translate("Grade");?></th>						
+					</tr>
+					<?php foreach($stdcoursemarksdet as $det){?>
+						<tr>
+							<td><?php echo (isset($det['coursename']) && $det['coursename']!='') ? $det['coursename'] : ''?></td>
+							<td><?php echo (isset($det['SubCode']) && $det['SubCode']!='') ? $det['SubCode'] : ''?></td>
+							<td><?php echo (isset($det['CreditHours']) && $det['CreditHours']!='') ? $det['CreditHours'] : ''?></td>
+							<td><?php echo (isset($det['Totalmarks']) && $det['Totalmarks']!='') ? $det['Totalmarks'] : ''?></td>
+							<td><?php echo (isset($det['GradePoint']) && $det['GradePoint']!='') ? $det['GradePoint'] : ''?></td>
+							<td><?php echo (isset($det['IdGrade']) && $det['IdGrade']!='') ? $det['IdGrade'] : ''?></td>
+						</tr>
+					<?php  } ?>
+				</table>
+				<br>
+		</fieldset>
+</fieldset>

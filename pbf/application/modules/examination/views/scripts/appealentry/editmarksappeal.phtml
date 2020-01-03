@@ -1,0 +1,64 @@
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Remarking Against").' '.$this->translate("Appeal");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Remarking Against").' '.$this->translate("Appeal");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Appeal Code");?></td>
+				<td><?php echo $this->appealcode;?> <?php echo $this->lobjAppealEntryForm->IdAppealEntry;?>
+					<?php echo $this->lobjAppealEntryForm->DateOfRemarks;?> <?php echo $this->lobjAppealEntryForm->RemarkedBy;?>
+					<?php echo $this->lobjAppealEntryForm->IdAppeal;?> <?php echo $this->lobjAppealEntryForm->Idverifiermarks;?>
+					<?php echo $this->lobjAppealEntryForm->prevmarks;?></td>
+
+				<td><?php echo $this->translate($this->Subject);?></td>
+				<td><?php echo $this->subjectname;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate($this->Subject).' '.$this->translate("Distribution");?>
+				</td>
+				<td><?php echo $this->CompNameMaster;?></td>
+				<td><?php echo $this->translate("Component Name");?></td>
+				<td><?php echo $this->CompNameDetails;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Previous Marks");?></td>
+				<td><?php echo $this->previousmarks;?></td>
+				<td><?php echo $this->translate("Comments");?></td>
+				<td><?php echo $this->comments;?></td>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate("Marks Obtained");?><span>*</span></td>
+				<td><?php echo $this->lobjAppealEntryForm->NewMarks;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjAppealEntryForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'appealentry', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+
+	</Form>
+
+</fieldset>
