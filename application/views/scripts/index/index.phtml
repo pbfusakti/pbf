@@ -1,14 +1,115 @@
 <style type="text/css">
-
-
-
 </style>
 
-<div id="footer-boxes">
- <?php  Echo $this->title;
-		echo "<br>";
-		foreach ($this->listnama as $item) {
-			echo $item;echo "<br>";
-		}?>
-</div>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+   <script type="text/javascript">
+       var config = {baseUrl: '<?php echo $this->baseUrl() ?>'};
+   </script>
+<style>
+
+h2 {
+	align: center;
+	font-size: 30px;
+}
+body {font-family: Arial, Helvetica, sans-serif; text-align:center;background-image: url('/images/images/index/usakti.jpg');}
+form {
+	background-color: white;
+	opacity: 0.95;
+	border: 3px solid #C4B65C; 
+	width: 40%; 
+	display: inline-block;
+	
+}
+
+input[type=text], input[type=password] {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #C4B65C;
+  color: black;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 20%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.container {
+  padding: 16px;
+}
+
+span.psw {
+  float: right;
+  padding-top: 16px;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+  span.psw {
+     display: block;
+     float: none;
+  }
+  .cancelbtn {
+     width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<h2 align="center" >LOGIN FORM</h2>
+
+<form position="center" action="/action_page.php" method="post">
+<br></br>
+<img width="30%" src="/images/images/index/trisakti.png" />
+<Br></Br>
+  <div class="container" align="center">
+    <label for="uname"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username  " name="uname" required>
+    <br>
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password  " name="psw" required>
+    <br>
+        
+    <input style="width: 150px; 
+    padding: 20px; 
+    cursor: 
+    pointer; 
+    box-shadow: 6px 6px 5px; #999; 
+    -webkit-box-shadow: 6px 6px 5px #999; 
+    -moz-box-shadow: 6px 6px 5px #999; 
+    font-weight: bold; 
+    background: #C4B65C; 
+    color: #000; 
+    border-radius: 10px; 
+    border: 1px solid #999; 
+    font-size: 100%;" type="button" value="LOGIN" onclick="window.location.href='/homepage/homepage/view'" />
+    <br><bR></bR>
+    <label>
+      <input type="checkbox" checked="checked" name="remember"> Remember me
+    </label>
+  </div>
+
+  <div class="container" style="background-color:#C4B65C">
+    <span class="psw"><Br>Forgot <a href="#">password?</a></span>
+  </div>
+</form>
+
+</body>
+</html>
+
 <div style="clear: both;">&nbsp;</div>
