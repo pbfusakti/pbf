@@ -1,0 +1,30 @@
+<form name = "datamhsform" method="post">
+<fieldset><legend> <?php echo "Data Entry Mahasiswa"?></legend>
+<input type = "hidden" id= "id" name="Idmhs" value="<?php echo $this->datapersonal['id']?>_">
+<table>
+<tr><th>NIM</th>
+<td><input type="text" name="Nim" id= "nim" value="<?php echo $this->datapersonal['nim']?>">
+<tr><th>NAMA</th>
+<td><input type="text" name="Nama" value="<?php echo $this->datapersonal['nama']?>">
+<tr><th>ALAMAT</th>
+<td><textarea rows="5" cols="50"name = "Alamat" id="alamat"><?php echo $this->datapersonal['alamat']?></textarea>
+<tr><th>NAMA PRODI</th>
+<td><input type="text" name="IdProgram" value="<?php echo $this->datapersonal['prodi']?>"> 
+<tr><th><td>
+<span="2">
+<input type="submit" name = "save" value="save">
+<input type="submit" name = "delete" value="delete">
+<input type="submit" name = "update" value="update">
+<input type="submit" name = "search" value="search">
+<input type="submit" name = "approve" value="approve"></td></th></tr>
+</fieldset>
+</input> 
+</span>
+<table class="table"><tr><th>NIM</th><th>NAMA</th><th>ALAMAT</th><th>PRODI</th></tr>
+<?php foreach($this->datamhs as $mhs) {?>
+  <Tr><td><?php echo $mhs['Nim'];?></td>
+  <td><?php echo $mhs['Nama'];?></td>
+  <td><?php echo $mhs['Alamat'];?></td>
+  <td><?php echo $mhs['IdProgram'];?></td></Tr>
+  <?php }?>
+  </table>
