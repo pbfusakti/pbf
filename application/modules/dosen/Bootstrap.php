@@ -1,10 +1,10 @@
 <?php
-class  Examination_Bootstrap extends Zend_Application_Module_Bootstrap
+class  Dosen_Bootstrap extends Zend_Application_Module_Bootstrap
 {
 
  protected function _initAutoload() {
   $autoloader = new Zend_Application_Module_Autoloader(array (
-    'namespace' => 'Examination_' ,
+    'namespace' => 'Dosen_' ,
     'basePath' => APPLICATION_PATH
   ));
 

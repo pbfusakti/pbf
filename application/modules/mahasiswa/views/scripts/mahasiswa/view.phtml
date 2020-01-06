@@ -1,0 +1,68 @@
+<form name = "datamhsform" method="post">
+
+<div class="niha">
+  <a href="/pelajaran/pelajaran/view">Matakuliah</a>
+  <a href="#mahasiswa">Mahasiswa</a>
+  <a href="#dosen">Dosen</a>
+  <a href="#ruangan">Ruangan</a>
+  <a href="#tahunakademik">Tahun Akademik</a>
+  <a href="#bataspengisiankrs">Batas Pengisian Krs</a>
+  <a href="#penjadwalanaktivasi">Penjadwalan Aktivasi</a>
+</div>
+<fieldset><legend> <?php echo "Data Entry Mahasiswa"?></legend>
+
+
+<style>
+/* Add a black background color to the top navigation */
+.niha {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.niha a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  border-bottom: 3px solid transparent;
+}
+</style>
+<br><br>
+
+<input type = "hidden" id= "id" name="id" value="<?php echo $this->mahasiswa['id']?>">
+<table>
+<tr><th>Mahasiswa</th>
+<td><input type="text" name="mahasiswa" id= "mahasiswa" value="<?php echo $this->mahasiswa['mahasiswa']?>">
+<tr><th>NIM</th>
+<td><input type="text" name="nim" id= "nim" value="<?php echo $this->mahasiswa['nim']?>">
+<tr><th>Jurusan</th>
+<td><input type="text" name="jurusan" value="<?php echo $this->mahasiswa['jurusan']?>">
+<tr><th>Alamat</th>
+<td><input type="text" name="alamat" id= "alamat" value="<?php echo $this->mahasiswa['alamat']?>">
+<tr><th>Jumlah SKS</th>
+<td><input type="text" name = "sks" id="sks" value="<?php echo $this->mahasiswa['sks']?>" >
+
+<br><br>
+<tr><td colspan="2">
+<input type="submit" name = "save" value="save">
+<input type="submit" name = "delete" value="delete">
+<input type="submit" name = "update" value="update">
+<input type="submit" name = "search" value="search">
+</td></tr>
+</table>
+</form>
+</fieldset>
+
+<table class="table" border="1"><h4> Data Mahasiswa</h4><br></br><tr><th>Mahasiswa</th><th>NIM</th><th>Jurusan</th><th>Alamat</th><th>Jumlah SKS </th><?php foreach($this->refmhs as $mhs) {?> 
+<tr><td><?php echo $mhs['mahasiswa'];?></td></th> 
+<td><?php echo $mhs['nim'];?></td> 
+<td><?php echo $mhs['jurusan'];?></td>
+<td><?php echo $mhs['alamat'];?></td>
+<td><?php echo $mhs['sks'];?></td>
+<?php }?>
+
+  </table>
