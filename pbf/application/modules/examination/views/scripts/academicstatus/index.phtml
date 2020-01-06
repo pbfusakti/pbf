@@ -1,0 +1,102 @@
+<?php
+$academicstatud = array('0' => 'GPA','1' => 'CGPA', '2' => 'ALL');
+?>
+<script type="text/javascript">
+    dojo.addOnLoad(function(){
+        <?php if (!$this->larrresult) { ?>
+            dijit.byId('field5').set('value','');
+            dijit.byId('field5').set('placeHolder','Select');
+            dijit.byId('field8').set('value','');
+            dijit.byId('field8').set('placeHolder','Select');
+            dijit.byId('field20').set('value','');
+            dijit.byId('field20').set('placeHolder','Select');
+            dijit.byId('field10').set('value','');
+            dijit.byId('field10').set('placeHolder','Select');
+            dijit.byId('field27').set('value','');
+            dijit.byId('field27').set('placeHolder','Select');
+        <?php } ?>
+    });
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("GPA/CGPA Setup"); ?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl(); ?>/examination/academicstatus/index/search/1"
+		method="POST">
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Semester");?></td>
+				<td><?php echo $this->lobjform->field8; ?></td>
+				<td><?php echo $this->translate("Award");?></td>
+				<td><?php echo $this->lobjform->field20; ?></td>
+				<td><?php echo $this->translate("Academic Status"); ?>
+				</td>
+				<td><?php echo $this->lobjform->field27; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Scheme");?></td>
+				<td><?php echo $this->lobjform->field10; ?></td>
+				<td><?php echo $this->translate($this->Program);?></td>
+				<td><?php echo $this->lobjform->field5; ?></td>
+			</tr>
+			<tr>
+				<td colspan="6" style="height: 10px"></td>
+			</tr>
+			<tr>
+				<td align="center" colspan="6"><?php echo $this->lobjform->Search; ?>
+					<input type="button" class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Add"); ?>"
+					onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'academicstatus', 'action' => 'newacademicstatus'), 'default', true); ?>';" />
+					<?php echo $this->lobjform->Clear; ?>
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+</br>
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+		<tr>
+
+			<th><?php echo $this->translate('Semester'); ?></th>
+			<th><?php echo $this->translate("Academic Status"); ?>
+			</th>
+			<th><?php echo $this->translate("Scheme");?></th>
+			<th><?php echo $this->translate("Award");?></th>
+			<th><?php echo $this->translate("Program");?></th>
+
+
+		</tr>
+
+
+		<?php if (count($this->paginator)): ?>
+		<?php foreach ($this->paginator as $lobjprogram): ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0", "#FFFFFF"))->next() ?>">
+			<!--<td><a href="<?php echo $this->url(array('module' => 'examination', 'controller' => 'academicstatus', 'action' => 'newacademicstatus', 'id' => $lobjprogram['IdProgram']), 'default', true); ?>" ><?php print_r($this->escape($lobjprogram['ProgramName'])); ?></a></td>-->
+			<td><a
+				href="<?php echo $this->url(array('module' => 'examination', 'controller' => 'academicstatus', 'action' => 'academicstatuslist', 'id' => $lobjprogram['IdAcademicStatus']), 'default', true); ?>"><?php echo (isset($lobjprogram['SemesterMainName'])) ? $lobjprogram['SemesterMainName']  : '' ; ?>
+			</a></td>
+			<td><?php echo $academicstatud[$lobjprogram['AcademicStatus']]; ?></td>
+			<td><?php echo ($lobjprogram['schemename']) ? $lobjprogram['schemename']  : '' ; ?>
+			</td>
+			<td><?php echo (isset($lobjprogram['award'])) ? $lobjprogram['award']  : '' ; ?>
+			</td>
+			<td><?php echo (isset($lobjprogram['ProgramName']) && isset($lobjprogram['ProgramCode'])) ? $lobjprogram['ProgramCode'].' - '.$lobjprogram['ProgramName']  : '' ; ?>
+			</td>
+
+
+		</tr>
+		<?php endforeach; ?>
+		<?php endif; ?>
+
+		<tr>
+			<td colspan="5" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator, 'Sliding',
+							'/partials/my_pagination_control.phtml'); ?>
+				</div></td>
+		</tr>
+
+	</table>
+</fieldset>

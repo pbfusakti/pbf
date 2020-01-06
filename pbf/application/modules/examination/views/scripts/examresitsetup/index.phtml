@@ -1,0 +1,47 @@
+<script type="text/javascript">
+dojo.addOnLoad(function(){
+    <?php if(!isset($this->configarray)){?>
+        dijit.byId('FinalMarks').set('value','');
+        dijit.byId('FinalMarks').set('placeHolder','Select');
+        dijit.byId('MinimumGrade').set('value','');
+        dijit.byId('MinimumGrade').set('placeHolder','Select');
+    <?php } ?>
+});
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Exam Resit Setup"); ?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                return true;
+            }else {
+                return false;
+            }
+        </script>
+		<table class="table" width="100%">
+			<tr>
+				<td><?php echo $this->translate('Application Count');?>
+				</td>
+				<td><?php echo $this->lobjexamresitsetupForm->ApplicationCount;?> <?php echo $this->lobjexamresitsetupForm->UpdatedOn;?>
+					<?php echo $this->lobjexamresitsetupForm->UpdatedBy;?> <?php echo $this->lobjexamresitsetupForm->IdUniversity;?>
+				</td>
+				<td><?php echo $this->translate('Final Marks');?>
+				</td>
+				<td><?php echo $this->lobjexamresitsetupForm->FinalMarks;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Minimum Grade');?>
+				</td>
+				<td><?php echo $this->lobjexamresitsetupForm->MinimumGrade;?></td>
+			</tr>
+			<tr>
+				<td colspan="4" align="right"><?php echo $this->lobjexamresitsetupForm->Save;?>
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>

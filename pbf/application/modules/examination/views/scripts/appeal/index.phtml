@@ -1,0 +1,198 @@
+<script>
+function approve(){
+	var sa_id = $('input[name=sa_id]:checked').val();
+	
+	if(!sa_id){
+		alert('Please select student first.');
+	}else{	
+		openDialog(sa_id);
+	}
+}
+
+function openDialog(sa_id){	
+	
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'appeal','action'=>'appeal-approval'), 'default', true);?>/id/"+sa_id;
+
+	$( "#dialog-box" ).load(url).dialog('open');
+}
+
+$(function() {
+
+	$( "#dialog-box" ).dialog({
+	    autoOpen: false,
+	    width: 750,
+	    height: 250,
+	    modal: true,
+	    buttons: {          
+	        "Submit": function() {
+
+	        	var dosen = $("#dosen option:selected").val();
+	        	var approval_status = $("#approval_status option:selected").val();
+
+	        	if(approval_status==3){
+	        		$("#appealApproval").submit();   
+	        	}else{
+	        		if($("#meeting_date").val()=='' || dosen==0 || approval_status==0){
+		        		alert('Nilai diperlukan dan tidak boleh kosong.');
+		        	}else{                 	
+	    				$("#appealApproval").submit();    
+	             	}  
+	        	}
+	        	
+	        	    
+	        },
+	        "Close": function() {
+	            $( this ).dialog( "close" );
+	        }
+	    }
+	});
+
+
+	$( "#dialog-view" ).dialog({
+	    autoOpen: false,
+	    width: 750,
+	    height: 350,
+	    modal: true,
+	    buttons: {          
+	       
+	        "Close": function() {
+	            $( this ).dialog( "close" );
+	        }
+	    }
+	});
+
+	$( "#dialog-update" ).dialog({
+	    autoOpen: false,
+	    width: 750,
+	    height: 450,
+	    modal: true,
+	    buttons: {  
+	        "Close": function() {
+	            $( this ).dialog( "close" );
+	        }
+	    }
+	});
+
+	$("#meeting_date").datepicker({
+		"dateFormat":"yy-mm-dd",
+		"changeMonth":"true"		
+	});
+	
+});
+
+function changeDosen(val){
+
+	if(val==2){
+		$("#dosen").removeAttr("disabled"); 
+		$("#meeting_date").removeAttr("disabled"); 
+		$("#meeting_time").removeAttr("disabled"); 
+		$("#location").removeAttr("disabled"); 
+	}else{
+		$("#dosen").attr("disabled", "disabled"); 
+		$("#meeting_date").attr("disabled", "disabled"); 
+		$("#meeting_time").attr("disabled", "disabled"); 
+		$("#location").attr("disabled", "disabled"); 
+	}
+	
+}
+
+function view(id){
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'appeal','action'=>'view'), 'default', true);?>/id/"+id;
+	$( "#dialog-view" ).load(url).dialog('open');
+}
+
+function UpdateMark(id){
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'appeal','action'=>'update-mark'), 'default', true);?>/id/"+id;
+    $( "#dialog-update" ).load(url).dialog('open');
+}
+
+
+
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		<li>
+				<a href="#" onclick="javascript:approve()">
+					<span class='process'></span>
+					Approve
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<br>
+
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong></div>
+<br>
+<?php } ?>
+
+<div style="width:100%;">
+<?php echo $this->form; ?>
+<br>
+
+<?php 
+	//echo $this->paginationControl($this->paginator,'Sliding','paginationTop.phtml');
+?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>		
+		<th><?php echo $this->translate("Student Name");?></th>
+		<th><?php echo $this->translate("Student NIM");?></th>
+		<th><?php echo $this->translate("Date Apply");?></th>
+		<th><?php echo $this->translate("Semester");?></th>
+		<th><?php echo $this->translate("Subject");?></th>
+		<th><?php echo $this->translate("Application Status");?></th>
+		<th><?php echo $this->translate("Mark Verification Status");?></th>	
+	</tr>
+	<?php 
+	if(count($this->paginator)>0){
+		foreach($this->paginator as $key=>$student){
+	?>
+	<tr>
+		<td align="center">
+		<?php if($student['sa_status']==1){?>
+		<input type="radio" name="sa_id" id="sa_id" value="<?php echo $student['sa_id']; ?>">
+		<?php } ?>
+		</td>
+		<td><?php echo $student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"]?></td>
+		<td><?php echo $student['registrationId']; ?>-<?php echo $student['IdStudentRegistration']; ?></td>
+		<td><?php echo date("d-m-y",strtotime($student['sa_applyDate'])); ?></td>
+		<td><?php echo $student["SemesterMainName"];?></td>
+		<td><?php echo $student["SubjectCode"].' - '.$student["SubjectName"];?></td>
+		<td align="center">
+		<?php 
+		if($student['sa_status']==1) echo $this->translate("Apply");
+		
+		if($student['sa_status']==2) echo $this->translate("Approved").'<br>'.date("d-m-Y",strtotime($student['sa_approvedDate'])); 
+		
+		if($student['sa_status']==3) { echo $this->translate("Rejected").'<br>'.date("d-m-Y",strtotime($student['sa_approvedDate'])); }?></td>		
+		<td align="center">
+		<?php 
+		if( $student["sa_verify_status"] == 1) {
+			echo '<a href="#" onclick="view('.$student["sa_id"].')">'.$this->translate("Verified").'</a><br>'.date("d-m-Y",strtotime($student['sa_verify_date']));
+		}else{
+			if($student['sa_status']==2){
+				echo '<a href="#" onclick="UpdateMark('.$student['sa_id'].');">'.$this->translate("Enter Mark").'</a>';
+			}else{
+				echo '<a href="#" onclick="view('.$student["sa_id"].')">'.$this->translate("View").'</a>';
+			}
+		} 
+		?>
+		</td>
+	</tr>
+	<?php }} ?>
+</table>
+</div>
+
+<div id="dialog-view" title="Student Appeal Information">
+</div>
+
+<div id="dialog-update" title="Student Appeal">
+</div>
+
+<div id="dialog-box" title="Student Appeal">
+</div>

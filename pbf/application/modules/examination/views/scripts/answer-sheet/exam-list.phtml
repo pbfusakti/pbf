@@ -1,0 +1,62 @@
+<script>
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'view'), 'default', true);?>";
+}
+
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		 
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+	
+<table class="table" width="80%" cellpadding="5" cellspacing="1" border="0">
+	<tr>		
+		<th width="30%"><?php echo $this->translate("Location"); ?></th>
+		<th width="30%"><?php echo $this->translate("Date"); ?></th>
+	</tr>
+	
+	<tr>		
+
+		<td>Lokasi</td>
+		<td align="center"><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet', 'action'=>'room-detail','default',true)); ?>">Tarikh</a></td>
+	</tr>
+	
+</table>
+</div>

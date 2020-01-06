@@ -1,0 +1,69 @@
+<table class="table" width="100%">
+	<tr>
+		<th colspan="4"><?php echo $this->translate("Marks Distribution History");?></th>
+	</tr>
+	<?php if(!empty($this->historyArray)){?>
+	<?php foreach($this->historyArray as $list){?>
+	<tr valign="top">
+		<td><?php echo $list['no']+1;?></td>
+		<td>
+			<table class="table" width="100%">
+				<tr>
+					<th width="20%"><?php echo $this->translate('Faculty');?></th>
+					<th width="20%"><?php echo $this->translate('Scheme');?></th>
+					<th width="20%"><?php echo $this->translate('Program');?></th>
+					<th width="20%"><?php echo $this->translate('Course');?></th>
+					<th width="20%"><?php echo $this->translate('Semester');?></th>
+				</tr>
+				<tr>
+					<td><?php echo ($list['facultyname']=='') ? 'All' : $list['facultyname'];?>
+					</td>
+					<td><?php echo ($list['schemename']=='') ? 'All' : $list['schemename'];?>
+					</td>
+					<td><?php echo ($list['ProgramName']=='') ? 'All' : $list['ProgramName'];?>
+					</td>
+					<td><?php echo ($list['coursename']=='') ? '' : $list['coursename'];?>
+					</td>
+					<td><?php echo ($list['semester']=='') ? '' : $list['semester'];?>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td>
+			<table class="table" width="100%">
+				<tr>
+					<th><?php echo $this->translate('Activity');?></th>
+					<th><?php echo $this->translate('Old Status');?>
+					</th>
+					<th><?php echo $this->translate('New Status');?>
+					</th>
+					<th><?php echo $this->translate('Updated By');?></th>
+					<th><?php echo $this->translate('Updated On');?></th>
+				</tr>
+				<?php foreach($list['detail'] as $lis){?>
+				<tr>
+					<td><?php echo ($lis['Activity']=='') ? '' : $lis['Activity'];?></td>
+					<td><?php echo ($lis['OldStatus']=='') ? '' : strtoupper($lis['OldStatus']);?>
+					</td>
+					<td><?php echo ($lis['NewStatus']=='') ? '' : strtoupper($lis['NewStatus']);?>
+					</td>
+					<td><?php echo ($lis['UpdatedBy']=='') ? '' : $lis['UpdatedBy'];?>
+					</td>
+					<td><?php echo ($lis['UpdatedOn']=='') ? '' : $lis['UpdatedOn'];?>
+					</td>
+				</tr>
+				<?php  } ?>
+			</table>
+		</td>
+	</tr>
+	<?php }
+} ?>
+	<tr>
+		<td colspan="4" align="right"><input type="button" class="NormalBtn"
+			dojoType=dijit.form.Button
+			label='<?php echo $this->translate("Next");?>' name="Next"
+			Value="<?php echo $this->translate("Next");?>"
+			onclick="fnToggleTabs('Back','tab-one','tab-two')">
+		</td>
+	</tr>
+</table>

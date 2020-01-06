@@ -1,0 +1,247 @@
+<?php 
+	$this->headScript()->appendFile('/js/jquery/plugin/lou-multi-select/js/jquery.multi-select.js');
+	$this->headLink()->appendStylesheet('/js/jquery/plugin/lou-multi-select/css/multi-select.css');
+?>
+<script>
+$(function() {
+    $( "#tabs" ).tabs({
+        beforeLoad: function( event, ui ) {
+        	ui.panel.html('Loading...');
+
+        	ui.jqXHR.error(function() {
+                ui.panel.html(
+                  "Couldn't load this tab. We'll try to fix this as soon as possible. " +
+                  "If this wouldn't be a demo." );
+              });
+		}
+   	});
+	console.log(window.location.hash);
+
+	if(window.location.hash == '#tabs-3'){
+    	$("#tabs").tabs({ active: 2 });
+	}
+
+    $( "#dialog-edit-status" ).dialog({
+        autoOpen: false,
+		resizable: false,
+        height:140,
+        modal: true,
+        buttons: {
+        	"Save": function() {
+        		$('#form_edit_status').submit();
+          	},
+          	Cancel: function() {
+            	$( this ).dialog( "close" );
+          	}
+        }
+	});
+
+
+	
+});
+  
+function print_kpu(sid, nim){
+
+	if(sid !="" && nim!=""){
+
+		var sem = $('#semester').val();
+		var ass_type = $('#exam_type').val();
+		
+		$('#form_print_kpu').remove();
+		$('body').append(
+			$('<form />')
+			.attr('id','form_print_kpu')
+			.attr('action','/examination/exam-grouping/kpu-print/')
+			.attr('method','post')
+			.attr('target','_BLANK')
+			.append(
+				'<input type="hidden" name="sid" value="'+sid+'" />' +
+				'<input type="hidden" name="nid" value="'+nim+'" />' +
+				'<input type="hidden" name="semid" value="'+sem+'" />' +
+				'<input type="hidden" name="ass_type" value="'+ass_type+'" />'	
+			)
+		);
+
+		$('#form_print_kpu').submit();
+	}
+}
+
+function release_exam_slip(sem,ass_type){
+
+	$('#esr_semester_id').val(sem);
+	$('#esr_assessment_type_id').val(ass_type);
+	
+	$( "#dialog-edit-status" ).dialog('open');
+}
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+		</ul>
+	</div>
+</div>
+<br />
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+
+<div id="tabs">
+  	<ul>
+    	<li><a href="#tabs-1"><?php echo $this->translate("Exam Slip Release");?></a></li>
+    	<li><a href="#tabs-2"><?php echo $this->translate("View Exam Slip");?></a></li>
+    	<li><a href="/examination/exam-grouping/attendance-policy"><?php echo $this->translate("Attendance Policy");?></a></li>
+  	</ul>
+  	
+  	<div id="tabs-1">
+  		<fieldset>
+  			<legend><?php echo $this->translate('Academic Year');?></legend>
+  			<form id="year_selector" method="get">
+	  			<select name="year" onchange="$('#year_selector').submit();">
+	  				<?php 
+	  					foreach ($this->academic_year_list as $academicYear):
+	  						$select = "";
+	  						if($academicYear['ay_id'] == $this->academic_year['ay_id']){
+								$select = 'selected="selected"';
+							}
+	  				?>
+	  				<option value="<?php echo $academicYear['ay_id'];?>" <?php echo $select;?>><?php echo $academicYear['ay_code'];?></option>
+	  				<?php endforeach;?>
+	  			</select>
+  			</form>
+  		</fieldset>
+    	<table class="table" width="100%">
+    		<tr>
+    			<th><?php echo $this->translate("Semester");?></th>
+    			<th><?php echo $this->translate("Exam Type");?></th>
+    			<th><?php echo $this->translate("Status");?></th>
+    			<th>&nbsp;</th>
+    		</tr>
+    		<?php foreach ($this->exam_release as $release):?>
+    		<tr>
+    			<td rowspan="<?php echo sizeof($release['assessment_type']);?>"><?php echo $release['SemesterMainDefaultLanguage'];?></td>
+    			<td><?php echo $release['assessment_type'][0]['value'];?></td>
+
+    				<?php 
+    					if( isset($release['assessment_type'][0]['release_data']['esr_status']) && $release['assessment_type'][0]['release_data']['esr_status']=='1' ){
+							echo '<td align="center" style="background-color: green; color: #FFF">';
+							echo $this->translate("Open");
+							echo '</td>';
+    					}else{
+							echo '<td align="center">';
+							echo $this->translate("Close");
+							echo '</td>';
+						}
+    				?>
+
+    			<td align="center">
+    				<a href="#" onclick="release_exam_slip(<?php echo $release['IdSemesterMaster']?>,<?php echo $release['assessment_type'][0]['key'];?>)"><?php echo $this->translate("Edit");?></a>
+    			</td>
+    		</tr>
+    			<?php 
+    				for($i=1; $i<sizeof($release['assessment_type']); $i++){
+						$assessment = $release['assessment_type'][$i];
+    			?>
+    		<tr>
+    				<td><?php echo $assessment['value'];?></td>
+    				
+    				<?php 
+    					if( isset($assessment['release_data']['esr_status']) && $assessment['release_data']['esr_status']==1 ){
+							echo '<td align="center" style="background-color: green; color: #FFF">';
+							echo $this->translate("Open");
+							echo '</td>';
+    					}else{
+							echo '<td align="center">';
+							echo $this->translate("Close");
+							echo '</td>';
+						}
+    					?>
+    				
+    				<td align="center">
+    					<a href="#" onclick="release_exam_slip(<?php echo $release['IdSemesterMaster']?>,<?php echo $assessment['key'];?>); return false;"><?php echo $this->translate("Edit");?></a>
+    				</td>
+    		</tr>
+    			<?php }?>
+    		
+    		<?php endforeach;?>
+    	</table>	
+  	</div>
+  
+	<div id="tabs-2">
+		<fieldset>
+			<legend><?php echo $this->translate("Search Options");?></legend>
+		    <?php echo $this->form;?>
+		</fieldset>
+		
+		<?php 
+		if (isset($this->paginator)){
+		?>
+		<table class="table" width="100%" cellpadding="5" cellspacing="1">
+			<tr>
+				<th><?php echo $this->translate("Student Name");?></th>
+				<th><?php echo $this->translate("Nom Fomulir");?></th>    
+		    	<th><?php echo $this->translate("NIM");?></th>
+		    	<th><?php echo $this->translate("Program");?></th>
+		    	<th><?php echo $this->translate("Student Status");?></th>
+		    	<th>&nbsp;</th>
+		    </tr>
+		    <?php    		
+		        foreach ($this->paginator as $lobjstudents){
+		        ?>
+		  		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">	  		
+		        	<td><?php echo $this->escape($lobjstudents['appl_fname'].' '.$lobjstudents['appl_mname'].' '.$lobjstudents['appl_lname']);?></td>
+		        	<td><?php echo $this->escape($lobjstudents['at_pes_id']);?></td>
+		        	<td><?php echo $this->escape($lobjstudents['registrationId']);?></td>
+		            <td><?php echo $this->escape($lobjstudents['ArabicName']);?></td>
+		        	<td><?php echo $this->escape($lobjstudents['profileStatus']);?></td>
+		        	<td align="center"><a class="button" href="#" onclick="print_kpu(<?php echo $this->escape($lobjstudents['IdStudentRegistration']);?>,<?php echo $this->escape($lobjstudents['registrationId']);?>);"><?php echo $this->translate("Exam Slip");?></a></td>
+		       <?php 
+		        }  
+		        ?>
+			</tr>
+			<tr>
+			<td colspan="8" align="right"><div class="pagination"><?php echo $this->paginationControl($this->lobjpaginator,'Sliding','exam-grouping/kpu-paginationLink.phtml'); ?></div></td>
+			</tr>
+		</table>
+		<?php 
+		}
+		?>    
+  	</div>
+  
+</div>
+
+
+<div id="dialog-edit-status" title="<?php echo $this->translate("Exam Slip Release Status");?>">
+	<form name="form_edit_status" id="form_edit_status" method="post" action="/examination/exam-grouping/exam-slip-release">
+		<input type="hidden" name="esr_semester_id" id="esr_semester_id" value="" />
+		<input type="hidden" name="esr_assessment_type_id" id="esr_assessment_type_id" value="" />
+	<table>
+		<tr>
+			<td><?php echo $this->translate("Status");?></td>
+			<td>:</td>
+			<td>
+				<select name="esr_status" style="width:200px;">
+					<option value="0"><?php echo $this->translate("Close");?></option>
+					<option value="1"><?php echo $this->translate("Open");?></option>
+				</select>
+			</td>
+		</tr>
+	</table>
+	</form>
+</div>
+
+
+

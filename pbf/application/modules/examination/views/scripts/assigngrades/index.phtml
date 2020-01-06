@@ -1,0 +1,158 @@
+<script type="text/javascript">
+
+</script>
+
+
+
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Assign").' '.$this->translate("Grades");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/assigngrades/index/search/1"
+		method="POST" dojoType="dijit.form.Form" id="myForm">
+
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+				}
+				else
+				{					
+					return false;
+                }
+				</script>
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Student").' '.$this->translate("Name");?>
+				</td>
+				<td><?php echo $this->lobjform->field3;?></td>
+				<td><?php echo $this->translate("Personal").' '.$this->translate("ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Semester");?></td>
+				<td><?php echo $this->lobjform->field5;?></td>
+				<td><?php //echo $this->translate($this->Branch);?></td>
+				<td><?php //echo $this->lobjform->field8;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Active");?></td>
+				<td><?php echo $this->lobjform->field7;?></td>
+			</tr>
+			<tr>
+				<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Clear')?>" value='Clear'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'assigngrades', 'action'=>'index'),'default',true);?>';" />
+
+				</td>
+
+			</tr>
+		</table>
+	</form>
+</fieldset>
+<br />
+<?php  if (count($this->paginator)) {?>
+<form name="placement" method="POST">
+	<fieldset>
+		<table class="table" width="100%" cellpadding="5" cellspacing="1">
+			<tr>
+				<th><?php echo $this->translate->_("Student").' '.$this->translate->_("Name");?>
+				</th>
+				<th><?php echo $this->translate->_("Program")." ".$this->translate->_("Name");?>
+				</th>
+				<th><?php echo $this->translate->_("Semester")." ".$this->translate->_("Name");?>
+				</th>
+				<th><?php echo $this->translate->_("Semseter")." ".$this->translate->_("Number");?>
+				</th>
+				<th><?php echo $this->translate->_("Grade");?></th>
+			</tr>
+			<?php	
+
+			if (count($this->paginator)): $cnt =0;
+			$cnts =0;
+		foreach ($this->paginator as $studentGrades):  ?>
+
+			<tr>
+				<td><?php echo $this->escape($studentGrades['FName']);?> <input
+					type="hidden" name="studentid[]" id="studentid"
+					value="<?php echo $studentGrades['IdStudentRegistration'];?>">
+				</td>
+				<td><?php echo $this->escape($studentGrades['ProgramName']);?>
+				</td>
+				<td><?php echo $this->escape($studentGrades['SemesterCode']);?>
+				</td>
+
+				<td colspan="3">
+					<table>
+						<tr>
+							<?php for($i=1;$i<=$studentGrades['SemsterCount'];$i++){?>
+						
+						
+						<tr>
+							<td><?php echo $i;?><input type="hidden"
+								name="semno[<?php echo $studentGrades['IdStudentRegistration'];?>][]"
+								id="semno" value="<?php echo $i;?>"></td>
+
+							<?php
+							if (count($this->ArraSubjectList)):
+		foreach ($this->ArraSubjectList as $ArraSubjectLists):  ?>
+							<td colspan="2">
+						
+						
+						<tr>
+							<td><?php echo $this->escape($ArraSubjectLists['SubjectName']);		   	        
+							?> <input type="hidden"
+								name="subjid[<?php echo $studentGrades['IdStudentRegistration'];?>][<?php echo $i;?>][]"
+								id="subjid"
+								value="<?php echo $this->escape($ArraSubjectLists['IdSubject']);?>">
+							</td>
+							<td><select dojoType="dijit.form.FilteringSelect"
+								name="idgrade[<?php echo $studentGrades['IdStudentRegistration'];?>][<?php echo $i;?>][<?php echo $ArraSubjectLists['IdSubject'];?>][]">
+									<?php foreach ($this->gradeslist as $larrrgradelist){ 									
+								if($studentGrades['IdGrade']==$larrrgradelist['IdGradeSetUp']){?>
+									<option value="<?php echo $larrrgradelist['IdGradeSetUp'];?>"
+										selected="selected">
+										<?php echo $this->escape($larrrgradelist['GradeDesc']);?>
+									</option>
+									<?php }?>
+									<option value="<?php echo $larrrgradelist['IdGradeSetUp'];?>">
+										<?php echo $this->escape($larrrgradelist['GradeDesc']);?>
+									</option>
+									<?php }?>
+							</select>
+							</td>
+						</tr>
+						<?php
+						$cnt++;
+						endforeach;
+			endif; ?>
+						</td>
+						</td>
+						</tr>
+						<?php }?>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<?php 
+			$cnts=1;
+		endforeach; endif; ?>
+
+		</table>
+
+		<table class="table" width="100%">
+			<tr>
+				<td align="right" colspan="4"><input type='submit' class="NormalBtn"
+					dojotype="dijit.form.Button" name="Save"
+					label="<?php echo $this->translate('Save')?>" value='Save' /> <input
+					type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'application','controller'=>'verifyprogramchecklist', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</form>
+<?php }  ?>

@@ -1,0 +1,234 @@
+<script type="text/javascript">
+function addAttendance(){
+	window.location = '/examination/class-attendance/student-attendance-add/group/<?php echo $this->group['IdCourseTaggingGroup']?>';
+
+	return false;
+}
+
+function editAttendance(){
+	var id = $('input[name=id]:checked').val();
+
+	if(!id){
+		alert('<?php echo $this->translate("Please select any class first"); ?>');
+	}else{
+		window.location = "<?php echo $this->url(array('module'=>'examination','controller'=>'class-attendance', 'action'=>'student-attendance-edit'),'default',true); ?>/id/"+id;
+	}
+}
+
+function deleteAttendance(){
+	var id = $('input[name=id]:checked').val();
+
+	if(!id){
+		alert('<?php echo $this->translate("Please select any class first"); ?>');
+	}else{
+		var msg = "<?php echo $this->translate('Confirm to delete?'); ?>";
+
+		var tr = $($('input[name=id]:checked')).closest('tr');
+		
+		if( confirm(msg) ){
+			$.ajax({
+			  type: "POST",
+			  url: "<?php echo $this->url(array('module'=>'examination','controller'=>'class-attendance', 'action'=>'student-attendance-delete'),'default',true); ?>",
+			  data: {'gid':<?php echo $this->group['IdCourseTaggingGroup']?>,'id':id},
+			  dataType: 'json',
+			  async : false,
+			  beforeSend: function(){
+				$(tr).hide();
+				$(tr).after('<tr id="loading"><td colspan="9">Deleting &nbsp;<img src="/images/ajax-loader-bar-small.gif" /></td></tr>');
+				$('#loading').css("background-color","#FF3700");
+			  }
+			})
+			.done(function(data){
+				$('#loading').remove();
+				
+				if(data.status == 1){
+					$(tr).show();
+					$(tr).css("background-color","#FF3700");
+					$(tr).fadeOut(400, function(){
+			            tr.remove();
+			        });
+				}else{
+					$(tr).show();
+					alert('Unable to delete. Please contact administrator');
+				}
+		        
+			})
+			.error(function(data){
+				$('#loading').remove();
+				$(tr).show();
+				alert('Unable to delete. Please contact administrator');
+			});
+		}
+	}
+}
+
+function view_detail(id){
+	window.location = '/examination/class-attendance/student-attendance-detail/group/<?php echo $this->group['IdCourseTaggingGroup']?>/id/'+id;
+}
+
+function reportAttendance(){
+	window.location = '/examination/class-attendance/student-attendance-group-report/group/<?php echo $this->group['IdCourseTaggingGroup']?>';
+}
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onclick="addAttendance();" >
+					<span class='add'></span>
+					Add 
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="editAttendance();" >
+					<span class='edit'></span>
+					Edit 
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="deleteAttendance();" >
+					<span class='delete'></span>
+					Delete
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="reportAttendance();" >
+					<span class='report'></span>
+					Report
+				</a>
+			</li>
+			<li>
+				<a href="<?php echo $this->url(array('module'=>'examination','controller'=>'class-attendance','action'=>'index'),'default',true);?>" >
+					<span class='back'></span>
+					Back
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<fieldset>
+		<legend><?php echo $this->translate("Group Info");?></legend>
+		
+		<div style="float:left; width:49%; margin: 0 1% 0 0;">
+			<table>
+				<tr>
+					<td><?php echo $this->translate("Subject"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->subject['subjectMainDefaultLanguage'];?> - <?php echo $this->subject['SubCode'];?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupName"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupCode"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupCode']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Coordinator"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['FullName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Semester"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['semester_name']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Total Student"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['total_student']; ?></td>
+				</tr>
+			</table>
+		</div>
+		
+		<div style="float:left; width:49%;">
+			
+			<table class="table2" width="100%" cellpadding="10" cellspacing="2">
+				<tr>
+					<th colspan="5"><?php echo $this->translate("Schedule");?></th>
+				</tr>
+				<tr>
+					<th><?php echo $this->translate('Lecturer');?></th>
+					<th><?php echo $this->translate('Day');?></th>
+					<th><?php echo $this->translate('Time');?></th>
+					<th><?php echo $this->translate('Venue');?></th>
+					<th><?php echo $this->translate('Class Name');?></th>
+				</tr>
+				<?php foreach ($this->schedule as $schedule){?>
+				<tr>
+					<td><?php echo $schedule['FullName']!=""?$schedule['FullName']:$this->group['FullName']; ?></td>
+					<td><?php echo $schedule['sc_day']; ?></td>
+					<td><?php echo $schedule['sc_start_time']; ?> - <?php echo $schedule['sc_end_time']; ?></td>
+					<td><?php echo $schedule['sc_venue']; ?></td>
+					<td><?php echo $schedule['GroupName']; ?></td>
+				</tr>
+				<?php }?>
+			</table>
+		</div>
+</fieldset>
+<br />
+
+
+<?php echo $this->paginationControl($this->paginator,'Sliding','paginationLink.phtml'); ?>
+<table class="table" width="100%">
+	<tr>
+		<th width="10px;">&nbsp;</th>
+		<th><?php echo $this->translate("Date");?></th>
+		<th><?php echo $this->translate("Time");?></th>
+		<th><?php echo $this->translate("Lecturer");?></th>
+		<th><?php echo $this->translate("Total Student");?></th>
+		<th><?php echo $this->translate("Bil. Attend");?></th>
+		<th><?php echo $this->translate("Bil. Absent");?></th>
+		<th><?php echo $this->translate("Bil. Others");?></th>
+		<th><?php echo $this->translate("Remark");?></th>
+		<th>&nbsp;</th>
+	</tr>
+	
+	<?php 
+		if( sizeof($this->paginator) >0 ){
+			$grpAttDtlDb = new Examination_Model_DbTable_CourseGroupStudentAttendanceDetail();
+			$i=0;
+			foreach ($this->paginator as $entry){
+
+	?>
+	
+	<tr <?php echo $i%2==0?"class='shade'":""; ?>>
+		<td align="center"><input type="radio" name="id" value="<?php echo $entry['id']; ?>" /></td>
+		<td><?php echo date('d/m/Y', strtotime($entry['class_date'])); ?></td>
+		<td align="left"><?php echo $entry['class_time_start']; ?> - <?php echo $entry['class_time_end']; ?></td>
+		<td align="left"><?php echo $entry['FullName']; ?></td>
+		<td align="center"><?php echo $entry['total_registered_student']; ?></td>
+		<td align="center"><?php echo $grpAttDtlDb->getStatusCount($entry['id'],array(395));?></td>
+		<td align="center"><?php echo $grpAttDtlDb->getStatusCount($entry['id'],array(null,398));?></td>
+		<td align="center"><?php echo $grpAttDtlDb->getStatusCount($entry['id'],array(396,397));?></td>
+		<td><?php echo $entry['remark']; ?></td>
+		<td align="center"><a href="#" onclick="view_detail(<?php echo $entry['id']; ?>);">View Detail</a></td>
+	</tr>
+
+	<?php 
+				$i++;
+			}//end foreach 
+		}
+	?>
+</table>
+<?php echo $this->paginationControl($this->paginator,'Sliding','paginationLink.phtml'); ?>

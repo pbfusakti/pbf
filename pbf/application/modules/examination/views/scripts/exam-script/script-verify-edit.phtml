@@ -1,0 +1,172 @@
+<script>
+function onclickUpload(semester,subject,program,examtype) {
+	//alert(id);
+	//document.getElementById("items_id").value=n;
+	 
+	$('#dialog-upload-scripts').dialog('open');
+}
+$(function() {
+
+	$( "#dialog-upload-scripts" ).dialog({
+		autoOpen: false,
+    	resizable: false,
+      	height:140,
+      	modal: true,
+      	buttons: {
+        	"Upload Exam Script": function() {
+        		$('#form_script').submit();
+        	},
+        	Cancel: function() {
+          		$( this ).dialog( "close" );
+        	}
+      	}
+    });
+	 
+	$( "#dialog-exam-group" ).dialog({
+		  autoOpen: false,
+	      modal: true,
+	      width: 550,
+	      buttons: {
+	    	  "<?php echo $this->translate('Add'); ?>": function() {  
+	    		  var sel_text = $('#select_exam').find('option:selected').text();
+	    		  var sel_id = $('#select_exam').val();
+	    		  	    		  
+	    		  var tappend = '<tr>'+
+	    		  '<td>'+
+	    		  '<input type="hidden" name="examgroup[]" value="'+sel_id+'" />'+
+	    		  sel_text +
+	    		  '</td>' +
+	    		  '<td align="center"><a href="#" onclick="$(this).parent().parent().remove(); return false;"><img src="/images/icon/user_trash_full.png" title="Delete" /></td>'+
+	    		  '</tr>';
+		    	  $('#examgroup tbody').append(tappend);
+		    	  
+	          $( this ).dialog( "close" );
+	        },
+	        Close: function() {
+	          $( this ).dialog( "close" );
+	        }
+	      }
+	    });
+
+	$('#assign-examgroup').click(function(){
+    	$( "#dialog-exam-group" ).dialog('open');
+
+    	return false;
+    });
+});
+
+function getLecturer(element,targetElement){
+	var nama = $(element).val();
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'generalsetup','controller'=>'course-group', 'action'=>'ajax-get-lecturer'),'default',true);?>",
+		data: {'nama':$(element).val()},
+		type: 'POST',
+		dataType: 'json',	
+		beforeSend: function(){
+			$(targetElement).hide();
+			$(targetElement).parent().append('<div class="loading">Loading...</div>');	
+		}	
+	}).done(function ( data ) {
+
+		$('.loading').remove();  
+		$(targetElement).show();
+		
+		$(targetElement).empty().append('<option value="0"> <?php echo $this->translate("Please Select"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$(targetElement).append('<option value="'+data[index].IdStaff+'"> '+data[index].FullName+' </option>');
+		});
+	});
+}
+
+function getprintedby(){
+	var nama = $("#printedbysearch").val();
+ 
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'generalsetup','controller'=>'course-group', 'action'=>'ajax-get-lecturer'),'default',true);?>",
+		data: {'nama':nama},
+		type: 'POST',
+		dataType: 'json',	
+		beforeSend: function(){
+			$("#printedby").hide();
+			$("#printedby").parent().append('<div class="loading">Loading...</div>');	
+		}	
+	}).done(function ( data ) {
+
+		$('.loading').remove();  
+		$("#printedby").show();
+		
+		$("#printedby").empty().append('<option value="0"> <?php echo $this->translate("Please Select"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$("#printedby").append('<option value="'+data[index].IdStaff+'"> '+data[index].FullName+' </option>');
+		});
+	});
+}
+
+
+function showLoading(target,target_div,loading_id){
+	$('#'+target).hide();
+	$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+}
+
+function hideLoading(loading_id,target){
+	$('#'+loading_id).remove();
+	$('#'+target).show();
+}
+
+ 
+</script>
+  
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php echo $this->form; ?>
+
+ 
+<div id="dialog-exam-group" title="tag exam group">
+  <table>
+    <tr>
+      <td><?php echo $this->translate('Exam Group'); ?></td>
+      <td>:</td>
+      <td>
+      <select name="select_exam" id="select_exam" >
+      <?php if (count($this->examgrp)>0) {
+      		foreach ($this->examgrp as $value) {?>
+      	 		<option value="<?php echo $value['eg_id']?>"><?php echo $value['eg_group_code'].'/'.$value['eg_group_name'].' '.$value['subject_code'].'-'.$value['subject_name'].' '.$value['av_room_code'] ?></option>
+     <?php 	}
+     	}?>
+     
+      </select>
+      </td>
+      
+    </tr>
+    
+     
+   </table>
+</div>
+
+<div id="dialog-upload-scripts" title="<?php echo $this->translate("Upload Exam Scripts");?>">
+  	<form name="form_script" id="form_script" method="post" action="/examination/exam-script/upload-exam-script" enctype="multipart/form-data">
+  		<input type="file" name="file" />
+  		<input type="hidden" name="document_name" id="document_name">
+  		<input type="hidden" id="exam_script_id" name="exam_script_id">
+  		<input type="hidden" id="semester" name="semester" value="<?php echo $this->semester?>">
+  		<input type="hidden" id="program" name="program" value="<?php echo $this->program?>">
+  		<input type="hidden" id="subject" name="subject" value="<?php echo $this->subject?>">
+  		<input type="hidden" id="examtype" name="examtype" value="<?php echo $this->examtype?>"> 
+  		
+  		<input type="hidden" id="idStudentRegistrationUp" name="idStudentRegistrationUp">
+  		<input type="hidden" name="redirect_path" id="redirect_path" value="/examination/exam-script/script-add/semester_id/<?php echo $this->semester?>/subject_id/<?php echo $this->subject?>/program_id/<?php echo $this->program ?>/examtype/<?php echo $this->examtype?>/idDistribution/<?php echo $this->idDistribution;?>/group_id/<?php echo $this->group_id?>" > 
+  		
+  	</form>
+</div>
+

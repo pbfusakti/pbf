@@ -1,0 +1,85 @@
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>			
+			
+			<li>
+				<a href="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry','action'=>'view-component','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject), 'default', true);?>" >
+					<span class='back'></span>
+					Back
+				</a>
+			</li>
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+
+
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Assessment"); ?></th>   
+		    <td><?php echo $this->main_component["component_name"]; ?></td>   
+	</tr>
+</table>
+
+<br>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th><?php echo $this->translate("Group")?></th>
+		<th><?php echo $this->translate("Code")?></th>
+		<th><?php echo $this->translate("Semester")?></th>
+		<th><?php echo $this->translate("Coordinator")?></th>
+		<th><?php echo $this->translate("Total Student")?></th>	
+		
+	</tr>
+	<?php 
+	$i=1;
+	if(count($this->list_groups)>0){
+	foreach($this->list_groups as $group){
+	?>
+	<tr>
+		
+		<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'mark-entry','action'=>'student-list','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'id'=>$this->id,'idDetail'=>$this->idDetail,'gid'=>$group["IdCourseTaggingGroup"]),'default',true)?>"><?php echo $group["GroupName"];?></a></td>
+		<td><?php echo $group["GroupCode"];?></td>
+		<td><?php echo $group["semester_name"];?></td>
+		<td><?php echo ($group["IdLecturer"]!=0 ?  $group["FullName"]:$this->translate("-"));?></td>
+		<td align="center">
+		<?php echo ($group["total_student"]==0 ? '0':$group["total_student"]);?></td>
+		
+	</tr>
+	<?php $i++; } }?>
+</table>
+
+
+</div>
+

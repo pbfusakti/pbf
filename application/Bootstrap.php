@@ -1,6 +1,7 @@
 <?php
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
+
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     protected function _initSession() {
@@ -86,6 +87,7 @@ $translate = new Zend_Translate('array',
        
        
         return $registry;
+<<<<<<< HEAD
 }
 
 
@@ -125,3 +127,45 @@ set_include_path("/var/www/html/sis/library/dompdf/" . PATH_SEPARATOR . get_incl
 
 } */
 }
+=======
+	}
+	 
+	
+	 
+	 protected function _initDatabase(){
+		$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', 'development');		
+		$parameters = array('host'=>$config->resources->db->params->host,
+					'username' => $config->resources->db->params->username,
+					'password'=>$config->resources->db->params->password,
+					'dbname'=>$config->resources->db->params->dbname,
+					'unix_socket'    => $config->resources->db->params->unix_socket,
+					'driver_options' => array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8')
+				);
+		
+			//	echo var_dump($parameters);exit;
+		try {
+		    $db = Zend_Db::factory('Pdo_Mysql', $parameters);
+		    $db->getConnection();
+		} catch (Zend_Db_Adapter_Exception $e) {
+		    echo $e->getMessage();
+		    die('Could not connect to database.');
+		} catch (Zend_Exception $e) {
+		    echo $e->getMessage();
+		    die('Could not connect to database.');
+		}
+		
+		Zend_Registry::set('dbapp', $db);
+		
+		 $resource = $this->getPluginResource('multidb');
+      	 Zend_Registry::set("multidb", $resource);	
+      	 
+    }
+      
+    
+	/* protected function _initDomPdf(){
+		//set_include_path(APPLICATION_PATH . "/../../library/dompdf" . PATH_SEPARATOR . get_include_path());
+		set_include_path("/var/www/html/sis/library/dompdf/" . PATH_SEPARATOR . get_include_path());
+		
+	} */
+}
+>>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338

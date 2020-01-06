@@ -1,0 +1,202 @@
+<script>
+
+$(function() {
+	
+	$( "#dialog-upload" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Upload": function() {
+                //$( this ).dialog( "close" );
+                $('#upload').submit();
+
+            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
+	$( "#dialog-mapping" ).dialog({
+        autoOpen: false,
+        width: 650,
+        height: 400,
+        modal: true,
+        buttons: {
+            "Add": function() {
+                
+          	    myId = $('input:radio[name=mapIdStudentRegistration]:checked').val();              
+                counter = $('#counter').val();
+                element = '#IdStudentRegistration'+counter;             
+                $(element).val(myId);
+                $( this ).dialog( "close" );
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+	
+});
+
+function save(){
+	  $('#mapForm').submit();
+}
+
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'index'), 'default', true);?>";
+}
+
+function uploadOMR(){
+	$( "#dialog-upload" ).dialog('open');	
+}
+
+function openMapStudent(no){
+	$('#counter').val(no);
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'map-student-list','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'idMaster'=>$this->IdMarksDistributionMaster), 'default', true);?>";
+	$( "#dialog-mapping" ).load(url).dialog('open');	
+}
+
+</script>
+
+
+<div class="breadcrum">
+	<ul class="tri-steps">
+		<li class="current"><div class="text"><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'upload-omr','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'idMaster'=>$this->IdMarksDistributionMaster),'default',true);?>"><?php echo $this->translate("Upload"); ?></a></div></li>
+		<li class="last"><div class="text"><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'student-list','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'idMaster'=>$this->IdMarksDistributionMaster),'default',true);?>"><?php echo $this->translate("Student List"); ?></a></div></li>	
+	</ul>
+	<div class="clear"></div>
+</div>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		    <li>
+				<a id="search" href="#" onclick="javascript:uploadOMR()">
+					<span class='upload_omr'></span>
+					<?php echo $this->translate("Upload Answer OMR"); ?>
+				</a>
+			</li>
+			 <li>
+			        <a href="#" onClick="save()">
+					<span class='save' ></span>
+					<?php echo $this->translate("Save"); ?>
+					</a>	
+				
+			</li>
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<form id ="mapForm"  method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet','action'=>'save-mapping'), 'default', true);?>">
+
+<input type="hidden" name="counter" id="counter" value="">
+<input type="hidden" name="idSemester" value="<?php echo $this->idSemester;?>">
+<input type="hidden" name="idProgram" value="<?php echo $this->idProgram;?>">
+<input type="hidden" name="idSubject" value="<?php echo $this->idSubject;?>">
+<input type="hidden" name="IdMarksDistributionMaster" value="<?php echo $this->IdMarksDistributionMaster;?>">
+<input type="hidden" name="IdMarksDistributionDetails" value="<?php echo $this->IdMarksDistributionDetails;?>">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+<?php if(count($this->arr_sets)>0){?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>
+		<th><?php echo $this->translate("Student NIM (OMR)")?></th>
+		<th><?php echo $this->translate("Student Name (OMR)")?></th>	
+		<th><?php echo $this->translate("Set Code")?></th>	
+		<th><?php echo $this->translate("Student Name (System)")?></th>		
+		<th><?php echo $this->translate("Mapping Status")?></th>		
+		<th><?php echo $this->translate("Map ID")?></th>
+		<th><?php echo $this->translate("Mark Entry Status (System)")?></th>	
+				
+	</tr>
+	<?php 
+	$i=1;	
+	foreach($this->arr_sets as $student){		
+	?>		
+	<input type="hidden" name="set_code[<?php echo $i?>]" value="<?php echo $student["set_code"];?>">
+	<input type="hidden" name="scheme_exist_status[<?php echo $i?>]" value="<?php echo $student["scheme_exist_status"];?>">
+	<input type="hidden" name="student_answer_raw[<?php echo $i?>]" value="<?php echo $student["student_answer_raw"];?>">
+	
+
+	<tr>
+		<td><?php echo $i;?></td>
+		<td><?php echo $student["student_nim"];?></td>
+		<td><?php echo $student["student_name"];?></td>
+		<td><?php echo $student["set_code"];?><br><font style="color:red"><?php echo $student["scheme_exist_status"];?></font></td>
+		<td><?php echo $student["name"];?></td>	
+		<td align="center">
+		<?php if($student["IdStudentRegistration"]!='') echo $this->translate("Match"); else echo $this->translate("Not Match");?>
+		<br>
+		<input type="button" value="Map Student" onclick="openMapStudent('<?php echo $i; ?>');">		
+		</td>
+		<td><input type="text" size ='5' style="background-color : #d1d1d1; " id="IdStudentRegistration<?php echo $i; ?>" name="IdStudentRegistration[<?php echo $i?>]"  value="<?php echo $student["IdStudentRegistration"];?>" readonly>	</td>
+		<td>
+		<?php 
+		//407=>ENTRY 409=>SUBMITTED 411=>APPROVED
+		if($student["MarksEntryStatus"]==407){
+			echo $this->translate("Entry");
+		}else if($student["MarksEntryStatus"]==409){
+			echo $this->translate("Submitted");
+		}else if($student["MarksEntryStatus"]==411){
+			echo $this->translate("Approved");
+		}else{
+			echo $this->translate("No Mark Entry");
+		}
+		?></td>	
+		
+		
+	</tr>
+		<?php 
+		$i++; }?>
+	
+</table>
+
+<?php }//end if?>
+</form>
+</div>	
+
+<br>
+
+<div id="dialog-upload" title="<?php echo $this->translate("Upload Answer OMR"); ?>">
+    <?php echo $this->form; ?> 
+</div>
+
+<div id="dialog-mapping" title="<?php echo $this->translate("Student Mapping"); ?>">
+  
+</div>
+

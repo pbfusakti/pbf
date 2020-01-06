@@ -1,0 +1,445 @@
+<head>
+
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+dojo.addOnLoad(function(){
+	
+	dijit.byId('IdSemester').set('value','');
+	dijit.byId('IdSemester').set('placeHolder','select');
+	dijit.byId('DescEnglishName').set('value','');
+	dijit.byId('DescEnglishName').set('placeHolder','Select');
+	dijit.byId('DescArabicName').set('value','');
+	dijit.byId('DescArabicName').set('placeHolder','Select');
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').BasedOn;
+	fnToggleProgramSubjectDetails(value);	
+	
+	});
+
+
+
+
+function fnToggleProgramSubjectDetails(value){
+	if(value == 0) {
+		dijit.byId('IdSubject').set('readOnly',true);
+		dijit.byId('IdSubject').set('value','');
+	} else {
+		dijit.byId('IdSubject').set('value','');
+		dijit.byId('IdSubject').set('readOnly',false);
+	}
+	
+	if(value != "" && value == 1)
+	{ 
+		var xhrArgs = {
+				url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/getprogramsubjectlist/value/"+value,
+				handleAs:'json',
+				load:function(data){ 
+					AutoFillNextEditableDropDown("IdSubject",data); 
+				}
+		   }
+		dojo.xhrGet(xhrArgs); 
+	} 
+}
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+    var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+    ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+function addGradedetails() {
+	var flag = true;
+
+	if(dijit.byId("GradeDesc").value==''){
+	    dijit.byId("GradeDesc").attr('required','true');
+		dijit.byId("GradeDesc").focus();flag = false;
+	}
+	if(dijit.byId("GradePoint").value==''){
+	    dijit.byId("GradePoint").attr('required','true');
+		dijit.byId("GradePoint").focus();flag = false;
+	}
+	if(dijit.byId("MinPoint").value==''){
+	    dijit.byId("MinPoint").attr('required','true');
+		dijit.byId("MinPoint").focus();flag = false;
+	}
+	if(dijit.byId("MaxPoint").value==''){
+	    dijit.byId("MaxPoint").attr('required','true');
+		dijit.byId("MaxPoint").focus();flag = false;
+	}
+
+	if(dijit.byId("Rank").value==''){
+	    dijit.byId("Rank").attr('required','true');
+		dijit.byId("Rank").focus();flag = false;
+	}
+	
+	if(dijit.byId("DescArabicName").value==''){
+	    dijit.byId("DescArabicName").attr('required','true');
+		dijit.byId("DescArabicName").focus();flag = false;
+	}
+	if(dijit.byId("DescEnglishName").value==''){
+	    dijit.byId("DescEnglishName").attr('required','true');
+		dijit.byId("DescEnglishName").focus();flag = false;
+	}
+	if(dijit.byId("Grade").value==''){
+	    dijit.byId("Grade").attr('required','true');
+		dijit.byId("Grade").focus();flag = false;
+	}
+
+	if(flag == true) {
+		GradedetailsInsert();	
+	}			
+	return flag;
+}
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+
+function GradedetailsInsert() {
+	
+	var GradeDesc = dijit.byId("GradeDesc").value;
+	var GradePoint = dijit.byId("GradePoint").value;
+	var MinPoint = dijit.byId("MinPoint").value;
+	var MaxPoint = dijit.byId("MaxPoint").value;
+
+	var Rank = dijit.byId("Rank").value;
+
+	var form = dijit.byId("myForm");
+	var value=form.attr('value').Pass;
+	if(value == 1){
+		var PassName = "Yes";
+	}else{
+		var PassName = "No";
+	}
+	var DescArabicName = dijit.byId("DescArabicName").value;
+	var DescArabicDisplayName = dijit.byId("DescArabicName").displayedValue;
+	var DescEnglishName = dijit.byId("DescEnglishName").value;
+	var DescEnglishDisplayedName = dijit.byId("DescEnglishName").displayedValue;
+	
+	var GradeName = dijit.byId("Grade").value;
+	var GradeDisplayName = dijit.byId("Grade").displayedValue;
+	
+	if(form.attr('value').BasedOn == 1 ){
+
+		var IdSubject = dijit.byId("IdSubject").value;
+		var SubjectName = dijit.byId("IdSubject").displayedValue;
+	}
+	else{
+		var SubjectName = "Program Subjects";
+	}
+
+	batchArray.push(GradeDesc);
+	if(arrHasDupes(batchArray))
+	{
+		batchArray = batchArray.unique();
+		alert("Duplicate Grade Description");
+	} 
+	else 
+	{
+
+		var trow = document.getElementById('hor').insertRow(rowid);
+			
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+
+		var tcol5=trow.insertCell(4);
+		var tcol6=trow.insertCell(5);
+		var tcol7=trow.insertCell(6);
+		var tcol8=trow.insertCell(7);
+		var tcol9=trow.insertCell(8);
+		var tcol10=trow.insertCell(9);
+		var tcol11=trow.insertCell(10);
+		tcol1.innerHTML="<input type='hidden' value='"+IdSubject+"' name=IdSubjectgrid[]>"+SubjectName;
+		
+		tcol2.innerHTML="<input type='hidden' value='"+GradeDesc+"' name=GradeDescgrid[]>"+GradeDesc;
+		tcol3.innerHTML="<input type='hidden' value='"+GradePoint+"' name=GradePointgrid[]>"+GradePoint;
+		tcol4.innerHTML="<input type='hidden' value='"+MinPoint+"' name=MinPointgrid[]>"+MinPoint;
+		tcol5.innerHTML="<input type='hidden' value='"+MaxPoint+"' name=MaxPointgrid[]>"+MaxPoint;
+		tcol6.innerHTML="<input type='hidden' value='"+GradeName+"' name=Gradegrid[]>"+GradeDisplayName;
+
+		tcol7.innerHTML="<input type='hidden' value='"+Rank+"' name=Rankgrid[]>"+Rank;
+		tcol8.innerHTML="<input type='hidden' value='"+PassName+"' name=Passgrid[]>"+PassName;
+		tcol9.innerHTML="<input type='hidden' value='"+DescEnglishName+"' name=DescEnglishNamegrid[]>"+DescEnglishDisplayedName;
+		tcol10.innerHTML="<input type='hidden' value='"+DescArabicName+"' name=DescArabicNamegrid[]>"+DescArabicDisplayName;
+		tcol11.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+		rowid++;
+	}
+}
+function clearpageAdd() {
+	dijit.byId("GradeDesc").set("value","");
+	dijit.byId("GradePoint").set("value","");
+	dijit.byId("MinPoint").set("value","");
+	dijit.byId("MaxPoint").set("value","");
+	dijit.byId("Rank").set("value","");
+	dijit.byId("Pass").set("value","");
+	dijit.byId("DescArabicName").set("value","");
+	dijit.byId("DescEnglishName").set("value","");
+	
+}
+function deleteRow(r)
+{
+	rowid--;
+	
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+	
+}
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+	var i, j, n;
+	n=A.length;
+                                         // to ensure the fewest possible comparisons
+	for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+		for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+			if (A[i]==A[j]) return true;
+	}	}
+	return false;
+}
+
+Array.prototype.unique = function () {
+    var r = new Array();
+    o:for(var i = 0, n = this.length; i < n; i++)
+    {
+        for(var x = 0, y = r.length; x < y; x++)
+        {
+                if(r[x]==this[i])
+                {
+                	continue o;
+                }
+                
+        }
+        r[r.length] = this[i];
+    }
+    return r;
+}
+
+function deletegradedetails(IdGradeSetUp) {
+	var xhrArgs = {url: "<?php echo $this->baseUrl();?>"+"/examination/gradesetup/deletegradesetup/IdGradeSetUp/"+IdGradeSetUp,
+			handleAs:'json',
+			load:function(data){ 
+				if(data == '1') {
+					window.location = "<?php echo $this->baseUrl(); ?>/examination/gradesetup/newgradesetup/id/<?php echo $this->IdProgram;?>"
+				}
+			}
+	}
+	dojo.xhrPost(xhrArgs); 
+}
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Grade Set-Up");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gradesetup/newgradesetup"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+			    } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details Set-Up");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Based On");?><span></span></span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->BasedOn;?></td>
+				<td><?php echo $this->translate("Program Name");?><span></span></span>
+				</td>
+				<td><?php echo $this->ProgramName;?></td>
+			
+			
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Subject");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->IdSubject;?></td>
+				<td><?php echo $this->translate("Semester Name");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->IdSemester;?></td>
+				<?php echo $this->lobjGradesetupForm->IdProgram;?>
+				<?php echo $this->lobjGradesetupForm->IdGradeSetUp;?>
+				<?php echo $this->lobjGradesetupForm->UpdDate;?>
+				<?php echo $this->lobjGradesetupForm->UpdUser;?>
+				</td>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Effective Date");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->EffectiveDate;?></td>
+				<td><?php echo $this->translate("Active");?><span></span></td>
+				<td><?php echo $this->lobjGradesetupForm->Active;?></td>
+			</tr>
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Grade Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade Description");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradeDesc;?></td>
+				<td><?php echo $this->translate("Grade Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->GradePoint;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Minimum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MinPoint;?></td>
+				<td><?php echo $this->translate("Maximum Point");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->MaxPoint;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Grade");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Grade;?></td>
+				<td><?php echo $this->translate("Rank");?><span>*</span></td>
+				<td><?php echo $this->lobjGradesetupForm->Rank;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Pass");?><span></span></td>
+				<td><?php echo $this->lobjGradesetupForm->Pass;?></td>
+				<td><?php echo $this->translate("Grade Description English");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->DescEnglishName;?></td>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Grade Description Bahasa Indonesia");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->DescArabicName;?></td>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjGradesetupForm->Add;?>
+					<?php echo $this->lobjGradesetupForm->Clear;?>
+				</td>
+			</tr>
+
+		</table>
+
+
+
+
+
+
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Subject");?></th>
+				<th><?php echo $this->translate("Grade Description");?>
+				</th>
+				<th><?php echo $this->translate("Grade Point");?>
+				</th>
+				<th><?php echo $this->translate("Minimum Point");?>
+				</th>
+				<th><?php echo $this->translate("Maximum Point");?>
+				</th>
+				<th><?php echo $this->translate("Grade");?></th>
+				<th><?php echo $this->translate("Rank");?></th>
+				<th><?php echo $this->translate("Pass");?></th>
+				<th><?php echo $this->translate("Grade Description English");?>
+				</th>
+				<th><?php echo $this->translate("Grade Description Bahasa Indonesia");?>
+				</th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $gradesetup) {?>
+
+			<tr>
+				<td><?php print_r($this->escape($gradesetup['SubjectName']));?></td>
+				<td><?php print_r($this->escape($gradesetup['GradeDesc']));?></td>
+				<td><?php echo $this->escape($gradesetup['GradePoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['MinPoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['MaxPoint']);?></td>
+				<td><?php echo $this->escape($gradesetup['Grade']);?></td>
+				<td><?php echo $this->escape($gradesetup['Rank']);?></td>
+				<td><?php if($gradesetup['Pass'] == 1){ 
+					echo "Yes";
+				} else{ echo "No";
+}?>
+				</td>
+				<td><?php echo $this->escape($gradesetup['DefinitionDescEng']);?></td>
+				<td><?php echo $this->escape($gradesetup['DefinitionDescBahas']);?>
+				</td>
+				<td><a href="#"
+					onClick="deletegradedetails(<?php echo $gradesetup['IdGradeSetUp'];?>);">
+						<img src='<?php echo $this->baseUrl();?>/images/delete.png'
+						border=0 width='16' height='16'>
+				</a></td>
+			</tr>
+			<?php   }?>
+			<?php } ?>
+			<tr>
+				<td align="right" colspan="11"><?php echo $this->lobjGradesetupForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gradesetup', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</Form>
+<Form method="post" name="CopyForm">
+	<fieldset>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Copy From");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Program Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdProgram;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Semester Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyFromIdSemester;?></td>
+
+			</tr>
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Copy To");?>
+				</th>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Program Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdProgram;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Semester Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjGradesetupForm->CopyToIdSemester;?></td>
+
+			</tr>
+			<tr>
+				<td align="right" colspan="6"><?php echo $this->lobjGradesetupForm->CopySetup;?>
+				</td>
+			</tr>
+		</table>
+
+</Form>
+</fieldset>
+

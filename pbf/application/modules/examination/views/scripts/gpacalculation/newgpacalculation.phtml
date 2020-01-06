@@ -1,0 +1,86 @@
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+dojo.addOnLoad(function(){
+	
+	})
+	
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("GPA").' '.$this->translate("Calculation").' '.$this->translate("Details");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gpacalculation/newgpacalculation"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("GPA").' '.$this->translate("Calculation").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate("Student").' '.$this->translate("Name");?><span></span></span>
+				</td>
+				<td><?php echo $this->lobjGpacalculationForm->IdApplication;?></td>
+				<?php echo $this->lobjGpacalculationForm->UpdDate;?>
+				<?php echo $this->lobjGpacalculationForm->UpdUser;?>
+				<?php echo $this->lobjGpacalculationForm->Gpa;?>
+				<?php echo $this->lobjGpacalculationForm->IdStudentRegistration;?>
+				<?php echo $this->lobjGpacalculationForm->Idgpacalculation;?>
+				<td></td>
+				<td></td>
+			
+			
+			<tr>
+		
+		</table>
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Subject").' '.$this->translate("Name");?>
+				</th>
+				<th><?php echo $this->translate("Credit").' '.$this->translate("Hours");?>
+				</th>
+				<th><?php echo $this->translate("Subject").' '.$this->translate("Marks");?>
+				</th>
+				<!--  	<th><?php echo $this->translate("Min").' '.$this->translate("Points");?></th>
+			<th><?php echo $this->translate("Max").' '.$this->translate("Points");?></th>
+			<th><?php echo $this->translate("Grade").' '.$this->translate("Point");?></th>
+			<th><?php echo $this->translate("Product");?></th>  -->
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $SubDtls) {?>
+
+			<tr>
+				<td><?php print_r($this->escape($SubDtls['SubjectName']));?></td>
+				<td><?php echo $this->escape($SubDtls['CreditHours']);?></td>
+				<td><?php echo $this->escape($SubDtls['fullcalculatedmarks']);?></td>
+				<!--      <td><?php echo $this->escape($SubDtls['MinPoint']);?></td>
+     		<td><?php echo $this->escape($SubDtls['MaxPoint']);?></td>
+     		<td><?php echo $this->escape($SubDtls['GradePoint']);?></td>
+     		<td><?php printf('%01.2f',$SubDtls['fullcalculatedmarks']*$SubDtls['GradePoint']);?></td> -->
+				<?php   }?>
+				<?php } ?>
+			
+			
+			<tr>
+				<td align="right" colspan="10"><?php echo $this->lobjGpacalculationForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gpacalculation', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</Form>

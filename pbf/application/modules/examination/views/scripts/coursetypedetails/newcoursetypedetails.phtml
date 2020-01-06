@@ -1,0 +1,209 @@
+<head>
+
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+dojo.addOnLoad(function(){
+	
+	});
+
+function addCourseTypeDetails() {
+	var flag = true;
+
+	if(dijit.byId("ComponentName").value==''){
+	    dijit.byId("ComponentName").attr('required','true');
+		dijit.byId("ComponentName").focus();flag = false;
+	}
+	if(dijit.byId("Description").value==''){
+	    dijit.byId("Description").attr('required','true');
+		dijit.byId("Description").focus();flag = false;
+	}
+	if(flag == true) {
+		CourseTypeDetailsInsert();	
+	}			
+	return flag;
+}
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+
+function CourseTypeDetailsInsert() {
+	
+	var ComponentName = dijit.byId("ComponentName").value;
+	var Description = dijit.byId("Description").value;
+	var Activevalue = dijit.byId("Active").checked;
+	if(Activevalue == true){
+		var Active = "Active";
+	}else{
+		var Active = "In-Active";
+	}
+	
+		var trow = document.getElementById('hor').insertRow(rowid);
+			
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		
+		
+		tcol1.innerHTML="<input type='hidden' value='"+ComponentName+"' name=ComponentNamegrid[]>"+ComponentName;
+		tcol2.innerHTML="<input type='hidden' value='"+Description+"' name=Descriptiongrid[]>"+Description;
+		tcol3.innerHTML="<input type='hidden' value='"+Active+"' name=Activegrid[]>"+Active;
+		
+		tcol4.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+		rowid++;
+	
+}
+function clearpageAdd() {
+	dijit.byId("ComponentName").set("value","");
+	dijit.byId("Description").set("value","");
+}
+function deleteRow(r)
+{
+	rowid--;
+	
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+	
+}
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+	var i, j, n;
+	n=A.length;
+                                         // to ensure the fewest possible comparisons
+	for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+		for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+			if (A[i]==A[j]) return true;
+	}	}
+	return false;
+}
+
+Array.prototype.unique = function () {
+    var r = new Array();
+    o:for(var i = 0, n = this.length; i < n; i++)
+    {
+        for(var x = 0, y = r.length; x < y; x++)
+        {
+                if(r[x]==this[i])
+                {
+                	continue o;
+                }
+                
+        }
+        r[r.length] = this[i];
+    }
+    return r;
+}
+
+function deletecoursedtls(IdCourseTypeDetails) {
+	var xhrArgs = {url: "<?php echo $this->baseUrl();?>"+"/examination/coursetypedetails/deletecoursetypedtls/IdCourseTypeDetails/"+IdCourseTypeDetails,
+			handleAs:'json',
+			load:function(data){ 
+				if(data == '1') {
+					window.location = "<?php echo $this->baseUrl(); ?>/examination/coursetypedetails/newcoursetypedetails/id/<?php echo $this->IdCourseType;?>"
+				}
+			}
+	}
+	dojo.xhrPost(xhrArgs); 
+}
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Couse").' '.$this->translate("Type").' '.$this->translate("Details");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/coursetypedetails/newcoursetypedetails"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Couse").' '.$this->translate("Type").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate("Couse").' '.$this->translate("Type");?><span></span></span>
+				</td>
+				<td><?php echo $this->lobjCoursetypedetailsForm->IdCourseType;?></td>
+				<?php echo $this->lobjCoursetypedetailsForm->IdCourseTypeDetails;?>
+				<?php echo $this->lobjCoursetypedetailsForm->UpdDate;?>
+				<?php echo $this->lobjCoursetypedetailsForm->UpdUser;?>
+				<td></td>
+				<td></td>
+			
+			
+			<tr>
+				<td><?php echo $this->translate("Component").' '.$this->translate("Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjCoursetypedetailsForm->ComponentName;?></td>
+				<td><?php echo $this->translate("Description");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjCoursetypedetailsForm->Description;?></td>
+			</tr>
+			<td><?php echo $this->translate("Active");?><span></span></td>
+			<td><?php echo $this->lobjCoursetypedetailsForm->Active;?></td>
+			<tr>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjCoursetypedetailsForm->Add;?>
+					<?php echo $this->lobjCoursetypedetailsForm->Clear;?>
+				</td>
+			</tr>
+
+		</table>
+
+
+
+
+
+
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Component").' '.$this->translate("Name");?>
+				</th>
+				<th><?php echo $this->translate("Description");?></th>
+				<th><?php echo $this->translate("Status");?></th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $gradesetup) {?>
+
+			<tr>
+				<td><?php print_r($this->escape($gradesetup['ComponentName']));?></td>
+				<td><?php echo $this->escape($gradesetup['Description']);?></td>
+				<td><?php if($gradesetup['Active'] == 1){ 
+					echo "Active";
+				} else{ echo "In-Active";
+}?>
+				</td>
+				<td><a href="#"
+					onClick="deletecoursedtls(<?php echo $gradesetup['IdCourseTypeDetails'];?>);">
+						<img src='<?php echo $this->baseUrl();?>/images/delete.png'
+						border=0 width='16' height='16'>
+				</a></td>
+			</tr>
+			<?php   }?>
+			<?php } ?>
+			<tr>
+				<td align="right" colspan="10"><?php echo $this->lobjCoursetypedetailsForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'coursetypedetails', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</Form>

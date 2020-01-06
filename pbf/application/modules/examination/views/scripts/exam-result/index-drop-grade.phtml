@@ -1,0 +1,29 @@
+<head>
+</head>
+<fieldset><legend><?php echo $this->title;?></legend>
+<?php  echo $this->form;?>
+</fieldset>
+<br>
+<fieldset><legend><?php echo $this->translate('Student List')?></legend>
+<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+	    	<tr>
+	        	<th><?php echo $this->translate("Registration Id");?></th>
+	        	<th><?php echo $this->translate("Stundet Name");?></th>
+	        	<th><?php echo $this->translate("Status");?></th>
+	        </tr>
+	       
+	        <?php if (count($this->students)>0) {
+	        foreach ($this->students as $student): ?>
+	  		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+	        	
+	        	<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-result', 'action'=>'drop-grade' , 'id'=>$student['IdStudentRegistration']),'default',true);?>" ><?php echo $student['registrationId'];?></a></td>
+	    	    <td><?php echo $student['student_name'];?></td>
+	    		<td><?php echo $student['appl_dob'];?></td>
+	    	<?php endforeach;
+	        } ?>
+	           
+			</tr>
+	    	<tr>
+</table>
+</fieldset>
