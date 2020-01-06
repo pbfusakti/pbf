@@ -1,0 +1,67 @@
+<script>
+$(function() {
+	
+	$("#meeting_date").datepicker({
+		"dateFormat":"yy-mm-dd",
+		"changeMonth":"true"		
+	});
+});
+
+</script>
+
+<h2><?php echo $this->translate("Appeal Application Info");?></h2>
+<form name="appealApproval" id="appealApproval" method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'appeal','action'=>'appeal-approval'), 'default', true);?>">
+<input type="hidden" name="sa_id" value="<?php echo $this->id; ?>">
+<input type="hidden" name="idSemester" value="<?php echo $this->appeal["sa_idSemester"]; ?>">
+<input type="hidden" name="idSubject" value="<?php echo $this->appeal["sa_idSubject"]; ?>">
+<input type="hidden" name="idStudentRegistration" value="<?php echo $this->appeal["sa_idStudentRegistration"]; ?>">
+
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		<th><?php echo $this->translate("Subject");?></th>
+		<td><?php echo $this->subject["BahasaIndonesia"];?> ( <?php echo $this->subject["SubCode"];?> )</td>
+			
+	</tr>
+	<tr>
+		
+		<th><?php echo $this->translate("Semester");?></th>
+		<td><?php echo $this->semester["SemesterMainName"]?></td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Component");?></th>
+		<td><?php echo $this->component["component_name"]; ?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Status");?></th>
+		<td>
+		<select name="approval_status" id="approval_status" onchange="changeDosen(this.value)">
+		<option value=""><?php echo $this->translate("-- Please Select --");?></option>
+		<option value="2"><?php echo $this->translate("Approve");?></option>
+		<option value="3"><?php echo $this->translate("Reject");?></option>
+		</select></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Dosen Penilai");?></th>
+		<td>
+		<select name="dosen" id="dosen" name="dosen" disabled>
+			<option value="0"><?php echo $this->translate("-- Please Select --"); ?></option>
+  			<?php foreach($this->staff as $staff){?>
+  			<option value='<?php echo $staff["IdStaff"];?>'><?php echo $staff["FullName"];?></option>
+  			<?php } ?>
+		</select></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Tanggal Pertemuan");?></th>
+		<td><input type="text" name="meeting_date" id="meeting_date" disabled></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Masa Pertemuan");?></th>
+		<td><input type="text" name="meeting_time" id="meeting_time" disabled></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Tempat Pertemuan");?></th>
+		<td><input type="text" name="location" id="location" disabled></td>
+	</tr>
+</table>
+</form>

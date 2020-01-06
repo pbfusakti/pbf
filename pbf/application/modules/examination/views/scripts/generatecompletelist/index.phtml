@@ -1,0 +1,146 @@
+<head>
+<script>
+dojo.addOnLoad(function(){	
+        dijit.byId('field24').set('value','');
+	dijit.byId('field24').set('placeHolder','Select');
+        dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');
+        dijit.byId('field5').set('value','');
+	dijit.byId('field5').set('placeHolder','Select');		
+});
+
+function formsubmit() {   
+    
+        var flag = true;
+        var semester =  dijit.byId('field27').get('displayedValue');
+ 
+	if(semester==''){                         
+             dijit.byId("field27").set( "state", "Error" );
+             flag = false; 
+	}
+        
+        if(flag == true) {
+                document.searchF.submit(); 
+        }      
+        return flag;
+    
+}
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Generate Complete Student List");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/generatecompletelist/index/search/1"
+		name="searchF" id="searchF" method="POST">
+		<input type="hidden" name='Search' id="Search" value="Search"> <input
+			type="hidden" name='UpdUser' id="UpdUser"
+			value="<?php echo $this->UpdUser;?>"> <input type="hidden"
+			name='UpdDate' id="UpdDate" value="<?php echo $this->UpdDate;?>">
+		<table class="table" width="100%">
+
+
+			<tr>
+				<td><?php echo $this->translate("Faculty"); ?></td>
+				<td><?php echo $this->lobjform->field5; ?></td>
+
+				<td><?php echo $this->translate('Program');?></td>
+				<td><?php echo $this->lobjform->field24;?></td>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate('Semester');?></td>
+				<td><?php echo $this->lobjform->field27;?></td>
+
+				<td><?php echo $this->translate("Student ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+			</tr>
+
+
+
+
+
+
+
+
+
+			<tr>
+				<td align="center" colspan="4"><input type="submit"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Search"); ?>"
+					onclick="return formsubmit();" /> <input type="button"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Clear"); ?>"
+					onclick="window.location.href='<?php echo $this->baseUrl();?>/examination/generatecompletelist' " />
+				</td>
+			</tr>
+
+
+		</table>
+	</form>
+</fieldset>
+<br />
+
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+		<tr>
+			<th><?php echo $this->translate('Student Name');?>
+			</th>
+			<th><?php echo $this->translate('Student ID');?>
+			</th>
+			<th><?php echo $this->translate("Semester");?></th>
+			<th><?php echo $this->translate("Program");?></th>
+			<th><?php echo $this->translate("Program Credit Hours");?>
+			</th>
+			<th><?php echo $this->translate("Credit Hours Taken");?>
+			</th>
+			<th><?php echo $this->translate("Status");?></th>
+
+
+		</tr>
+
+
+		<?php if (count($this->paginator)) {  ?>
+		<?php foreach ($this->paginator as $larrresult ) {  
+			?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+			<td><?php echo $larrresult['StudentName'];?></td>
+			<td><?php echo $larrresult['registrationId'];?></td>
+			<td><?php echo $larrresult['IdSemester'];?></td>
+			<td><?php echo $larrresult['ProgramName'];?></td>
+			<td><?php echo $larrresult['ProgramHours'];?></td>
+			<td><?php echo $larrresult['CreditHoursTaken'];?></td>
+			<td><?php echo $larrresult['DefinitionDesc'];?></td>
+		</tr>
+		<?php } ?>
+
+
+		<tr>
+			<td colspan="7" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator,'Sliding','/partials/my_pagination_control.phtml'); ?>
+				</div>
+			</td>
+		</tr>
+
+
+		<tr>
+			<td colspan="7" align="right"><input type="button" class="NormalBtn"
+				dojotype="dijit.form.Button"
+				label="<?php echo $this->translate("Download"); ?>"
+				onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'generatecompletelist', 'action'=>'exportcompletelist'),'default',true);?>';" />
+
+			</td>
+		</tr>
+		<?php }  else { ?>
+		<tr>
+			<td colspan="7" align="center" style="color: red;">
+				<?php echo $this->translate("No matching record found. Try different keywords.");?>
+			</td>
+		</tr>
+		<?php } ?>
+	</table>
+</fieldset>

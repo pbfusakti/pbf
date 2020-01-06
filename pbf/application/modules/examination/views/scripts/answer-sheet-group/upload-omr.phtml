@@ -1,0 +1,217 @@
+<script>
+
+$(function() {
+	
+	$( "#dialog-upload" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Upload": function() {
+                //$( this ).dialog( "close" );
+                $('#upload').submit();
+
+            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+
+
+	$( "#dialog-mapping" ).dialog({
+        autoOpen: false,
+        width: 700,
+        height: 700,
+        modal: true
+    });
+	
+});
+
+
+
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'index'), 'default', true);?>";
+}
+
+
+
+function openMapStudent(no,set_code){
+	$('#counter').val(no);
+
+	url = "<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'map-student-list','group_id'=>$this->group_id,'idSemester'=>$this->idSemester,'idSubject'=>$this->idSubject), 'default', true);?>/no/"+no+"/set_code/"+set_code;
+	$( "#dialog-mapping" ).load(url).dialog('open');	
+}
+
+
+
+
+function checkboxValidate(){
+	var valid = true;	
+	$('input[class="myId"]').each(function(){	   
+		 if($(this).val()==''){			 
+			 return valid = false;
+		 }	    
+	});
+	return valid;	
+}
+
+function validate(){
+	
+	//flag = checkboxValidate();
+	flag = true;
+	if(flag){
+		  
+		 msg = confirm("Are you sure you want to save?");
+		 if(msg){
+			// alert('submit');
+			$('#mapForm').submit();
+		 }else{
+			return false;
+		 }
+		
+	}else{     
+		alert("There is un-match Student NIM.");             	
+		return false;
+	}		
+}
+
+</script>
+
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		   
+			 <li>
+			        <a href="#" onClick="validate()">
+					<span class='save' ></span>
+					<?php echo $this->translate("Save"); ?>
+					</a>	
+				
+			</li>
+			<li>							
+					<a href="#" onClick="back()">
+						<span class='back'></span>Back</a>				
+			</li>	
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<form id ="mapForm"  method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'save-mapping'), 'default', true);?>">
+<input type="hidden" name="counter" id="counter" value="">
+<input type="hidden" name="idSemester" value="<?php echo $this->idSemester;?>">
+<input type="hidden" name="idSubject" value="<?php echo $this->idSubject;?>">
+<input type="hidden" name="idGroup" value="<?php echo $this->group_id;?>">
+
+<br>
+<?php if(count($this->arr_sets)>0){?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>
+		<th><?php echo $this->translate("Student NIM (OMR)")?></th>
+		<th><?php echo $this->translate("Student Name (OMR)")?></th>	
+		<th><?php echo $this->translate("Set Code")?></th>	
+		<th><?php echo $this->translate("Exam Group")?></th>	
+		<th><?php echo $this->translate("Mark Entry Status (System)")?></th>
+		<th><?php echo $this->translate("Map Student")?></th>		
+		<th><?php echo $this->translate("Student Name (System)")?></th>					
+		<th><?php echo $this->translate("Mapping Status")?></th>
+		
+				
+	</tr>
+	<?php 
+	$i=1;	
+	foreach($this->arr_sets as $student){	
+		if( $student['set_code'] != "" ){		
+		  	
+	?>		
+	<tr>
+		<td><?php echo $i;?></td>
+		<td>
+		<?php echo $student["student_nim"];?><br>
+		<input type="hidden" name="set_code[<?php echo $i?>]" value="<?php echo $student["set_code"];?>">
+	    <input type="hidden" name="student_answer_raw[<?php echo $i?>]" value="<?php echo (isset($student["student_answer_raw"]) ? $student["student_answer_raw"]:'' );?>">
+	    
+	 	
+	 	</td>
+		<td><?php echo $student["student_name"];?></td>
+		<td><?php echo $student["set_code"];?></td>
+		<td><?php echo (isset($student["student_group"]) ? $student["student_group"]:'');?></td>
+		<td>
+		<?php 
+		//407=>ENTRY 409=>SUBMITTED 411=>APPROVED
+		if(isset($student["MarksEntryStatus"])){
+			if($student["MarksEntryStatus"]==407){
+				echo $this->translate("Entry");
+			}else if($student["MarksEntryStatus"]==409){
+				echo $this->translate("Submitted");
+			}else if($student["MarksEntryStatus"]==411){
+				echo $this->translate("Approved");
+			}else{
+				echo $this->translate("No Mark Entry");
+			}
+		}else{
+				echo $this->translate("No Mark Entry");
+		}
+		?></td>	
+		
+		<td align="center">		
+		<input type="button" value="Map Student" onclick="openMapStudent('<?php echo $i; ?>','<?php echo $student["set_code"];?>');">		
+		</td>
+		<td>
+		<span id="studentName<?php echo $i; ?>"><?php echo (isset($student["name"]) ? $student["name"]: ''); ?></span><br>
+		<span id="registrationId<?php echo $i; ?>"><?php echo (isset($student["registrationId"]) ? $student["registrationId"]: ''); ?></span>
+		<input class="myId" type="hidden" size ='5' id="IdStudentRegistration<?php echo $i; ?>" name="IdStudentRegistration[<?php echo $i?>]"  value="<?php echo (isset($student["IdStudentRegistration"]) ? $student["IdStudentRegistration"]:'');?>" readonly>	
+		<input type="hidden"  id="IdStudentRegSubjects<?php echo $i?>"  name="IdStudentRegSubjects[<?php echo $i?>]"  value="<?php echo (isset($student["IdStudentRegSubjects"]) ? $student["IdStudentRegSubjects"]:'' );?>">
+		<input type="hidden"  id="student_groupid<?php echo $i?>"  name="student_groupid[<?php echo $i?>]"  value="<?php echo (isset($student["student_groupid"]) ? $student["student_groupid"]:'' );?>">
+		
+		<input type="hidden" id="idMaster<?php echo $i?>" name="idMaster[<?php echo $i?>]"   value="<?php echo (isset($student["IdMarksDistributionMaster"]) ? $student["IdMarksDistributionMaster"]:'');?>">
+	    <input type="hidden" id="idDetails<?php echo $i?>" name="idDetails[<?php echo $i?>]" value="<?php echo (isset($student["IdMarksDistributionDetails"]) ? $student["IdMarksDistributionDetails"]:'');?>">
+	
+		</td>	
+		<td>
+		<span id="mapStatus<?php echo $i; ?>">
+		<?php if(isset($student["IdStudentRegistration"])) {			
+			echo $this->translate("Match"); 
+		}else{
+			echo '<font style="color:red">';
+			echo '<strong>'.$this->translate("Not Match").'</strong>';
+			echo '<br>';
+			echo $student["answer_schema_status"];
+			echo '</font>';
+		}?>
+		</span>
+		
+		</td>		
+	</tr>
+		<?php 
+		$i++; }//end foreach
+		} //end if ?>
+	
+</table>
+
+<?php }//end if?>
+</form>
+</div>	
+
+<br>
+
+
+
+<div id="dialog-mapping" title="<?php echo $this->translate("Student Mapping"); ?>">
+  
+</div>
+

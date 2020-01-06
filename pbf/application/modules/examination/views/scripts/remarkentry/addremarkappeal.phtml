@@ -1,0 +1,294 @@
+<head>
+<style>
+.makebold {
+	font-weight: bold;
+}
+</style>
+<script>
+dojo.addOnLoad(function(){
+	//dijit.byId('field23').set('value','');
+	//dijit.byId('field23').set('placeHolder','Select');
+        //dijit.byId('field27').set('value','');
+	//dijit.byId('field27').set('placeHolder','Select');
+
+});
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+        var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+
+
+
+ function formsubmit() {
+ 	    var examiner1 = dijit.byId('field23').value;
+ 	    var examiner2 = dijit.byId('field27').value;
+
+		if(examiner1!='' && examiner2!='') {
+	        $('#savedata').val('submitdata');
+	        document.searchstudents.submit();
+		} else {
+			alert('Examiner1 & Examiner2 cannot be left blank');
+		}
+ }
+
+
+
+ function positivevalue1(val1, val2 ,val3) {
+     var TotalMarks =  parseInt(val3);
+     var value1 = $('#'+val2).val();
+
+      if((isNaN(value1))){
+           $('#'+val2).val('');
+           alert('Please insert numeric value in Examiner1 Marks');
+           return false;
+       }
+
+     if(value1<0 || value1>TotalMarks ) {
+         $('#'+val2).val('');
+         alert("Examiner1 Marks should be postive and less than Total Marks");
+         return false;
+     }
+
+ }
+
+ function positivevalue2(val1, val2 ,val3) {
+     var TotalMarks =  parseInt(val3);
+     var value1 = $('#'+val2).val();
+
+      if((isNaN(value1))){
+           $('#'+val2).val('');
+           alert('Please insert numeric value in Examiner2 Marks');
+           return false;
+       }
+
+     if(value1<0 || value1>TotalMarks ) {
+         $('#'+val2).val('');
+         alert("Examiner2 Marks should be postive and less than Total Marks");
+         return false;
+     }
+
+ }
+
+</script>
+</head>
+
+
+<div id="target">
+	<form name="searchstudents" id="searchstudents" method="post">
+		<input type="hidden" name="savedata" id="savedata" value="searchdata">
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Remarking Against Appeal Entry - Add");?>
+			</legend>
+
+			<table class="table" width="100%">
+
+				<tr>
+					<td width="25%" class="makebold"><?php echo $this->translate("Student ID");?>
+					</td>
+					<td width="25%"><?php echo $this->resultAppeal[0]['IdStudent'];?></td>
+
+					<td width="25%" class="makebold"><?php echo $this->translate('Semester');?>
+					</td>
+					<td width="25%"><?php echo $this->resultAppeal[0]['SemesterCode'];?>
+					</td>
+				</tr>
+
+				<tr>
+					<td class="makebold"><?php echo $this->translate('Course');?></td>
+					<td><?php echo $this->resultAppeal[0]['value'];?></td>
+				</tr>
+
+				<tr>
+					<td width="25%" class="makebold"><?php echo $this->translate('Examiner1');?>
+					</td>
+					<td width="25%"><?php echo $this->lobjform->field23;?></td>
+
+					<td width="25%" class="makebold"><?php echo $this->translate('Examiner2');?>
+					</td>
+					<td width="25%"><?php echo $this->lobjform->field27;?></td>
+				</tr>
+
+
+			</table>
+
+		</fieldset>
+		<br />
+
+
+		<fieldset>
+
+			<table class="table" width="100%" cellpadding="5" cellspacing="1">
+				<form>
+
+					<tr>
+						<th><?php echo $this->translate("Component Type");?>
+						</th>
+						<th><?php echo $this->translate("Item");?></th>
+						<!--<th><?php echo $this->translate("Detail Type");?></th>-->
+						<th><?php echo $this->translate("Detail Item");?>
+						</th>
+						<th><?php echo $this->translate("Old Marks");?></th>
+						<th><?php echo $this->translate("Examiner1 Marks");?>
+						</th>
+						<th><?php echo $this->translate("Examiner2 Marks");?>
+						</th>
+						<th><?php echo $this->translate("Total Marks");?>
+						</th>
+					</tr>
+
+
+					<?php if (count($this->finalResult)) {
+$i=1;   ?>
+					<?php foreach ($this->finalResult as $lobjprogram ) {
+						if(isset($lobjprogram['IdcomponentsDetails'])) {
+              $tot = count($lobjprogram['IdcomponentsDetails'])+1;
+} else {  $tot=NULL;
+}
+?>
+					<!--
+                 <input type="hidden" name="Component" id="Component" value="<?php echo $lobjprogram['IdComponent'];?>" >
+                 <input type="hidden" name="IdAppeal" id="IdAppeal" value="<?php echo $lobjprogram['IdAppeal'];?>" >
+                 <input type="hidden" name="IdSubComponent[]" id="IdSubComponent[]" value="<?php echo $lobjprogram['IdSubComponent'];?>" >
+                 <input type="hidden" name="Course" id="Course" value="<?php echo $this->course;?>" >
+                 <input type="hidden" name="IdStudentRegistration" id="IdStudentRegistration" value="<?php echo $this->IdStudentRegistration;?>" >
+                 <input type="hidden" name="registrationID" id="registrationID" value="<?php echo $this->registrationID;?>" >
+                 <input type="hidden" name="IdProgram" id="IdProgram" value="<?php echo $this->IdProgram;?>" >
+                 <input type="hidden" name="semesterCode" id="semesterCode" value="<?php echo $this->semesterCode;?>" >
+                 <input type="hidden" name="UpdUser" id="UpdUser" value="<?php echo $this->iduser;?>" >
+                 <input type="hidden" name="TotalMarks" id="TotalMarks" value="<?php echo $lobjprogram['TotalMarks'];?>" > -->
+
+					<input type="hidden" name="IdAppeal" id="IdAppeal"
+						value="<?php echo $lobjprogram['IdAppeal'];?>"> <input
+						type="hidden" name="UpdUser" id="UpdUser"
+						value="<?php echo $this->iduser;?>">
+
+
+					<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+						<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['ComponentName'];?>
+						</td>
+						<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['MainComponentItemName'];?>
+						</td>
+
+						<?php
+						if(isset($lobjprogram['IdcomponentsDetails']) && count($lobjprogram['IdcomponentsDetails'])>0) {
+$j=1;
+                         foreach($lobjprogram['IdcomponentsDetails'] as $values) {   ?>
+
+						<input type="hidden" name="IdAppealEntry[]" id="IdAppealEntry[]"
+							value="<?php echo $values['IdAppealEntry'];?>">
+						<input type="hidden"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_IdStudentMarksEntry"
+							id="IdStudentMarksEntry"
+							value="<?php echo $lobjprogram['IdStudentMarksEntry'];?>">
+						<input type="hidden"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_IdComponent"
+							id="IdComponent" value="<?php echo $values['IdComponent'];?>">
+						<input type="hidden"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_IdComponentItem"
+							id="IdComponentItem"
+							value="<?php echo $values['IdComponentItem'];?>">
+						<input type="hidden"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_IdSubComponent"
+							id="IdSubComponent"
+							value="<?php echo $values['IdSubComponent'];?>">
+
+
+					<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))?>" >
+
+						<!--<td><?php //echo $values['ComponentTypeName'];?></td> -->
+
+						<td><?php echo $values['ComponentItemName'];?></td>
+
+						<td><input id="compdetail_<?php echo $i;?>_<?php echo $j;?>"
+							readonly="readonly" dojoType="dijit.form.TextBox" type="text"
+							value="<?php echo $values['OldMarks'];?>" style="width: 50px;">
+						</td>
+
+						<td><input id="examiner1_<?php echo $i;?>_<?php echo $j;?>"
+						<?php if($this->larrresultAppealStatus[0]['Status']!='192') { ?>
+							readonly="readonly" <?php } ?> dojoType="dijit.form.TextBox"
+							onkeyup="positivevalue1(this.value,this.id,'<?php echo $lobjprogram['TotalMarks'];?>');"
+							type="text"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_examiner1marks"
+							value="<?php echo $values['Examiner1Marks'];?>"
+							style="width: 50px;">
+						</td>
+
+
+						<td><input id="examiner2_<?php echo $i;?>_<?php echo $j;?>"
+						<?php if($this->larrresultAppealStatus[0]['Status']!='192') { ?>
+							readonly="readonly" <?php } ?> dojoType="dijit.form.TextBox"
+							onkeyup="positivevalue2(this.value,this.id,'<?php echo $lobjprogram['TotalMarks'];?>');"
+							type="text"
+							name="<?php echo $lobjprogram['IdAppeal'];?>_<?php echo $values['IdAppealEntry'];?>_examiner2marks"
+							value="<?php echo $values['Examiner2Marks'];?>"
+							style="width: 50px;">
+						</td>
+
+						<td><input readonly="readonly" dojoType="dijit.form.TextBox"
+							type="text" value="<?php echo $values['TotalMarks'];?>"
+							style="width: 50px;">
+						</td>
+
+
+					</tr>
+					<?php $j++;
+}
+} else { ?>
+
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+
+					<?php } ?>
+
+					</tr>
+					<?php $i++;
+					}
+} ?>
+
+					<tr>
+						<td align="right" colspan="7">
+
+							<?php if ($this->disableSubmit=='1') { ?>
+							<?php if (count($this->finalResult)) { ?>
+ 							<input type='button'
+							<?php if($this->larrresultAppealStatus[0]['Status']!='192') { ?>
+							disabled="disabled" <?php } ?> class="NormalBtn"
+							dojotype="dijit.form.Button" name="Submit" id="Submit"
+							label="<?php echo $this->translate('Submit');?>" value='Submit'
+							OnClick="formsubmit();" />
+							<?php } } else {  ?>
+							<span style="color: red">Sorry, Student's Profile Status is not eligible for Remarking Against Appeal Entry.</span>
+							<?php } ?>
+
+
+							<input type='button' class="NormalBtn"
+							dojotype="dijit.form.Button"
+							label="<?php echo $this->translate('Back')?>" value='click'
+							onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'remarkentry', 'action'=>'index'),'default',true);?>';" />
+
+						</td>
+
+					</tr>
+
+			</table>
+
+		</fieldset>
+
+	</form>
+</div>
+
+
+

@@ -1,0 +1,190 @@
+<script type="text/javascript">
+dojo.addOnLoad(function(){
+	dijit.byId('IdStaff').set('value','');
+	dijit.byId('IdStaff').set('placeHolder','Select');
+
+
+	 var store = new dojo.data.ItemFileReadStore({
+		 data:<?php echo $this->jsondata?>
+     });
+
+
+	 var layout = [
+                    [{
+                    name: '<?php  echo $this->translate($this->Subject)." ".$this->translate("Name")?>',
+                    field: 'SubjectName',
+                    width: "auto"
+                },
+                {
+                    name: '<?php  echo $this->translate("Verifier")?>',
+                    field: 'FirstName',
+                    width: "auto"
+                },
+                {
+                    name: '<?php  echo $this->translate("Rank")?>',
+                    field: 'Rank',
+                    width: "auto"
+                  
+                },
+                {
+                    name: '<?php  echo $this->translate("Effective Date")?>',
+                    field: 'EffectiveDate',
+                    width: "auto"
+                }]];
+
+
+	 var grid = new dojox.grid.EnhancedGrid({
+		 id:'grid2',
+         store: store,
+         structure: layout,
+         plugins:{exporter:true,dnd:true,filter:true,nestedSorting: true,pagination:true,printer:true}    
+     });
+     
+     grid.placeAt('gridDiv');
+     
+     // Call startup() to render the grid
+     grid.startup();
+
+    var checkBoxes = [];
+		var container = dojo.byId('checkBoxContainer');
+		dojo.forEach(grid.layout.cells, function(cell, index){
+			var cb = new dijit.form.CheckBox({
+				checked: !cell.hidden
+			});
+			dojo.connect(cb, "onChange", function(newValue){
+				grid.layout.setColumnVisibility(index, newValue);
+			});
+
+			var label = dojo.doc.createElement('label');
+			label.innerHTML = cell.name;
+			dojo.attr(label, 'for', cb.id);
+
+			dojo.place(cb.domNode, container);
+			dojo.place(label, container);
+			dojo.place(dojo.doc.createElement("br"), container);
+
+			checkBoxes.push(cb);
+		});    
+	});
+
+function validateStaff( value, constraint )
+{
+
+var loginID = dijit.byId( "IdStaff");
+var IdSubject = dojo.byId( "IdSubject").value;
+var bNoNameFound =  ( "Error" == loginID.get( "state" ) ) ? false:true;
+
+if( "" == loginID.value ) {
+    // for some required=true is not kicking in, so we are forcing it.
+    bNoNameFound = false;
+}
+else {  
+
+
+        console.log( "Checking username..." );
+        dojo.xhrGet({
+            url: "<?php echo $this->baseUrl();?>"+"/examination/marksentrysetup/getvalidstaff/staffid/"+value+"/IdSubject/"+IdSubject,
+            handleAs: 'text',
+            content: { l: value},
+            timeout: 10000, 
+            load: function( data ) {
+                if ( data ) {
+                    // setting the state to error since the username is already taken                    
+                    bNoNameFound = false;
+                    loginID.set( "state", "Error" );
+                    loginID.setValue("");
+                    loginID.displayMessage( "The Staff is already taken" );
+                    // used to change the style of the control to represent a error
+                    loginID._setStateClass();
+                    console.log( "Invalid username" ); 
+                }
+                else
+                {
+                    bNoNameFound = true;
+                    loginID.set( "state", "" );
+                    loginID.displayMessage( "" );
+                }
+            }
+        });
+	 
+}
+
+return bNoNameFound;
+}
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Entry").' '.$this->translate("Setup");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/marksentrysetup/markssetuplist"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Marks").' '.$this->translate("Entry").' '.$this->translate("Setup");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate($this->Subject).' '.$this->translate("Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->subjectName;?></td>
+				<td></td>
+				<td></td>
+				<?php echo $this->lobjMarksentryForm->IdMarksEntrySetup;?>
+				<?php echo $this->lobjMarksentryForm->UpdDate;?>
+				<?php echo $this->lobjMarksentryForm->UpdUser;?>
+				<?php echo $this->lobjMarksentryForm->IdSubject;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Verification");?><span>*</span></td>
+				<td><?php echo $this->lobjMarksentryForm->Verification;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Verifier");?><span>*</span></td>
+				<td><?php echo $this->lobjMarksentryForm->IdStaff;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Rank");?><span></span></td>
+				<td><?php echo $this->lobjMarksentryForm->Rank;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("EffectiveDate");?><span>*</span></td>
+				<td><?php echo $this->lobjMarksentryForm->EffectiveDate;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Active");?><span></span></td>
+				<td><?php echo $this->lobjMarksentryForm->Active;?></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjMarksentryForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'marksentrysetup', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+
+	</Form>
+
+</fieldset>
+<div
+	style="width: 100%; height: 400px; float: left;" id="gridDiv"></div>

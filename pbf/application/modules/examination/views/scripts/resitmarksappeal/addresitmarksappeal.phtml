@@ -1,0 +1,249 @@
+<script type="text/javascript">
+    var batchArray  = new Array();
+    var rowid = 1;
+     dojo.addOnLoad(function(){
+         var studentcode = dijit.byId("StudentCode").value;
+         if(studentcode!=''){
+             dijit.byId('StudentCode').set("readOnly",true);
+         }
+         dijit.byId('SemesterCode').set('value','');
+         dijit.byId('SemesterCode').set('placeHolder','Select');
+         dijit.byId('IdCourse').set('value','');
+         dijit.byId('IdCourse').set('placeHolder','Select');
+     });
+
+function getstudentdet(){
+    var StudentCode = dijit.byId("StudentCode").value;
+    if(StudentCode == ''){
+        alert('Please Enter Student Id');
+        return false;
+    }
+    //return true;
+    $('#formsave').val('searchdata');
+    document.myForm.submit();
+}
+
+function fngetComponent(Idcourse){
+    if(Idcourse != "") {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/resitmarksappeal/getcoursecomponent/Idcourse/"+Idcourse,
+                handleAs:'json',
+                load:function(data){
+                    if(data!=''){
+                        $('#IdComponent').val(data[0]['IdComponentType']);
+                        $("#component").text(data[0]['DefinitionDesc']);
+                    }else{
+                        $('#IdComponent').val('');
+                        $("#component").text(' ');
+                    }
+
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+}
+
+function addappeal(){
+     var IdCourse = dijit.byId("IdCourse").value;
+     var IdCourseName = dijit.byId("IdCourse").displayedValue;
+
+     var IdComponent = $("#IdComponent").val();
+     var IdComponentName = $("#component").text();
+     if(IdCourse == ''){
+         alert('Please select course');
+         return false;
+     }else if(IdComponent == ''){
+         alert('The selected course does not have final component');
+         return false;
+     }
+
+     if(IdCourse!='' && IdComponent!=''){
+        var studentcode = dijit.byId("StudentCode").value;
+        $.ajax({
+          type: "GET",
+          async: false,
+          url: '<?php echo $this->url(array('module' => 'examination', 'controller' => 'resitmarksappeal', 'action' => 'getmarkentrydet'), 'default', true); ?>',
+          data: "IdCourse=" + IdCourse + "&IdComponent=" +IdComponent +"&studentcode=" +studentcode , // appears as $_GET['id'] @ ur backend side
+          success: function(data) {
+            if(data == '0'){
+                alert('Marks entry does not exist for selected course');
+                return false;
+            }else if(data == '1'){
+                addcomponentdetail(IdCourse,IdCourseName,IdComponent,IdComponentName);
+            }else if(data == '2'){
+                alert('User does not exist');
+                return false;
+            }
+          }
+        });
+         return false;
+     }
+}
+
+
+function addcomponentdetail(IdCourse,IdCourseName,IdComponent,IdComponentName){
+    var insertval = IdCourse +'_'+ IdComponent;
+    var rowlen = $('#hor').find('tr').length;
+    if(rowlen > 1){
+        dijit.byId('SemesterCode').set("readOnly",true);
+    }
+    batchArray.push(insertval);
+    if(arrHasDupes(batchArray)){
+        batchArray = batchArray.unique();
+        alert("Duplicate Entry");
+    }else{
+        var trow=document.getElementById('hor').insertRow(rowid);
+        var tcol1=trow.insertCell(0);
+        var tcol2=trow.insertCell(1);
+        var tcol3=trow.insertCell(2);
+
+        tcol1.innerHTML="<input type='hidden' value='"+IdCourse+"' name=coursegrid[]>"+IdCourseName;
+        tcol2.innerHTML="<input type='hidden' value='"+IdComponent+"' name=componentgrid[]>"+IdComponentName;
+        tcol3.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+        rowid++;
+    }
+}
+
+function clearappeal(){
+    dijit.byId("StudentCode").setValue('');
+    dijit.byId('SemesterCode').set('value','');
+    dijit.byId('SemesterCode').set('placeHolder','Select');
+    dijit.byId('IdCourse').set('value','');
+    dijit.byId('IdCourse').set('placeHolder','Select');
+    dijit.byId('StudentCode').set("readOnly",false);
+    dijit.byId('SemesterCode').set("readOnly",false);
+    dijit.byId('IdCourse').set("readOnly",false);
+    $('#IdComponent').val('');
+    $("#component").text(' ');
+    $('#IdProgram').val('');
+    $("#program").text(' ');
+}
+
+function deleteRow(r){
+    var ret = confirm('Are you sure you want to delete?');
+    if(ret){
+        rowid--;
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+        var rowlen = $('#hor').find('tr').length;
+        if(rowlen <= 2){
+            dijit.byId('SemesterCode').set("readOnly",false);
+        }
+    }
+}
+
+
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+        var i, j, n;
+        n=A.length;
+        // to ensure the fewest possible comparisons
+        for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+            for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+                if (A[i]==A[j]) return true;
+            }	}
+        return false;
+    }
+
+    Array.prototype.unique = function () {
+        var r = new Array();
+        o:for(var i = 0, n = this.length; i < n; i++)
+        {
+            for(var x = 0, y = r.length; x < y; x++)
+            {
+                if(r[x]==this[i])
+                {
+                    continue o;
+                }
+
+            }
+            r[r.length] = this[i];
+        }
+        return r;
+    }
+
+</script>
+<form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+	name="myForm">
+	<input type="hidden" name="formsave" id="formsave" value="">
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Exam Resit Appeal"); ?>
+		</legend>
+	</fieldset>
+	<table class="table" width="100%">
+		<tr>
+			<td><?php echo $this->translate("Student Id"); ?>
+			</td>
+			<td colspan="3"><?php echo $this->lobjresitmarksappealForm->StudentCode;?>
+				<input type='submit' name="Search" id="Search" class="NormalBtn"
+				dojotype="dijit.form.Button"
+				label="<?php echo $this->translate('Search') ?>"
+				onclick="return getstudentdet()" />
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate("Semester"); ?></td>
+			<td><?php echo $this->lobjresitmarksappealForm->SemesterCode; ?></td>
+			<td><?php echo $this->translate("Program"); ?></td>
+			<td><span id="program"><?php echo (isset($this->programdet)) ? $this->programdet : '';?>
+			</span> <?php echo $this->lobjresitmarksappealForm->IdProgram; ?></td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate("Course"); ?></td>
+			<td><?php echo $this->lobjresitmarksappealForm->IdCourse; ?></td>
+			<td><?php echo $this->translate("Component"); ?></td>
+			<td><span id="component"></span> <?php echo $this->lobjresitmarksappealForm->IdComponent; ?>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4" align="right"><?php echo $this->lobjresitmarksappealForm->ProcessedBy; ?>
+				<?php echo $this->lobjresitmarksappealForm->ProcessedOn; ?> <?php echo $this->lobjresitmarksappealForm->UpdatedOn; ?>
+				<?php echo $this->lobjresitmarksappealForm->UpdatedBy; ?> <?php echo $this->lobjresitmarksappealForm->IdStudent; ?>
+				<?php echo $this->lobjresitmarksappealForm->Add; ?> <?php echo $this->lobjresitmarksappealForm->Clear; ?>
+			</td>
+		</tr>
+	</table>
+	<table class="table" id="hor" width="100%">
+		<tr>
+			<th><?php echo $this->translate('Course')?></th>
+			<th><?php echo $this->translate('Component')?></th>
+			<th><?php echo $this->translate('Delete')?></th>
+		</tr>
+		<tr>
+			<td colspan="4" align="right">
+				<?php if($this->errMsgPS=='0') {
+				 echo $this->lobjresitmarksappealForm->Save;
+				 } ?>
+				<input type="button" class="NormalBtn" dojotype="dijit.form.Button"
+				label="<?php echo $this->translate("Back"); ?>"
+				onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'resitmarksappeal', 'action'=>'index'),'default',true);?>';" />
+			</td>
+		</tr>
+	</table>
+</form>
+
+
+<?php if($this->errMsg=='1') {  ?>
+
+<table class="table" width="100%">
+	<tr>
+		<td colspan="3" style="color: red;" align="center"><?php echo $this->translate("Sorry, you cannot
+			add more as you have already exceed your Exam Resit Max Appeal.");?></td>
+	</tr>
+
+</table>
+
+
+<?php } ?>
+
+
+<?php if($this->errMsgPS=='1') {  ?>
+<table class="table" width="100%">
+	<tr>
+		<td colspan="3" style="color: red;" align="center"><?php echo $this->translate("Sorry, Student's Profile Status is not Eligible for Exam Resit Appeal.");?></td>
+	</tr>
+
+</table>
+<?php } ?>
+

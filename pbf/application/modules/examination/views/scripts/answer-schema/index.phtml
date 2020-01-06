@@ -1,0 +1,54 @@
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<div style="width:100%;">
+
+<?php echo $this->form; ?>
+<br>
+
+<?php 
+	//echo $this->paginationControl($this->list_subject,'Sliding','paginationTop.phtml');
+?>
+<?php if(count($this->list_subject)>0){?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>
+		<th><?php echo $this->translate("Course Code")?></th>
+		<th><?php echo $this->translate("Course Name")?></th>
+		<th><?php echo $this->translate("Faculty")?></th>
+		<th><?php echo $this->translate("Status")?></th>
+		<th><?php echo $this->translate("Action")?></th>
+	</tr>
+	<?php 
+	$i=1;	
+	foreach($this->list_subject as $subject){
+		//if($subject["total_student"]>0){
+	?>
+		
+	<tr>
+		<td><?php echo $i;?></td>
+		<td><?php echo $subject["SubCode"];?></td>
+		<td><?php echo $subject["SubjectName"];?></td>
+		<td><?php echo $subject["facultyName"];?></td>
+		<td></td>
+		<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-schema','action'=>'view','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$subject['IdSubject'])); ?>"><?php echo $this->translate("View");?></a></td>
+	</tr>
+		<?php 
+		$i++; }?>
+	
+</table>
+<?php }//end if?>
+</div>
+<br>

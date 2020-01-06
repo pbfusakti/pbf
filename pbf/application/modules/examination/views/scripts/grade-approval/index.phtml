@@ -1,0 +1,244 @@
+<script type="text/javascript">
+	function search_subject(){
+		
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var table = $("#result tbody");
+		
+		if(semester_id!=0 && faculty_id!=0){
+			$.ajax({
+				url: "/examination/answer-sheet-group/search-course",
+			    type: "post",
+			    async : false,
+			    data: {'semester_id':semester_id, 'faculty_id':faculty_id},
+			    dataType: 'json',
+			    success: function(data){
+			    	$('#subject').empty();
+					$('#subject').append('<option value="">Please Select</option>');
+				    	
+				    	$.each(data, function(index) {
+				    		$('#subject').append('<option value="'+data[index].IdSubject+'">'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+				    	});
+			          
+				},
+				error:function(){
+			          alert("failure");
+				},
+				beforeSend: function() {
+					showLoading('subject','subject','loading');
+
+			        $(table).empty();
+				},
+				complete: function() {
+					hideLoading('loading','subject');
+				}   
+			});
+		}
+	}
+
+	function search_group(){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var course_id = $('#subject').val();
+
+		var table = $("#result tbody");
+		var table_head = $("#result thead");
+        $(table).empty();
+        $(table_head).empty();
+
+      
+
+
+			    	   $.ajax({
+			  		      url: "/examination/class-attendance/search-course-group",
+			  		      type: "post",
+			  		      async : false,
+			  		      data: {'semester_id':semester_id, 'faculty_id':faculty_id, 'subject_id':course_id},
+			  		      dataType: 'json',
+			  		      beforeSend: function (){
+			  		    	  $(table).html('<tr><td colspan="6">Loading...</td></tr>');
+			  		      },
+			  		      success: function(data){
+			  		    	  $(table).empty();
+			  		    	  $(table_head).empty();
+				  				
+					    	  var head =    "<tr>"+
+								  				"<th><?php echo $this->translate('Group Name'); ?></th>"+
+								  				"<th><?php echo $this->translate('Group Code'); ?></th>"+
+								  				"<th><?php echo $this->translate('Semester'); ?></th>"+
+								  				"<th><?php echo $this->translate('Coordinator'); ?></th>"+
+								  				"<th><?php echo $this->translate('Total Student'); ?></th>"+
+								  												  				
+											"</tr>"
+			  				 $(table_head).append(head);	
+				  				 
+			  		          if(data.length>0){
+			  		        	  for(var i=0; i<data.length; i++){
+			  				          var content = "<tr>" +
+				  				       			    "<td><a href='#' onclick='view_detail2("+data[i].IdCourseTaggingGroup+","+semester_id+","+course_id+");'>"+data[i].GroupName+"</a></td>"+
+			  				          				"<td align='center'>"+data[i].GroupCode+"</a></td>"+
+			  				          				"<td>"+data[i].semester_name+"</td>"+
+			  				          				"<td>"+data[i].FullName+"</td>"+
+			  				          				"<td align='center'>"+data[i].total_student+"</td>"+			  				          				
+			  				          				"</tr>"
+			  			        	  $(table).append(content);
+			  			          }
+			  		          }else{
+			  		        	  var content = '<tr><td colspan="6"> No Search Result </td></tr>';
+			  		        	  $(table).append(content);
+			  		          }
+			  		      },
+			  		      error:function(){
+			  		    	  $(table).empty();
+			  		          alert("failure");
+			  		      }   
+			  		});
+    		
+     
+       
+	}
+
+	function showLoading(target,target_div,loading_id){
+		$('#'+target).hide();
+		$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+	}
+
+	function hideLoading(loading_id,target){
+		$('#'+loading_id).remove();
+		$('#'+target).show();
+	}
+
+
+	function view_detail2(cgid,semester_id,course_id){	
+		window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'grade-approval','action'=>'student-list'),'default',true);?>/id/'+cgid+'/idSemester/'+semester_id+'/idSubject/'+course_id;
+	}
+
+	
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			   			 $select ='';
+			    		if( isset($this->idsemester) && $this->idsemester== $semester["key"] ){
+							$select = 'selected="selected"';
+						} ?>
+			    		<option value="<?php echo $semester["key"];?>" <?php echo $select; ?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program Study"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdProgram" name="IdProgram" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		$select ='';
+			    		if( isset($this->default_program) && $this->default_program== $program["IdProgram"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>" <?php echo $select; ?>><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+			
+		</dd>
+		<dt></dt>
+		
+		<dd> <input type="submit" name="submit">
+			
+		</dd>
+				
+	</dl>
+</form>
+
+<table class="table" id="result" width="100%">
+	<thead>
+		<th><?php echo $this->translate('Subject Code')?></th>
+		<th><?php echo $this->translate('Subject Name')?></th>
+		<th><?php echo $this->translate('Credit Hours')?></th>
+		<th><?php echo $this->translate('Group Code')?></th>
+		<th><?php echo $this->translate('Group Name')?></th>
+		<th><?php echo $this->translate('Day')?></th>
+		<th><?php echo $this->translate('Time')?></th>
+		<th><?php echo $this->translate('Venue')?></th>
+		<th><?php echo $this->translate('# of Student')?></th>
+		<th><?php echo $this->translate('Keyed in By')?></th>
+		<th><?php echo $this->translate('Verified By')?></th>
+		<th><?php echo $this->translate('Approved')?></th> 
+	</thead>
+	<tbody>
+	<?php 
+	if (count($this->courses) > 0) {
+	foreach ($this->courses as $course) {
+		$idGroup=$course['IdCourseTaggingGroup'];
+		$idsemester=$this->idsemester;
+		$idsubject=$course['IdSubject'];?>
+	
+	<tr><td><?php echo $course['SubCode'];?></td>
+	<td><?php echo $course['SubjectName'];?></td>
+	<td><?php echo $course['CreditHours'];?></td>
+	<td><?php echo $course['GroupCode'];?></td>
+	<td><?php echo $course['GroupName'];?></td>
+	<td><?php echo $course['Day'];?></td>
+	<td><?php echo $course['sc_start_time'].'-'.$course['sc_end_time'];?></td>
+	<td><?php echo $course['sc_venue'];?></td>
+	<td><?php echo $course['n_of_student'];?></td>
+	<td><?php echo $course['FullName'];?></td>
+	<td><?php echo $course['Verificator'];?></td>
+	<td align="center">
+	<?php if ($course['approved']=='Approved') {?>
+	<img src="/images/icon/approvedcek.png"  style="width:20px;height:20px;" title="<?php echo $course['approved'];?>">
+	<?php } else if  ($course['approved']=='Not All Approved') {?>
+	<a href="<?php echo $this->url(array('module'=>'examination','controller'=>'grade-approval','action'=>'student-list'),'default',true);?>/id/<?php echo $idGroup?>/idSemester/<?php echo $idsemester?>/idSubject/<?php echo $idsubject?>/idprogram/<?php echo $this->default_program?>" target="_blank">
+	<img src="/images/icon/incomplete.png"  style="width:20px;height:20px;" title="<?php echo 'Not all approved';?>"></a>
+	<?php } else if ($course['verified']=='Yes') { ?>
+            <a href="<?php echo $this->url(array('module'=>'examination','controller'=>'grade-approval','action'=>'student-list'),'default',true);?>/id/<?php echo $idGroup?>/idSemester/<?php echo $idsemester?>/idSubject/<?php echo $idsubject?>/idprogram/<?php echo $this->default_program?>" target="_blank">
+            <img src="/images/icon/green.png"  style="width:25px;height:25px;" title="<?php echo 'Need Approval';?>"> </a><?php } else  {?>
+            <img src="/images/icon/red.ico"  style="width:20px;height:20px;" title="<?php echo 'Not verified yet' ?>">
+            <?php }  ?>
+	 
+	</tr>
+	<?php }
+	}?>
+	</tbody>
+</table>

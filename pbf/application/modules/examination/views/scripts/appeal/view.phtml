@@ -1,0 +1,69 @@
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		<th><?php echo $this->translate("Subject");?></th>
+		<td><?php echo $this->subject["BahasaIndonesia"];?> ( <?php echo $this->subject["SubCode"];?> )</td>
+			
+	</tr>
+	<tr>
+		
+		<th><?php echo $this->translate("Semester");?></th>
+		<td><?php echo $this->semester["SemesterMainName"]?></td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Component");?></th>
+		<td><?php echo $this->component["component_name"]; ?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Application Status");?></th>
+		<td>
+		<?php 
+		if($this->appeal['sa_status']==1) echo $this->translate("Apply");
+		if($this->appeal['sa_status']==2) { echo $this->translate("Approved").', '.date("d-m-Y",strtotime($this->appeal['sa_approvedDate'])); }
+		if($this->appeal['sa_status']==3) { echo $this->translate("Rejected").', '.date("d-m-Y",strtotime($this->appeal['sa_approvedDate'])); }?>
+		
+		</td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Dosen Penilai");?></th>
+		<td><?php echo ($this->appeal["dosen_penilai"]!='') ? $this->appeal["dosen_penilai"]:'-';?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Tanggal Pertemuan");?></th>
+		<td><?php echo ($this->appeal["sa_meeting_date"]!='') ? date("d-m-Y",strtotime($this->appeal["sa_meeting_date"])).', '.strftime("%I:%M %P",strtotime($this->appeal["sa_meeting_time"])):'-';?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Ruang");?></th>
+		<td><?php echo $this->appeal["sa_location"]; ?></td>
+	</tr>
+</table>
+
+<h2><?php echo $this->translate("Student Mark");?></h2>
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+	    <th><?php echo $this->translate("Coursework");?></th>
+	    <?php 
+			if(count($this->component["item"])>0){ ?>
+		<th><?php echo $this->translate("Item");?></th>
+		<?php } ?>
+		<th><?php echo $this->translate("New Mark");?></th>		
+	</tr>
+	
+<?php 
+if(count($this->component["item"])>0){
+	$item_no=1;
+	foreach($this->component["item"] as $item){?>
+	<tr>
+	    <td><?php echo $this->component["component_name"];?></td>
+		<td><?php echo $item["ComponentName"];?></td>
+		<td align="center"><?php echo $item["mark"]; ?></td>
+	</tr>
+<?php $item_no++;} 
+}else{ ?>
+	<tr>
+	    <td><?php echo $this->component["component_name"];?></td>			
+		<td>(<input type="text" size=5 value="<?php echo $this->component["mark"]; ?>" readonly>/<?php echo $this->component["Marks"]; ?>)*<?php echo $this->component["Percentage"]; ?> = <input type="text" size=5 value="<?php echo $this->component["finalmark"]; ?>" readonly></td>
+	</tr>
+<?php } ?>
+</table>

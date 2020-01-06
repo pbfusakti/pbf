@@ -1,0 +1,147 @@
+<script>
+
+function back(role){
+	if(role==1){//admin
+		window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'display-mark','action'=>'index'), 'default', true);?>";
+	}else{
+		window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'display-mark','action'=>'group-list'), 'default', true);?>";
+	}
+}
+
+
+
+$(function() {
+	$(".datepicker").datepicker({
+		"dateFormat":"yy-mm-dd",
+		"changeMonth":"true"		
+	});
+});
+
+
+function SaveDisplayDate(i,idMaster){
+
+	var button_save = "#showButton"+i
+	var element_displayMarkDate = "#displayMarkDate"+i
+	var displayMarkDate = $(element_displayMarkDate).val();
+	var element_pmid = "#pmid"+i
+	var pm_id = $(element_pmid).val();
+	
+	$.ajax({
+		url: "/examination/display-mark/save/idMaster/"+idMaster+"/dt/"+displayMarkDate+"/pmid/"+pm_id,
+	    type: "post",
+	    async : false,
+	    data: {'idSemester':<?php echo $this->idSemester; ?>,'idProgram':<?php echo $this->idProgram; ?>,'idSubject':<?php echo $this->idSubject; ?>,'id':<?php echo $this->idGroup; ?>},
+	    dataType: 'json',
+	    success: function(data){		
+	    	   $(element_pmid).val(data.pmid);
+		},
+		error:function(){
+	          alert("failure");
+		},
+		beforeSend: function() {
+			showLoading(button_save);
+		},
+		complete: function() {
+			hideLoading(button_save);
+		}   
+	});
+	
+}
+
+
+function showLoading(button_save){	
+	$(button_save).hide();
+	$(button_save).after("<div id='loading'><img src='/images/spinner.gif' width='30' heigth='30' /></div>");
+}
+
+function hideLoading(button_save){
+	$('#loading').remove();	
+	$(button_save).show();
+}
+</script>
+
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>		
+			<li>							
+					<a href="#" onClick="back('<?php echo $this->role; ?>')">
+						<span class='back'></span>Back</a>				
+			</li>	
+			
+			
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					Info
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+
+<br>
+
+<div style="width:100%;">
+
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+<br>
+
+
+<br><br>	
+	
+	
+	<table  class="table" width="100%" cellpadding="5" cellspacing="1" >
+		  <tr>
+		    <th width="25px">No</th>   
+		    <th>Component Name</th>	
+		    <th><?php echo $this->translate("Display Date"); ?></th>   	   		   
+		  </tr>
+		  <?php 
+		  if($this->rs_component){	
+		  	foreach ($this->rs_component as $index=>$component){		  	
+		  ?>
+		   <tr>
+		    <td>&nbsp;<?php echo $index+1;?>.</td>   
+		    <td>&nbsp;<?php echo $component["component_name"]?></td>
+		    <td>
+		        <div id="showButton<?php echo $index;?>" >	 
+		        <input type="hidden" id="pmid<?php echo $index;?>" value="<?php echo $component["pm_id"]?>" >   
+		        <input type="text" id="displayMarkDate<?php echo $index;?>" class="datepicker" value="<?php echo $component["display_date"]?>" >
+		        <input type="button" value="Save" id="buttonSave" onclick="SaveDisplayDate('<?php echo $index;?>',<?php echo $component["IdMarksDistributionMaster"]?>);"></td> 
+		  		</div>	
+		   </tr>
+		  <?php }
+	}else{ ?>
+		 <tr bgcolor="#FFFFFF">
+			<td colspan="3"><font color="red"></>No assessment component has been setup.</font></td>   
+		 </tr>
+	<?php }?>
+  </table>
+</div>

@@ -1,0 +1,168 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	dijit.byId('field5').set('value','');
+	dijit.byId('field5').set('placeHolder','Select');
+        dijit.byId('field23').set('value','');
+	dijit.byId('field23').set('placeHolder','Select');
+	dijit.byId('field24').set('value','');
+	dijit.byId('field24').set('placeHolder','Select');
+        dijit.byId('field25').set('value','');
+	dijit.byId('field25').set('placeHolder','Select');
+        dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');	
+});
+
+
+function fnGetSchmeList(IdFaculty){ 
+        if(IdFaculty != "") {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/generategrade/getschemelist/IdFaculty/"+IdFaculty,
+                handleAs:'json',
+                load:function(data){                    
+                    AutoFillNextEditableDropDown("field25",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+    }
+
+function fnGetProgramList(IdScheme){
+        var IdFaculty = dijit.byId("field5").value;
+        var IdScheme = dijit.byId("field25").value;
+        var flag = true;
+        if(flag){
+            if(IdScheme != "" ) {
+                var xhrArgs = {
+                    url: "<?php echo $this->baseUrl(); ?>"+"/examination/generategrade/getprogramlist/IdFaculty/"+IdFaculty+"/IdScheme/"+IdScheme,
+                    handleAs:'json',
+                    load:function(data){
+                        AutoFillNextEditableDropDown("field24",data);
+                    }
+                }
+                dojo.xhrGet(xhrArgs);
+            }
+        }
+    }
+
+
+function fnGetCourseList(IdProgram){
+        if(IdProgram != "") {
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/generategrade/getcourselist/IdProgram/"+IdProgram,
+                handleAs:'json',
+                load:function(data){						
+                    AutoFillNextEditableDropDown("field23",data);
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        }
+    }
+
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+        dijit.byId(EditableDropDownId).setValue("");
+        var ddwidget = dijit.byId(EditableDropDownId);
+        ddwidget.setAttribute('disabled', false);
+        var options = {
+            label:"name",
+            identifier:"key",
+            items:JSONText
+        };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+    }
+
+function formsubmit() {   
+    var sem = $('#field27').val();
+    var course = $('#field23').val();
+      
+    if(sem=='' ) {   
+      alert('Semester cannot be left blank');
+      return false;
+    } 
+    
+    if(course=='' ) {   
+      alert('Course cannot be left blank');
+      return false;
+    } 
+    
+    if(sem!='' && course!='') {         
+        document.searchF.submit();
+    }
+    
+}
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Generate Grade");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/generategrade/index/search/1"
+		name="searchF" id="searchF" method="POST">
+		<input type="hidden" name='Search' id="Search" value="Search">
+		<table width="100%">
+
+			<tr>
+				<td><?php echo $this->translate("Faculty"); ?></td>
+				<td><?php echo $this->lobjform->field5; ?></td>
+				<td><?php echo $this->translate("Scheme"); ?></td>
+				<td><?php echo $this->lobjform->field25; ?></td>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate('Program');?></td>
+				<td><?php echo $this->lobjform->field24;?></td>
+
+				<td><?php echo $this->translate('Semester');?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjform->field27;?></td>
+
+			</tr>
+
+			<tr>
+
+				<td><?php echo $this->translate('Course');?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjform->field23;?></td>
+
+				<td><?php echo $this->translate("Student ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+
+			</tr>
+
+			<tr>
+				<td align="center" colspan="4"><input type="submit"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Process Grade"); ?>"
+					onclick="return formsubmit();" /> <input type="button"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Clear"); ?>"
+					onclick="window.location.href='<?php echo $this->baseUrl();?>/examination/generategrade' " />
+				</td>
+			</tr>
+
+
+		</table>
+	</form>
+</fieldset>
+<br />
+
+
+<?php if($this->errMsg=='0') { ?>
+<table class="table" width="100%" cellpadding="5" cellspacing="1">
+	<tr>
+		<td align="center" style="color: red"><?php echo $this->translate("No matching record found. Try
+			different keywords.");?></td>
+	</tr>
+</table>
+<?php } ?>
+<?php if($this->errMsg=='1') { ?>
+<table class="table" width="100%" cellpadding="5" cellspacing="1">
+	<tr>
+		<td align="center" style="color: red"><?php echo $this->translate("Grade generated successfully.");?></td>
+	</tr>
+</table>
+<?php } ?>

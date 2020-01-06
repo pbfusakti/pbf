@@ -1,0 +1,165 @@
+<script type="text/javascript">
+$(document).ready(function(){
+   // $("#searchForm").submit(function(){
+    $("#print").click(function(){    
+        if($("#print").prop("checked") == true)
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/grade-distributionpdf');
+           // alert('here');
+        }
+        else
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/grade-distribution');
+        }
+    })
+});
+	
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+<form action="<?php echo $this->baseUrl()?>/examination/mark-report/grade-distribution" method="post" id="searchForm">
+	<dl class="zend_form">
+	
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdProgram-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdProgram-element">
+			<select id="IdProgram" name="IdProgram">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>"><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="SubjectName-label">
+			<label class="optional" for="SubjectName"><?php echo $this->translate("Subject");?></label>
+		</dt>
+		<!--
+        <dd id="SubjectName-element">
+			<select name="subject" id="subject"  onchange="search_group();">
+				
+			</select>
+		</dd>
+			-->	
+	</dl>
+    <input type="checkbox" name="print" value="1" id="print" /> Print <br /><input type="submit" value="Submit" name="submit" />
+</form>
+<?php if(isset($this->subjects)):?>
+<table class="table" id="result" width="100%">
+	<thead>
+        <tr>
+            <th>No</th>
+            <th>Kode</th>
+            <th>Matakuliah</th>
+            <th>Kelas</th>
+            <th>Nik</th>
+            <th>Dosen</th>
+            <th>Jumlah Mahasiswa</th>
+            <th>A</th>
+            <th>A-</th>
+            <th>B+</th>
+            <th>B</th>
+            <th>B-</th>
+            <th>C+</th>
+            <th>C</th>
+            <th>C-</th>
+            <th>D+</th>
+            <th>D</th>
+            <th>D-</th>
+            <th>E</th>
+            <th>MG</th>
+            <th>IN</th>
+            <th>NR</th>
+            <th>W</th>
+            <th>FR</th>
+            
+        </tr>
+	</thead>
+	<tbody>
+        <?php 
+        $i = 0;
+        foreach ($this->subjects as $key => $value)
+        {
+            foreach($value['courseGroup'] as $index => $val)
+            {
+                $i++;
+        ?>
+        <tr>
+            <td><?php echo $i;?></td>
+            <td><?php echo $value['SubCode'];?></td>
+            <td><?php echo $value['SubjectName'];?></td>
+            <td><?php echo $val['GroupName'];?></td>
+            <td></td>
+            <td><?php echo $val['FullName'];?></td>
+            <td><?php echo $val['totalStudentGroup'];?></td>
+            <td><?php echo $val['marks']['A'];?></td>
+            <td><?php echo $val['marks']['AMinus'];?></td>
+            <td><?php echo $val['marks']['BPlus'];?></td>
+            <td><?php echo $val['marks']['B'];?></td>
+            <td><?php echo $val['marks']['BMinus'];?></td>
+            <td><?php echo $val['marks']['CPlus'];?></td>
+            <td><?php echo $val['marks']['C'];?></td>
+            <td><?php echo $val['marks']['CMinus'];?></td>
+            <td><?php echo $val['marks']['DPlus'];?></td>
+            <td><?php echo $val['marks']['D'];?></td>
+            <td><?php echo $val['marks']['DMinus'];?></td>
+            <td><?php echo $val['marks']['E'];?></td>
+            <td><?php echo $val['marks']['MG'];?></td>
+            <td><?php echo $val['marks']['IN'];?></td>
+            <td><?php echo $val['marks']['NR'];?></td>
+            <td><?php echo $val['marks']['W'];?></td>
+            <td><?php echo $val['marks']['FR'];?></td>
+            
+        </tr>
+        <?php
+            }
+        }
+        ?>
+	</tbody>
+</table>
+<?php endif;?>

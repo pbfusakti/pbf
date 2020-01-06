@@ -1,0 +1,260 @@
+<script type="text/javascript">
+dojo.addOnLoad(function(){
+
+	});
+
+var rowid = <?php echo count($this->paginator)+1;?>;
+
+function addSubjectregistrationDetails() {
+	
+	var IdProgram ="<?php echo $this->pgmid;?>";		
+	
+	var EffectiveDate = dojo.byId("EffectiveDate").value;
+	var AcademicStatusId = dijit.byId("AcademicStatus").value;
+	var AcademicStatus = dijit.byId("AcademicStatus").displayedValue;
+	var Semester=dijit.byId("Semester").value;
+	var TerminateStatusId=dijit.byId("TerminateStatus").value;
+	var TerminateStatus=dijit.byId("TerminateStatus").displayedValue;	
+	var VirtualSemester=dijit.byId("VirtualSemester").value;
+	var Min=dijit.byId("Min").value;
+	var Max=dijit.byId("Max").value;
+	var Subjects=dijit.byId("Subjects").value;
+
+	if(TerminateStatus=='Register' && Subjects<=0){
+		alert("Subject Count Value Invalid");
+		dijit.byId("Subjects").focus();
+		return false;		
+	}
+	
+	var data=parseFloat(Max)+0.01;
+	dijit.byId('Min').set('value',data);
+		
+	if(VirtualSemester==''){
+	    dijit.byId("VirtualSemester").attr('required','true');
+		dijit.byId("VirtualSemester").focus();
+	return false;
+	}	
+	
+	if(Min==''){
+	    dijit.byId("Min").attr('required','true');
+		dijit.byId("Min").focus();
+	return false;
+	}	
+	if(Max==''){
+	    dijit.byId("Max").attr('required','true');
+		dijit.byId("Max").focus();
+	return false;
+	}
+	if(Semester==''){
+	    dijit.byId("Semester").attr('required','true');
+		dijit.byId("Semester").focus();
+	return false;
+	}	
+	if(Subjects==''){
+	    dijit.byId("Subjects").attr('required','true');
+		dijit.byId("Subjects").focus();
+	return false;
+	}
+	
+		var trow=document.getElementById('hor').insertRow(rowid);
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		var tcol5=trow.insertCell(4);
+		var tcol6=trow.insertCell(5);
+		var tcol7=trow.insertCell(6);
+		var tcol8=trow.insertCell(7);
+		var tcol9=trow.insertCell(8);
+		var tcol10=trow.insertCell(9);	
+		
+		tcol1.innerHTML= "<?php echo $this->Progname;?>";
+		tcol2.innerHTML= "<input type='hidden' value='"+IdProgram+"' name=IdProgramgrid[]><input type='hidden' value='"+EffectiveDate+"' name=EffectiveDategrid[]>"+EffectiveDate;
+		tcol3.innerHTML="<input type='hidden' value='"+AcademicStatusId+"' name=AcademicStatusIdgrid[]><input type='hidden' value='"+AcademicStatus+"' name=AcademicStatusgrid[]>"+AcademicStatus;
+		tcol4.innerHTML="<input type='hidden' value='"+VirtualSemester+"' name=VirtualSemestergrid[]>"+VirtualSemester;
+		tcol5.innerHTML="<input type='hidden' value='"+Min+"' name=Mingrid[]>"+Min;
+		tcol6.innerHTML="<input type='hidden' value='"+Max+"' name=Maxgrid[]>"+Max;
+		tcol7.innerHTML="<input type='hidden' value='"+Semester+"' name=Semestergrid[]>"+Semester;	
+		tcol8.innerHTML="<input type='hidden' value='"+TerminateStatusId+"' name=TerminateStatusIdgrid[]><input type='hidden' value='"+TerminateStatus+"' name=TerminateStatusgrid[]>"+TerminateStatus;
+		tcol9.innerHTML="<input type='hidden' value='"+Subjects+"' name=Subjectsgrid[]>"+Subjects;
+		tcol10.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+		rowid++;
+	
+}
+
+function deleteRow(r)
+{
+	rowid--;
+	
+	var i=r.parentNode.parentNode.rowIndex;
+	document.getElementById('hor').deleteRow(i);
+	
+}
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Subject").' '.$this->translate("Registration Policy");?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myform" name="myform"
+		method="post" action="">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return true;
+                }
+				</script>
+
+
+		<table class="table" border="0" width="100%" cellpadding="5"
+			cellspacing="1">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Subject").' '.$this->translate("Registration").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Program").' '.$this->translate("Name");?>
+				</td>
+				<td><?php echo $this->Progname;?></td>
+				<td><?php echo $this->translate("Credit").' '.$this->translate("Hours");?>
+				</td>
+				<td><?php echo $this->lobjSubjectregistrationForm->CreditHours;?>
+			
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Select").' '.$this->translate("Effective Date");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->EffectiveDate;?>
+				</td>
+				<td><?php echo $this->translate("Virtual Semester");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->VirtualSemester;?>
+
+					<?php  echo $this->lobjSubjectregistrationForm->UpdDate;?> <?php  echo $this->lobjSubjectregistrationForm->UpdUser;?>
+					<?php  echo $this->lobjSubjectregistrationForm->IdProgram;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Academic Status");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->AcademicStatus;?>
+				</td>
+				<td><?php echo $this->translate("Select").' '.$this->translate("Termination");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->TerminateStatus;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Min");?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjSubjectregistrationForm->Min;?></td>
+				<td><?php echo $this->translate("Max");?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjSubjectregistrationForm->Max;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Enter").' '.$this->translate("Semester Count");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->Semester;?></td>
+				<td><?php echo $this->translate("Enter").' '.$this->translate("$this->Subject").' '.$this->translate("Count");?><span
+					class="reqMark">*</span></td>
+				<td><?php echo $this->lobjSubjectregistrationForm->Subjects;?></td>
+			</tr>
+
+			<tr>
+				<td colspan="4" align="right"><?php echo $this->lobjSubjectregistrationForm->Add;?>
+				</td>
+			</tr>
+		</table>
+		<table id="hor" class="table" width="100%" cellpadding="5"
+			cellspacing="1">
+			<tr>
+				<th><?php echo $this->translate("Program").' '.$this->translate("Name")?>
+				</th>
+				<th><?php echo $this->translate("Effective").' '.$this->translate("Date")?>
+				</th>
+				<th><?php echo $this->translate("Academic").' '.$this->translate("Status");?>
+				</th>
+				<th><?php echo $this->translate("Virtual").' '.$this->translate("Semester");?>
+				</th>
+				<th><?php echo $this->translate("Minimum");?></th>
+				<th><?php echo $this->translate("Maximum");?></th>
+				<th><?php echo $this->translate("No:Of").' '.$this->translate("Semesters")?>
+				</th>
+				<th><?php echo $this->translate("Mode of").' '.$this->translate("Termination")?>
+				</th>
+				<th><?php echo $this->translate("No:Of").' '.$this->translate("$this->Subject")?>
+				</th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if (count($this->paginator)): 
+				foreach ($this->paginator as $lobjSubjectregistrationList): ?>
+			<tr>
+				<td><?php echo $this->escape($lobjSubjectregistrationList['ProgramName']);?>
+				</td>
+				<td><?php  echo ($this->escape($lobjSubjectregistrationList['EffectiveDate']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['IdProgram']);?>"
+					name=IdProgramgrid[]>
+				</td>
+				<td><?php if($this->escape($lobjSubjectregistrationList['AcademicStatus']) == 0) echo "GPA";else echo "CGPA";?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['AcademicStatus']);?>"
+					name=AcademicStatusIdgrid[]> <input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['EffectiveDate']);?>"
+					name=EffectiveDategrid[]>
+				</td>
+				<td><?php  echo ($this->escape($lobjSubjectregistrationList['VirtualSemester']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['VirtualSemester']);?>"
+					name=VirtualSemestergrid[]>
+				</td>
+				<td><?php  echo ($this->escape($lobjSubjectregistrationList['Min']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['Min']);?>"
+					name=Mingrid[]>
+				</td>
+				<td><?php  echo ($this->escape($lobjSubjectregistrationList['Max']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['Max']);?>"
+					name=Maxgrid[]>
+				</td>
+				<td><?php print_r($this->escape($lobjSubjectregistrationList['Semester']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['Semester']);?>"
+					name=Semestergrid[]>
+				</td>
+				<td><?php print_r($this->escape($lobjSubjectregistrationList['DefinitionCode']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['TerminateStatus']);?>"
+					name=TerminateStatusIdgrid[]>
+				</td>
+				<td><?php print_r($this->escape($lobjSubjectregistrationList['Subjects']));?>
+					<input type='hidden'
+					value="<?php echo $this->escape($lobjSubjectregistrationList['Subjects']);?>"
+					name=Subjectsgrid[]>
+				</td>
+
+				<td><a href='#' onClick='deleteRow(this); return false;'><img
+						src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+						width='16' height='16'> </a></td>
+
+			</tr>
+			<?php endforeach;
+			endif; ?>
+		</table>
+		<table class="table" width="100%" cellpadding="5" cellspacing="1">
+			<tr>
+				<td colspan="4" align="right"><?php echo $this->lobjSubjectregistrationForm->Save;?>
+					<input type="button" class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Back"); ?>"
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'subjectregistration', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+
+
