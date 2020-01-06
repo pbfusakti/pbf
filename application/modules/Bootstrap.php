@@ -1,10 +1,38 @@
 <?php
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
+//setup the frontController
+		Zend_Loader_Autoloader::autoload(Zend_Controller_Front); 
+		$frontController = Zend_Controller_Front::getInstance();
+		
+		// frontController Configuration
+		$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
+		$frontController->setDefaultModule('default');
+      $frontController->setModuleControllerDirectoryName('controllers');
 
+class krs_Bootstrap extends Zend_Application_Module_Bootstrap {
+
+ }
+
+ class Mahasiswa_Model_DbTable_BiodataMahasiswa extends Zend_Db_Table {
+ }
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
-    protected function _initSession() {
+ protected function _initAutoload()
+   {
+            $moduleLoader = new Zend_Application_Module_Autoloader(
+ 
+                                         array(   
+ 
+                                              'namespace' => '',   
+ 
+                                              'basePath' => APPLICATION_PATH
+                                              ));   
+ 
+              return $moduleLoader;
+     }
+	
+	protected function _initSession() {
         //Zend_Session::start();
     	$sis = new Zend_Session_Namespace('sis');
 	    if (!isset($sis->initialized)) :    
@@ -127,3 +155,4 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		
 	} */
 }
+?>
