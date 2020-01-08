@@ -1,7 +1,6 @@
 <?php
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
-
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     protected function _initSession() {
@@ -21,7 +20,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initAppAutoload() {
         $autoloader = new Zend_Application_Module_Autoloader(array(
             'namespace' => 'App',
-            'basePath'  => dirname(_FILE_),));
+            'basePath'  => dirname(__FILE__),));
         Zend_Loader_Autoloader::getInstance()->suppressNotFoundWarnings(false);
         
         return $autoloader;
@@ -91,7 +90,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	 
 	
 	 
-	 protected function _initDatabase(){
+	protected function _initDatabase(){
 		$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/application.ini', 'development');		
 		$parameters = array('host'=>$config->resources->db->params->host,
 					'username' => $config->resources->db->params->username,
@@ -101,7 +100,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 					'driver_options' => array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8')
 				);
 		
-			//	echo var_dump($parameters);exit;
 		try {
 		    $db = Zend_Db::factory('Pdo_Mysql', $parameters);
 		    $db->getConnection();
@@ -119,7 +117,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
       	 Zend_Registry::set("multidb", $resource);	
       	 
     }
-      
+     
     
 	/* protected function _initDomPdf(){
 		//set_include_path(APPLICATION_PATH . "/../../library/dompdf" . PATH_SEPARATOR . get_include_path());

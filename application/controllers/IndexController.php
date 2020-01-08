@@ -7,9 +7,7 @@ class IndexController extends Zend_Controller_Action {
 	}
 
 
-    public function indexAction(){
-    	
-    }
+    
     public function ajaxLoginAction(){
     
     	$user = $this->_getParam('user',null);
