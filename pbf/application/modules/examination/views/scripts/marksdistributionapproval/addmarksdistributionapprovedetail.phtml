@@ -1,0 +1,341 @@
+<script type="text/javascript">
+    var rowid = 1;
+    var batchArray  = new Array();
+    var pecentagecount = 0;
+    var markscount = 0;
+    dojo.addOnLoad(function(){
+        //dijit.byId('componenttype').set('value','');
+        //dijit.byId('componenttype').set('placeHolder','Select');
+        dijit.byId('componentitem').set('value','');
+        dijit.byId('componentitem').set('placeHolder','Select');
+        <?php if(isset($this->detailmarks) && !empty($this->detailmarks)){?>
+                <?php $markscount = 0;?>
+                <?php //$totalper = 0; ?>
+                <?php foreach($this->detailmarks as $lis){?>
+                    <?php $markscount = $markscount + $lis['Weightage'];?>
+                    <?php //$totalper = $totalper + $lis['Percentage'];?>
+                    <?php $val = $lis['IdComponentType'].'_'.$lis['IdComponentItem'];?>
+                    batchArray.push('<?php echo $val;?>');
+                    rowid++;
+                <?php } ?>
+                    markscount = '<?php echo $markscount;?>'
+                    //pecentagecount = '<?php //echo $totalper;?>'
+
+        <?php } ?>
+    });
+
+    function addMarksDistributionDetails(){
+        var flag = true;
+        //var componenttype = dijit.byId("componenttype").value;
+        var componentitem = dijit.byId("componentitem").value;
+        //var percentage = dijit.byId("percentage").value;
+         var Marks = dijit.byId("Marks").value;
+        
+        //if(componenttype == ''){
+       //     dijit.byId("componenttype").attr('required','true');
+        //    dijit.byId("componenttype").focus();
+        //    flag = false;
+       // }
+
+        if(componentitem == ''){
+            dijit.byId("componentitem").attr('required','true');
+            dijit.byId("componentitem").focus();
+            flag = false;
+        }
+        
+        
+        if((isNaN(Marks)) || Marks<=0){
+            flag = false;
+            alert('Please insert numeric value greater than 0 in Marks');
+        }
+        
+        /*if(percentage == ''){
+           dijit.byId("percentage").attr('required','true');
+           dijit.byId("percentage").focus();
+           flag = false;
+        }else{
+           if((isNaN(percentage)) || percentage<=0){
+            alert('Please insert numeric value greater than 0 in percentage');
+            //dijit.byId("subjectgradepoint").attr('required','true');
+            dijit.byId("percentage").reset();
+            dijit.byId("percentage").focus();
+            flag = false;
+           }else{
+               if(percentage > 100){
+                   alert('Percentage can not greater than 100');
+                   //dijit.byId("subjectgradepoint").attr('required','true');
+                    dijit.byId("percentage").reset();
+                   dijit.byId("percentage").focus();
+                   flag = false;
+               }
+           }
+        }*/
+        if(flag){
+            insertcomponents();
+        }
+    }
+
+    function insertcomponents(){
+        //var componenttype = dijit.byId("componenttype").value;
+        //var componenttypevalue = dijit.byId("componenttype").displayedValue;
+        var componenttype = $("#componenttype").val();
+        var componentitem = dijit.byId("componentitem").value;
+        var componentitemvalue = dijit.byId("componentitem").displayedValue;
+
+        var totalmarks = $('#totalmarks').val();
+        var Marks = dijit.byId("Marks").value;
+        markscount = parseInt(markscount) + parseInt(Marks);
+        if(markscount > totalmarks){
+            alert('Total marks breakup in component section should be equal to total marks.');
+            //pecentagecount = parseFloat(pecentagecount) - parseFloat(percentage);
+            markscount = parseInt(markscount) - parseInt(Marks);
+            return false;
+        }
+
+        var insertval = componenttype +'_'+ componentitem;
+        batchArray.push(insertval);
+        if(arrHasDupes(batchArray)){
+            batchArray = batchArray.unique();
+            alert("Duplicate Entry");
+            //pecentagecount = parseFloat(pecentagecount) - parseFloat(percentage);
+            markscount = parseInt(markscount) - parseInt(Marks);
+        }else{
+            var trow=document.getElementById('hor').insertRow(rowid);
+            var tcol1=trow.insertCell(0);
+            var tcol2=trow.insertCell(1);
+            var tcol3=trow.insertCell(2);
+           
+            tcol1.innerHTML="<input type='hidden' value='"+componenttype+"' name=componenttypegrid[]><input type='hidden' value='"+componentitem+"' name=componentitemgrid[]>"+componentitemvalue;
+            tcol2.innerHTML="<input type='hidden' value='"+Marks+"' name=markgrid[]>"+Marks;
+            tcol3.innerHTML="<a href='#' onClick='deleteRow(this,"+'"'+Marks+'"'+"); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+            rowid++;
+        }
+    }
+
+    function deleteRow(r,mark){
+	rowid--;
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+        markscount = parseInt(markscount) - parseInt(mark);
+    }
+
+    function clearpageAdd(){
+        //dijit.byId("componenttype").reset();
+        //dijit.byId('componenttype').set('value','');
+        //dijit.byId('componenttype').set('placeHolder','Select');
+
+        dijit.byId("componentitem").reset();
+        dijit.byId('componentitem').set('value','');
+        dijit.byId('componentitem').set('placeHolder','Select');
+
+//        dijit.byId("percentage").reset();
+//        dijit.byId('percentage').set('value','');
+
+        dijit.byId("Marks").reset();
+        dijit.byId('Marks').set('value','');
+    }
+
+    function validateform(){
+        flag = true;
+//        if(pecentagecount == 0){
+//            alert('Please insert entry');
+//            flag = false;
+//        }
+        var totalmarks = $('#totalmarks').val();
+        if(markscount != totalmarks){
+            alert('Total marks breakup in component section should be equal to total marks.');
+            flag = false;
+        }
+
+//        if(pecentagecount != 100){
+//            alert('Total percentage breakup in component section should be equal to 100.');
+//            flag = false;
+//        }
+        return flag;
+    }
+
+    function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+        var i, j, n;
+        n=A.length;
+        // to ensure the fewest possible comparisons
+        for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+            for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+                if (A[i]==A[j]) return true;
+            }	}
+        return false;
+    }
+
+    Array.prototype.unique = function () {
+        var r = new Array();
+        o:for(var i = 0, n = this.length; i < n; i++)
+        {
+            for(var x = 0, y = r.length; x < y; x++)
+            {
+                if(r[x]==this[i])
+                {
+                    continue o;
+                }
+
+            }
+            r[r.length] = this[i];
+        }
+        return r;
+    }
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Distribution Detail"); ?>
+	</legend>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+		<tr>
+			<td><?php echo $this->translate('Faculty'); ?></td>
+			<td><?php echo (isset($this->detailmaster['CollegeName']) && ($this->detailmaster['CollegeName'] != '')) ? $this->detailmaster['CollegeName'] : 'All'; ?>
+			</td>
+			<td><?php echo $this->translate('Scheme'); ?></td>
+			<td><?php echo (isset($this->detailmaster['schemename']) && ($this->detailmaster['schemename'] != '')) ? $this->detailmaster['schemename'] : 'All'; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('Semester'); ?></td>
+			<td><?php echo (isset($this->detailmaster['semester']) && ($this->detailmaster['semester'] != '')) ? $this->detailmaster['semester'] : ''; ?>
+			</td>
+			<td><?php echo $this->translate('Program'); ?></td>
+			<td><?php echo (isset($this->detailmaster['ProgramName']) && ($this->detailmaster['ProgramName'] != '')) ? $this->detailmaster['ProgramName'] : 'All'; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('Course'); ?></td>
+			<td><?php echo (isset($this->detailmaster['SubjectName']) && ($this->detailmaster['SubjectName'] != '')) ? $this->detailmaster['SubjectName'] : ''; ?>
+			</td>
+			<td><?php echo $this->translate('Component Type'); ?>
+			</td>
+			<td><?php echo (isset($this->detailmaster['component']) && ($this->detailmaster['component'] != '')) ? $this->detailmaster['component'] : ''; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('Component Item'); ?>
+			</td>
+			<td><?php echo (isset($this->detailmaster['componentitem']) && ($this->detailmaster['componentitem'] != '')) ? $this->detailmaster['componentitem'] : ''; ?>
+			</td>
+			<td><?php echo $this->translate('Total Marks'); ?>
+			</td>
+			<td><?php echo (isset($this->detailmaster['Marks']) && ($this->detailmaster['Marks'] != '')) ? $this->detailmaster['Marks'] : ''; ?>
+			</td>
+		</tr>
+	</table>
+	<?php if($this->detailmaster['Status'] == 193){ ?>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+		<th><?php echo $this->translate('Add Sub Component Item') ?>
+		</th>
+	</table>
+	<table class="table" width="100%">
+		<tr>
+			<!--<td><?php //echo $this->translate('Component') . " " . $this->translate('Type'); ?></td> 
+            <td><?php //echo $this->lobjmarksdetailForm->componenttype ?></td> -->
+			<td><?php echo $this->translate('Sub Component Item'); ?>
+			</td>
+			<td><?php echo $this->lobjmarksdetailForm->componentitem; ?>
+			</td>
+
+			<td><?php echo $this->translate('Marks'); ?></td>
+			<td><?php echo $this->lobjmarksdetailForm->Marks; ?></td>
+
+		</tr>
+		<tr>
+			<!--<td><?php //echo $this->translate('Percentage'); ?></td>
+            <td colspan="4"><?php //echo $this->lobjmarksdetailForm->percentage; ?></td>-->
+
+		</tr>
+		<tr>
+			<td colspan="4" align="right"><?php echo $this->lobjmarksdetailForm->Add; ?>
+				<?php echo $this->lobjmarksdetailForm->Clear; ?></td>
+		</tr>
+	</table>
+	<?php } ?>
+	<form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                var flag = validateform();
+                if(flag){
+                    return true;
+                }else{
+                    return false;
+                }
+            } else {
+            return false;
+            }
+        </script>
+		<table class="table" id="hor" width="100%">
+			<tr>
+				<!--<th><?php //echo $this->translate("Component") . " " . $this->translate('Type'); ?></th>-->
+				<th width="33%"><?php echo $this->translate('Sub Component Item'); ?>
+				</th>
+				<th><?php echo $this->translate("Marks"); ?></th>
+				<!--<th><?php echo $this->translate("Percentage"); ?></th>-->
+				<?php if($this->detailmaster['Status'] == 193){ ?>
+				<th><?php echo $this->translate("Delete"); ?></th>
+				<?php } ?>
+			</tr>
+			<?php if(isset($this->detailmarks)){?>
+			<?php foreach($this->detailmarks as $list){?>
+			<tr>
+				<!--<td><?php //echo $this->escape($list['component']);?></td>-->
+				<td width="33%"><input type='hidden'
+					value="<?php echo $this->escape($list['IdComponentType']);?>"
+					name=componenttypegrid[]> <input type='hidden'
+					value="<?php echo $this->escape($list['IdComponentItem']);?>"
+					name=componentitemgrid[]> <?php echo $this->escape($list['componentitem']);?>
+				</td>
+
+				<td><input type='hidden'
+					value="<?php echo $this->escape($list['Weightage']);?>"
+					name=markgrid[]> <?php echo $this->escape($list['Weightage']);?></td>
+
+
+				<!--<td><input type='hidden' value="<?php echo $this->escape($list['Percentage']);?>" name=percentagegrid[]><?php echo $this->escape($list['Percentage']);?></td>-->
+
+				<?php if($this->detailmaster['Status'] == 193){ ?>
+				<td><a href="javascript:void(0);"
+					onClick="deleteRow(this,'<?php echo $list['Weightage']; ?>');"><img
+						src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+						width='16' height='16'> </a></td>
+				<?php } ?>
+			</tr>
+
+			<?php }
+} ?>
+		</table>
+		<table class="table" width="100%">
+			<tr>
+				<td width="33%" align="right"><?php echo $this->translate("Total");?></td>
+				<td width="33%"><?php echo $this->lobjmarksdetailForm->UpdDate; ?> <?php echo $this->lobjmarksdetailForm->UpdUser; ?>
+					<input type='text' readonly="readonly"
+					dojoType="dijit.form.ValidationTextBox" name="totalmarks"
+					id="totalmarks"
+					value="<?php echo (isset($this->detailmaster['Marks']) && ($this->detailmaster['Marks'] != '')) ? $this->detailmaster['Marks'] : ''; ?>" />
+				</td>
+				<td width="33%"></td>
+			</tr>
+		</table>
+		<table class="table" width="100%">
+			<tr>
+				<td align="right" colspan="3"><?php if($this->detailmaster['Status'] == 193){ ?>
+					<?php echo $this->lobjmarksdetailForm->Save; ?> <?php } ?> <?php
+					$url = $this->url(array('module' => 'examination', 'controller' => 'marksdistributionapproval', 'action' => 'editmarksdistributionmasterapproval', 'id' => $this->detailmaster['IdCourse']), 'default', true);
+					$url = $url."/scheme/".$this->detailmaster['IdScheme'];
+					$url = $url."/faculty/".$this->detailmaster['IdFaculty'];
+					$url = $url."/program/".$this->detailmaster['IdProgram'];
+					$url = $url."/appcode/".$this->detailmaster['MarksApplicationCode'];
+					?> <input type='button' class="NormalBtn"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back') ?>" value='click'
+					onclick="window.location.href='<?php echo $url;?>';" />
+				</td>
+			</tr>
+		</table>
+	</form>
+
+</fieldset>

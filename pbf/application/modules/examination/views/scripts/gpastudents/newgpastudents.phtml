@@ -1,0 +1,67 @@
+<head>
+
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+dojo.addOnLoad(function(){
+	
+	});
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("GPA").' '.$this->translate("Status");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/gpastudents/newgpastudents"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					
+					return true;
+					
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("GPA").' '.$this->translate("Status").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Student").' '.$this->translate("Name");?><span></span></span>
+				</td>
+				<td><?php echo $this->lobjGpastudentsForm->IdStudentRegistration;?>
+				</td>
+				<td><?php echo $this->translate("In-Take");?><span></span></span></td>
+				<td><?php echo $this->lobjGpastudentsForm->Intake;?></td>
+				<?php echo $this->lobjGpastudentsForm->IdGpaStudents;?>
+				<?php echo $this->lobjGpastudentsForm->UpdDate;?>
+				<?php echo $this->lobjGpastudentsForm->UpdUser;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Academic").' '.$this->translate("Status");?><span></span>
+				</td>
+				<td><?php echo $this->lobjGpastudentsForm->AcademicStatus;?></td>
+				<td><?php echo $this->translate("Semester");?><span></span></td>
+				<td><?php echo $this->lobjGpastudentsForm->IdSemester;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Marks");?><span>*</span></td>
+				<td><?php echo $this->lobjGpastudentsForm->Marks;?></td>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjGpastudentsForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gpastudents', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+		</table>
+
+</fieldset>
+</Form>
+
+

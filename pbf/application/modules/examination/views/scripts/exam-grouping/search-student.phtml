@@ -1,0 +1,120 @@
+<script>
+function getVal(id,element){
+
+	
+	var element_semester = "#idsemesterstatus"+id;
+	
+	var isChecked = $(element).is(':checked');
+
+	if(isChecked==true){		
+		$(element_semester).removeAttr("disabled"); 
+	}else{
+		$(element_semester).attr("disabled", "disabled"); 
+	}
+}
+
+function cetak(){
+	
+	 var isChecked = $('.chk').is(':checked');
+
+	 if(isChecked==true){
+			$("#formStudent").submit();
+	 }else{
+		alert("You did not select any student. Please select.");
+	 }
+}
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').each(function() {
+				    if(this.disabled==false){
+				    	$(this).prop('checked',true);
+				    	$('.chk2').removeAttr("disabled"); 
+				    }
+			 });
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+			 $('.chk2').attr("disabled", "disabled"); 
+		 }
+	 });
+	
+	 
+});
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		  <li>
+			<a href="#" onclick="cetak();">
+				<span class='print'></span>
+				Print KHS
+			</a>
+		
+		</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<div>
+
+<?php echo $this->form; ?>
+
+<br>
+
+<div id="loading">
+</div>
+<?php if(count($this->student_list)>0){?>
+
+<form name="formStudent" id="formStudent" method='post' action='<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'kpu-bulk-print'),'default',true);?>'>
+<input type="hidden" name='IdSemester' value='<?php echo $this->IdSemester;?>'>
+<input type="hidden" name='ass_type' value='<?php echo $this->ass_type;?>'>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="5px"><?php echo $this->translate("No");?>.</th>		
+		<th width="40%"><?php echo $this->translate("Student Name");?></th>
+		<th width="30%"><?php echo $this->translate("Student NIM");?></th>
+		<th width="30%"><?php echo $this->translate("Profile Status");?></th>
+		<th>
+		<input type="checkbox" id="checkall"  value="" > <?php echo $this->translate("Check All"); ?>				
+		</th>		
+	</tr>
+	<?php foreach($this->student_list as $index=>$student){?>
+	<tr>
+	    <td><?php echo $index+1;?></td>
+		<td><?php echo $student["StudentName"];?></td>
+		<td><?php echo $student["registrationId"]?></td>
+		<td><?php echo $student["status"]?></td>
+		<td>		
+		<input class='chk' type="checkbox" name='IdStudentRegistration[]' id='IdStudentRegistration' value='<?php echo $student["IdStudentRegistration"];?>'></td>
+	</tr>
+	<?php } ?>
+</table>
+</form>
+<?php } ?>
+</div>
+
+<br>

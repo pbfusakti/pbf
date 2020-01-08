@@ -1,0 +1,196 @@
+<script type="text/javascript">
+	function search_subject(){
+		
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var table = $("#result tbody");
+		
+		if(semester_id!=0 && faculty_id!=0){
+			$.ajax({
+				url: "/examination/exam-grouping/search-course",
+			    type: "post",
+			    async : false,
+			    data: {'semester_id':semester_id, 'faculty_id':faculty_id},
+			    dataType: 'json',
+			    success: function(data){
+			    	$('#subject').empty();
+					$('#subject').append('<option value="">Please Select</option>');
+				    	
+				    	$.each(data, function(index) {
+				    		$('#subject').append('<option value="'+data[index].IdSubject+'">'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+				    	});
+			          
+				},
+				error:function(){
+			          alert("failure");
+				},
+				beforeSend: function() {
+					showLoading('subject','subject','loading');
+
+			        $(table).empty();
+				},
+				complete: function() {
+					hideLoading('loading','subject');
+				}   
+			});
+		}
+	}
+
+	function search_group(){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var course_id = $('#subject').val();
+
+		var table = $("#result tbody");
+        $(table).empty();
+         
+		$.ajax({
+		      url: "/examination/exam-grouping/search-exam-group",
+		      type: "post",
+		      async : false,
+		      data: {'semester_id':semester_id, 'faculty_id':faculty_id, 'subject_id':course_id},
+		      dataType: 'json',
+		      beforeSend: function (){
+		    	  $(table).html('<tr><td colspan="8">Loading...</td></tr>');
+		      },
+		      success: function(data){
+		    	  $(table).empty();
+		          if(data.length>0){
+		        	  for(var i=0; i<data.length; i++){
+
+		        		  var repeat = "";
+						  if(data[i].eg_repeat_status==1){
+							  repeat = "(<?php echo $this->translate("Repeat"); ?>)";
+						  }	
+						  
+				          var content = "<tr>" +
+				          				"<td><a href='#' onclick='view_detail("+data[i].eg_id+");' target='_blank'>"+data[i].eg_group_name+"</a></td>"+
+				          				"<td align='center'>"+data[i].eg_group_code+"</td>"+
+				          				"<td>"+data[i].eg_exam_name+" "+repeat+"</td>"+
+				          				"<td>"+data[i].semester_name+"</td>"+
+				          				"<td align='center'>"+data[i].total_student+"</td>"+
+				          				"<td>"+data[i].av_room_name+"</td>"+
+				          				"<td align='center'>"+data[i].av_exam_capacity+"</td>"+
+				          				"<td align='center'>"+data[i].eg_date+" ("+data[i].eg_start_time+" - "+data[i].eg_end_time+")</td>"+
+				          				"</tr>"
+			        	  $(table).append(content);
+			          }
+		          }else{
+		        	  var content = '<tr><td colspan="8"><?php echo $this->translate('No Group Available'); ?></td></tr>';
+		        	  $(table).append(content);
+		          }
+		      },
+		      error:function(){
+		    	  $(table).empty();
+		          alert("failure");
+		      }   
+		});
+	}
+
+	function showLoading(target,target_div,loading_id){
+		$('#'+target).hide();
+		$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+	}
+
+	function hideLoading(loading_id,target){
+		$('#'+loading_id).remove();
+		$('#'+target).show();
+	}
+
+	function view_detail(gid){
+		window.open('<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'group-attendance-detail'),'default',true);?>/id/'+gid,'_blank');
+	}
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+		</ul>
+	</div>
+</div>
+<br />
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+		<dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdCollege"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdCollege" name="IdCollege" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->college_list as $college):
+			    		$select ='';
+			    		if( isset($this->default_faculty) && $this->facid== $college["IdProgram"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $college["IdProgram"];?>" <?php echo $select; ?>><?php echo $college["ProgramCode"].' - '.$college["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		
+		<dt id="SubjectName-label">
+			<label class="optional" for="SubjectName"><?php echo $this->translate("Subject");?></label>
+		</dt>
+		<dd id="SubjectName-element">
+			<select name="subject" id="subject"  onchange="search_group();">
+				
+			</select>
+		</dd>
+				
+	</dl>
+</form>
+
+<table class="table" id="result" width="100%">
+	<thead>
+		<tr>
+			<th><?php echo $this->translate("Group Name"); ?></th>
+			<th><?php echo $this->translate("Group Code"); ?></th>
+			<th><?php echo $this->translate("Exam Name"); ?></th>
+			<th><?php echo $this->translate("Semester"); ?></th>
+			<th><?php echo $this->translate("Total Student"); ?></th>
+			<th><?php echo $this->translate("Room"); ?></th>
+			<th><?php echo $this->translate("Exam Capacity"); ?></th>
+			<th><?php echo $this->translate("Schedule"); ?></th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>

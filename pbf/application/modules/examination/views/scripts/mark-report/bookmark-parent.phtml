@@ -1,0 +1,242 @@
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+            <li><a href="<?php echo $this->baseUrl()?>/examination/mark-report/bookmark-parent-pdf/id/<?php echo $this->id?>" id="cetak">Print</a></li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if (isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+ 
+ 
+<table class="table" width="50%">
+     
+    <tr>
+        <td>Kode / Matakuliah</td>
+        <td>:</td>
+        <td><?php echo $this->parent['SubCode'];?> / <?php echo $this->parent['NamaSubjek'];?></td>
+    </tr>
+</table>
+<br />
+<br />
+<?php if (count($this->liststudents) >0) {?>
+<table class="table">
+    <tr align="center">
+        <th width="3%" rowspan="2">No</th>
+        <th width="20%" rowspan="2">Nama</th>
+        <th width="5%" rowspan="2">Nim</th>
+     <?php 
+     foreach ($this->childs as $child) :
+     	$component=$this->components[$child['subjectid']];
+     	$col[$child['subjectid']]=count($component);
+		?><th width="10%"colspan="<?php echo count($component)+3;?>"><?php echo $child['NamaSubjek'];?></th>
+     
+     <?php  endforeach;
+     ?>
+     <th width="5%" rowspan="2" >Nilai Gabungan</th>
+     <th width="5%" rowspan="2" >Huruf Gabungan</th>
+     </tr>
+     
+     <tr align="center">
+      
+     <?php 
+     
+     foreach ($this->childs as $child) :
+	
+     	$component=$this->components[$child['subjectid']];
+         ?><th><?php echo "Semester";?></td><?php 
+	     foreach ($component as $a => $b ):?>
+	        <th width="10%" align="center"><?php echo $b['component_name'];?> <br /> (<?php echo number_format($b['Percentage'],'0');?>/100 %)</th>
+	    <?php
+
+	    endforeach;
+	     
+	 ?>
+	  
+        <th align="center" width="10%">Nilai Ahir</th>
+        <th align="center" width="10%">Nilai Huruf</th>
+     <?php endforeach;?>
+     
+    </tr>
+    <?php 
+    $i=1;
+    $A=0; $A_minus=0;$B_plus=0; $B=0;$B_minus =0; $C_plus=0; $C=0; $C_minus =0; $D_plus=0; $D=0; $D_minus=0; $E=0;
+    foreach ($this->liststudents as $key => $value) :?>
+    <tr>
+        <td><?php echo $i++;?></td>
+        <td><?php echo $value['studentname'];?></td>
+        <td><?php echo $value['registrationid'];?></td>
+        
+        <?php 
+        foreach ($this->childs as $child) :
+        	$marks=$value[$child['subjectid']];
+        	?><td align="center"><?php echo $marks['semester'];?> </td><?php 
+	        $row_marks = 0;
+	        if  (count($marks['marks'])>0) {
+		        foreach ($marks['marks'] as $c => $d) :?>
+		            <td align="center"><?php 
+		                echo (isset($d['FinalTotalMarkObtained'])) ? $d['FinalTotalMarkObtained'].'/'.$d['TotalMarkObtained'] : '&nbsp;';
+		                $row_marks = $row_marks + $d['FinalTotalMarkObtained'];
+		            ?></td>
+		        <?php endforeach; 
+		     }
+		     else
+		     {
+		     ?><td colspan="<?php  echo $col[$child['subjectid']];?>"></td><?php 
+		     } ?>
+	        
+	        <td align="center"><?php if (isset($marks['finalmark'])) echo $marks['finalmark'];//$value['grade_point'];?></td>
+	        <td align="center"><?php 
+	         	$grade=$marks['grade_name'];
+	         	echo $grade;
+	           ?>
+	           </td>
+        <?php 
+            $value['grade_name'] = str_replace(' ','',$grade);
+            if ($value['grade_name'] == 'A')
+            {
+               $A = $A + 1;
+            }
+            elseif ($value['grade_name'] == 'A-')
+            {
+               $A_minus = $A_minus + 1;
+            }
+            elseif ($value['grade_name'] == 'B+')
+            {
+                $B_plus = $B_plus + 1;
+            }
+            elseif ($value['grade_name'] == 'B')
+            {
+                $B = $B + 1;
+            }
+            elseif ($value['grade_name'] == 'B-')
+            {
+                $B_minus = $B_minus + 1;
+            }
+            elseif ($value['grade_name'] == 'C+')
+            {
+                $C_plus = $C_plus + 1;
+            }
+            elseif ($value['grade_name'] == 'C')
+            {
+                $C = $C + 1;
+            }
+            elseif ($value['grade_name'] == 'C-')
+            {
+                $C_minus = $C_minus + 1;
+            }
+            elseif ($value['grade_name'] == 'D+')
+            {
+                $D_plus = $D_plus + 1; 
+            }
+            elseif ($value['grade_name'] == 'D')
+            {
+                $D = $D + 1;
+            }
+            elseif ($value['grade_name'] == 'D-')
+            {
+                $D_minus = $D_minus + 1;
+            }
+            elseif ($value['grade_name'] == 'E')
+            {
+                $E = $E + 1;
+            }
+        
+        ?>
+     
+    <?php endforeach;
+    $gradeparent=$value['gradeparent'];
+    ?><td align="center"><?php echo $gradeparent['final_course_mark']?></td><td align="center"><?php echo $gradeparent['grade_name']?></td>
+    </tr><?php 
+    endforeach;?>
+</table>
+<?php 
+    $total = $A + $A_minus + $B_plus + $B + $B_minus + $C_plus + $C + $C_minus + $D_plus + $D + $D_minus + $E;
+    
+?>
+<br /><br />
+Distribusi Nilai
+<table class="table">
+    <tr>
+        <th>Nilai</th>
+        <th>Jumlah</th>
+        <th>Percentage</th>
+    </tr>
+   <?php if ($total>0) {?>
+    <tr>
+        <td>A</td>
+        <td><?php echo $A;?></td>
+        <td><?php echo $percentA = ($A / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>A-</td>
+        <td><?php echo $A_minus;?></td>
+        <td><?php echo $percentAM = ($A_minus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>B+</td>
+        <td><?php echo $B_plus;?></td>
+        <td><?php echo $percentBP = ($B_plus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>B</td>
+        <td><?php echo $B;?></td>
+        <td><?php echo $percentB = ($B / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>B-</td>
+        <td><?php echo $B_minus;?></td>
+        <td><?php echo $percentBM = ($B_minus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>C+</td>
+        <td><?php echo $C_plus;?></td>
+        <td><?php echo $percentCP = ($C_plus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>C</td>
+        <td><?php echo $C;?></td>
+        <td><?php echo $percentC = ($C / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>C-</td>
+        <td><?php echo $C_minus;?></td>
+        <td><?php echo $percentCM = ($C_minus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>D+</td>
+        <td><?php echo $D_plus;?></td>
+        <td><?php echo $percentDP = ($D_plus / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>D</td>
+        <td><?php echo $D;?></td>
+        <td><?php echo $percentD = ($D / $total) * 100;?></td>
+    </tr>
+    <tr>
+        <td>D-</td>
+        <td><?php echo $D_minus;?></td>
+        <td><?php echo $percentDM = ($D_minus / $total) * 100;?></td>
+    </tr>
+     <tr>
+        <td>E</td>
+        <td><?php echo $E;?></td>
+        <td><?php echo $percentE = ($E / $total) * 100;?></td>
+    </tr>
+    <?php }?>
+</table>
+</br></br></br>
+<?php }?>

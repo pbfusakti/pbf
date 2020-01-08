@@ -1,0 +1,302 @@
+<script type="text/javascript">
+
+$(function() {
+	<?php
+	if(isset($this->semid) && isset($this->facid) && isset($this->subid) ){
+	?>
+		
+        $('#IdSemester').val('<?php echo $this->semid; ?>');
+		$('#IdCollege').val('<?php echo $this->facid; ?>');
+		var subject = <?php echo $this->subid; ?>;
+
+		var table = $("#result tbody");
+		
+		$.ajax({
+			url: "/examination/exam-grouping/search-course",
+		    type: "post",
+		    async : false,
+		    data: {'semester_id':<?php echo $this->semid; ?>, 'faculty_id':<?php echo $this->facid; ?>},
+		    dataType: 'json',
+		    success: function(data){
+		    	$('#subject').empty();
+				$('#subject').append('<option value="">Please Select</option>');
+			    	
+			    	$.each(data, function(index) {
+				    	var select = '';
+				    	if(subject==data[index].IdSubject){
+					    	select='selected="selected"';
+				    	}
+			    		$('#subject').append('<option value="'+data[index].IdSubject+'" '+select+'>'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+			    	});
+
+			    	
+		          
+			},
+			error:function(){
+		          alert("failure");
+			},
+			beforeSend: function() {
+				showLoading('subject','subject','loading');
+
+		        $(table).empty();
+			},
+			complete: function() {
+				hideLoading('loading','subject');
+				search_group();
+			}   
+		});
+	<?php
+	}
+	?>
+});
+
+	function search_subject(){
+		
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var table = $("#result tbody");
+		
+		if(semester_id!=0 && faculty_id!=0){
+			$.ajax({
+				url: "/examination/exam-grouping/search-course",
+			    type: "post",
+			    async : false,
+			    data: {'semester_id':semester_id, 'faculty_id':faculty_id},
+			    dataType: 'json',
+			    success: function(data){
+			    	$('#subject').empty();
+					$('#subject').append('<option value="">Please Select</option>');
+				    	
+				    	$.each(data, function(index) {
+				    		$('#subject').append('<option value="'+data[index].IdSubject+'">'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+				    	});
+			          
+				},
+				error:function(){
+			          alert("failure");
+				},
+				beforeSend: function() {
+					showLoading('subject','subject','loading');
+
+			        $(table).empty();
+				},
+				complete: function() {
+					hideLoading('loading','subject');
+				}   
+			});
+		}
+	}
+
+	function search_group(){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var course_id = $('#subject').val();
+
+		var table = $("#result tbody");
+        $(table).empty();
+         
+		$.ajax({
+		      url: "/examination/exam-grouping/search-exam-group",
+		      type: "post",
+		      async : false,
+		      data: {'semester_id':semester_id, 'faculty_id':faculty_id, 'subject_id':course_id},
+		      dataType: 'json',
+		      beforeSend: function (){
+		    	  $(table).html('<tr><td colspan="10">Loading...</td></tr>');
+		      },
+		      success: function(data){
+		    	  $(table).empty();
+		          if(data.length>0){
+		        	  for(var i=0; i<data.length; i++){
+
+			        	  var repeat = "";
+						  if(data[i].eg_repeat_status==1){
+							  repeat = "(<?php echo $this->translate("Repeat"); ?>)";
+						  }	
+
+						  var program = "<ul class='program'>";
+			        	  if(data[i].program.length > 0){
+				        	 $.each(data[i].program,function(index,val){
+					        	program += "<li>"+val.ShortName+"</li>"; 
+				        	 }); 
+			        	  }
+			        	  program += "</ul>";
+
+			        	  var html_delete = "<td>&nbsp;</td>";
+
+			        	  if(data[i].total_student==0){
+			        		  html_delete = "<td><a href='#' onclick='delete_exam_group("+data[i].eg_id+","+course_id+"); return false;'><img src='/images/icon/delete_16.png' title='delete'/></a></td>";
+			        	  }
+			        	  
+				          var content = "<tr>" +
+				          				"<td><a href='#' onclick='view_detail("+data[i].eg_id+","+course_id+","+faculty_id+"); return false;'>"+data[i].eg_group_name+"</a></td>"+
+				          				"<td align='center'>"+data[i].eg_group_code+"</td>"+
+				          				"<td>"+data[i].eg_exam_name+" "+repeat+"</td>"+
+				          				"<td>"+data[i].semester_name+"</td>"+
+				          				"<td align='center'>"+data[i].total_student+"</td>"+
+				          				"<td>"+data[i].av_room_name+"</td>"+
+				          				"<td align='center'>"+data[i].av_exam_capacity+"</td>"+
+				          				"<td align='center'>"+data[i].eg_date+" ("+data[i].eg_start_time+" - "+data[i].eg_end_time+")</td>"+
+
+				          				"<td>"+program+"</td>"+html_delete+
+				          				"</tr>"
+			        	  $(table).append(content);
+			          }
+		          }else{
+		        	  var content = '<tr><td colspan="10"><?php echo $this->translate('No Group Available'); ?></td></tr>';
+		        	  $(table).append(content);
+		          }
+		      },
+		      error:function(){
+		    	  $(table).empty();
+		          alert("failure");
+		      }   
+		});
+	}
+
+	function showLoading(target,target_div,loading_id){
+		$('#'+target).hide();
+		$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+	}
+
+	function hideLoading(loading_id,target){
+		$('#'+loading_id).remove();
+		$('#'+target).show();
+	}
+
+	function view_detail(gid,subjectId,program){
+		window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'group-detail'),'default',true);?>/id/'+gid+'/subject_id/'+subjectId+'/program/'+program;
+	}
+
+	function addGroup(){
+
+		var semester_id = $('#IdSemester').val();
+		var subject_id = $('#subject').val();
+		var program_id = $('#IdCollege').val();
+
+		if( semester_id!=0 && subject_id !=0 && subject_id!=""&& subject_id!=null ){
+			window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'group-add'),'default',true);?>/semester_id/'+semester_id+'/subject_id/'+subject_id+'/program_id/'+program_id;
+		}else{
+			alert('<?php echo $this->translate('Please select semester and subject to add');?>');
+		}
+	}
+
+	function delete_exam_group(gid,sid){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var subject_id = $('#subject').val();
+
+		var msg = '<?php echo $this->translate('Confirm to delete?'); ?>';
+		if(confirm(msg)){
+			window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'group-delete'),'default',true);?>/gid/'+gid+'/facid/'+faculty_id+'/semid/'+semester_id+'/subid/'+subject_id;
+		} 
+	}
+	
+</script>
+
+<style>
+ul.program, ul.program li{
+  margin: 0 0 0 10px;
+  padding: 0;
+}
+</style>
+<body ">
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onclick="addGroup();" >
+					<span class='add'></span>
+					<?php echo $this->translate('Add Group');?>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+		<dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    		if ($this->semid==$semester['key']) $status='selected="selected"'; else $status="";
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>" <?php echo $status; ?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdCollege"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdCollege" name="IdCollege" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->college_list as $college):
+			    		$select ='';
+			    		if( isset($this->default_faculty) && $this->facid== $college["IdProgram"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $college["IdProgram"];?>" <?php echo $select; ?>><?php echo $college["ProgramCode"].' - '.$college["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="SubjectName-label">
+			<label class="optional" for="SubjectName"><?php echo $this->translate("Subject");?></label>
+		</dt>
+		<dd id="SubjectName-element">
+			<select name="subject" id="subject"  onchange="search_group();">
+				
+			</select>
+		</dd>
+				
+	</dl>
+</form>
+
+<table class="table" id="result" width="100%">
+	<thead>
+		<tr>
+			<th><?php echo $this->translate("Group Name"); ?></th>
+			<th><?php echo $this->translate("Group Code"); ?></th>
+			<th><?php echo $this->translate("Exam Name"); ?></th>
+			<th><?php echo $this->translate("Semester"); ?></th>
+			<th><?php echo $this->translate("Total Student"); ?></th>
+			<th><?php echo $this->translate("Room"); ?></th>
+			<th><?php echo $this->translate("Exam Capacity"); ?></th>
+			<th><?php echo $this->translate("Schedule"); ?></th>
+			<th><?php echo $this->translate("Program"); ?></th> 
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+</body>

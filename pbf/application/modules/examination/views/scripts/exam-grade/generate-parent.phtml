@@ -1,0 +1,106 @@
+<script type="text/javascript">
+<!--
+
+
+function generate(){
+			
+	 var isChecked = $('.chk').is(':checked');
+	 
+	 if(isChecked==true){		   
+			$("#formStudent").submit();	
+	 }else{
+		alert("You did not select any student. Please select.");
+	 }
+}
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').prop('checked', true);
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+		 }
+	 });
+	
+	 
+});
+
+
+function check(i){
+	alert(i);
+}
+
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		<?php if(count($this->student_list)>0){?>
+		  <li>							
+					<a href="#" onClick="generate()">
+						<span class='process'></span>Generate Parent</a>				
+			</li>	
+		<?php } ?>
+		</ul>
+	</div>
+</div>
+<br />
+
+
+<div class="message notice"><strong><? echo $this->translate("Please make sure GRADE, GPA AND GPA has been setup.");?></strong>.</div>
+<br />
+
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+<div>
+
+<?php echo $this->form; ?>
+
+<br>
+
+<div id="loading">
+</div>
+<?php if(count($this->student_list)>0){?>
+<form id="formStudent" name="formStudent" method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grade','action'=>'generate-parent-grade'),'default',true);?>">
+<input type="hidden" name="idSemester" id="idSemester" value="<?php echo $this->idSemester; ?>"> 
+<input type="hidden" name="idProgram" id="idProgram" value="<?php echo $this->idProgram; ?>"> 
+
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="5%">&nbsp;</th>		
+		<th width="30%"><?php echo $this->translate("Student Name");?></th>
+		<th width="10%"><?php echo $this->translate("Student NIM");?></th>
+		<th width="10%"><?php echo $this->translate("Profile Status");?></th>	
+		
+		<th width="5%"><br><input type="checkbox" name="checkall" id="checkall" >&nbsp;<?php echo $this->translate("Check All ?")?></th>
+	</tr>
+	<?php foreach($this->student_list as $index=>$student){?>
+	<tr  valign="top">
+	    <td><?php echo $index+1;?></td>
+		<td><?php echo $student["StudentName"];?></td>
+		<td><?php echo $student["registrationId"]?></td>
+		<td><?php echo $student["status"]?></td>		
+		<td>
+		
+		<input class='chk' type="checkbox" name="IdStudentRegistration[]" id="IdStudentRegistration[]" value="<?php echo $student["IdStudentRegistration"];?>">
+		
+		</td>
+	</tr>
+	<?php } ?>
+</table>
+</form>
+<?php } ?>
+</div>

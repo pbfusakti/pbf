@@ -1,0 +1,66 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	<?php if(!$this->larrresult){?>
+	dijit.byId('field5').set('value','');
+	dijit.byId('field5').set('placeHolder','Select');
+	dijit.byId('field8').set('value','');
+	dijit.byId('field8').set('placeHolder','Select');
+	<?php }?>
+	});
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Remarking Against").' '.$this->translate("Appeal");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/appealentry/index/search/1"
+		method="POST">
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Appeal Code");?></td>
+				<td><?php echo $this->lobjform->field3;?></td>
+				<td><?php echo $this->translate($this->Subject).' '.$this->translate("Name");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+			</tr>
+			<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+				<!-- <input type="button" class="NormalBtn" dojotype="dijit.form.Button" label="<?php echo $this->translate("Add"); ?>" onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'marksdistributionmaster', 'action'=>'newmarksdistributionmaster'),'default',true);?>';" />  -->
+				<?php echo $this->lobjform->Clear;?>
+			</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+		<tr>
+			<th><?php echo $this->translate("Appeal Code");?></th>
+			<th><?php echo $this->translate($this->Subject).' '.$this->translate("Name");?>
+			</th>
+			<th><?php echo $this->translate($this->Subject).' '.$this->translate("Distribution");?>
+			</th>
+			<th><?php echo $this->translate("Component Name");?></th>
+		</tr>
+		<?php if (count($this->paginator)): ?>
+		<?php foreach ($this->paginator as $lobjprogram ): ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+			<td><a
+				href="<?php echo $this->url(array('module'=>'examination','controller'=>'appealentry', 'action'=>'editmarksappeal' , 'id'=>$lobjprogram['IdAppeal'],'appealcode'=>$lobjprogram['AppealCode'],'subjectname'=>$lobjprogram['SubjectName'],'CompNameMaster'=>$lobjprogram['Name'],'CompNameDetails'=>$lobjprogram['ComponentName'],'previousmarks'=>$lobjprogram['MarksObtained'],'comments'=>$lobjprogram['Comments'],'Idverifiermarks'=>$lobjprogram['Idverifiermarks']),'default',true);?>"><?php print_r($this->escape($lobjprogram['AppealCode']));?>
+			</a></td>
+			<td><?php echo $this->escape($lobjprogram['SubjectName']);?></td>
+			<td><?php echo $this->escape($lobjprogram['Name']);?></td>
+			<td><?php echo $this->escape($lobjprogram['ComponentName']);?></td>
+			<?php endforeach; ?>
+			<?php endif; ?>
+		</tr>
+		<tr>
+			<td colspan="8" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator,'Sliding',
+							'/partials/my_pagination_control.phtml'); ?>
+				</div></td>
+		</tr>
+	</table>
+</fieldset>

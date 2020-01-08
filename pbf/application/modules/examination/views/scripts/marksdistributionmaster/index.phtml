@@ -1,0 +1,100 @@
+<?php
+//echo "<pre>";
+//print_r($this->paginator);
+?>
+<head>
+<script>
+        dojo.addOnLoad(function(){
+<?php if (!$this->larrresult) { ?>
+                        dijit.byId('field5').set('value','');
+                        dijit.byId('field5').set('placeHolder','Select');
+                        dijit.byId('field23').set('value','');
+                        dijit.byId('field23').set('placeHolder','Select');
+                        dijit.byId('field24').set('value','');
+                        dijit.byId('field24').set('placeHolder','Select');
+                        dijit.byId('field8').set('value','');
+                        dijit.byId('field8').set('placeHolder','Select');
+                        dijit.byId('field20').set('value','');
+                        dijit.byId('field20').set('placeHolder','Select');
+
+<?php } ?>
+                });
+    </script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Distribution"); ?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl(); ?>/examination/marksdistributionmaster/index/search/1"
+		method="POST">
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Faculty"); ?></td>
+				<td><?php echo $this->lobjform->field5; ?></td>
+				<td><?php echo $this->translate("Scheme"); ?></td>
+				<td><?php echo $this->lobjform->field23; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Semester"); ?></td>
+				<td><?php echo $this->lobjform->field24; ?></td>
+				<td><?php echo $this->translate("Program"); ?></td>
+				<td><?php echo $this->lobjform->field8; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Course"); ?></td>
+				<td><?php echo $this->lobjform->field20; ?></td>
+			</tr>
+			<td align="center" colspan="4"><?php echo $this->lobjform->Search; ?>
+				<input type="button" class="NormalBtn" dojotype="dijit.form.Button"
+				label="<?php echo $this->translate("Add"); ?>"
+				onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'marksdistributionmaster', 'action' => 'newmarksdistributionmaster'), 'default', true); ?>';" />
+				<?php echo $this->lobjform->Clear; ?>
+			</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+<fieldset>
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+		<tr>
+			<th><?php echo $this->translate("Course"); ?></th>
+			<th><?php echo $this->translate("Program"); ?></th>
+			<th><?php echo $this->translate("Semester"); ?></th>
+			<th><?php echo $this->translate("Scheme"); ?></th>
+			<th><?php echo $this->translate("Faculty"); ?></th>
+			<th><?php echo $this->translate("Status"); ?></th>
+		</tr>
+		<?php if (count($this->paginator)): ?>
+		<?php foreach ($this->paginator as $lobjprogram): ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0", "#FFFFFF"))->next() ?>">
+			<?php 
+			$url = $this->url(array('module' => 'examination', 'controller' => 'marksdistributionmaster', 'action' => 'editmarksdistributionmaster', 'id' => $lobjprogram['IdCourse']), 'default', true);
+			$url = $url."/scheme/".$lobjprogram['IdScheme'];
+			$url = $url."/faculty/".$lobjprogram['IdFaculty'];
+			$url = $url."/program/".$lobjprogram['IdProgram'];
+			$url = $url."/appcode/".$lobjprogram['MarksApplicationCode'];
+			?>
+			<td><a href="<?php echo $url;?>"><?php print_r($this->escape($lobjprogram['SubjectName'])); ?>
+			</a></td>
+			<td><?php echo ($lobjprogram['ProgramName'] == '') ? 'All' : $lobjprogram['ProgramCode'].'-'.$lobjprogram['ProgramName']; ?>
+			</td>
+			<td><?php echo $this->escape($lobjprogram['semester']); ?></td>
+			<td><?php echo ($lobjprogram['schemename'] == '') ? 'All' : $lobjprogram['schemename']; ?>
+			</td>
+			<td><?php echo (($lobjprogram['CollegeName'] == '')) ? 'All' : $lobjprogram['CollegeName']; ?>
+			</td>
+			<td><?php echo strtoupper($this->escape($lobjprogram['status'])); ?>
+			</td>
+			<?php endforeach; ?>
+			<?php endif; ?>
+		</tr>
+		<tr>
+			<td colspan="8" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator, 'Sliding',
+							'/partials/my_pagination_control.phtml'); ?>
+				</div></td>
+		</tr>
+	</table>
+</fieldset>

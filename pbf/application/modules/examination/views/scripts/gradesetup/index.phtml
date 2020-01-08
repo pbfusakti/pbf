@@ -1,0 +1,127 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	<?php if(!$this->larrresult){?>
+	dijit.byId('field1').set('value','');
+	dijit.byId('field1').set('placeHolder','Select');
+	dijit.byId('field5').set('value','');
+	dijit.byId('field5').set('placeHolder','Select');
+        dijit.byId('field19').set('value','');
+	dijit.byId('field19').set('placeHolder','Select');
+        dijit.byId('field20').set('value','');
+	dijit.byId('field20').set('placeHolder','Select');
+        dijit.byId('field8').set('value','');
+	dijit.byId('field8').set('placeHolder','Select');
+	<?php }?>
+	});
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Grade Set-Up Search");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/gradesetup/index/search/1"
+		method="POST">
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Semester");?></td>
+				<td><?php echo $this->lobjform->field1;?></td>
+				<td><?php echo $this->translate("Scheme");?></td>
+				<td><?php echo $this->lobjform->field5;?></td>
+			</tr>
+
+			<tr>
+				<td><?php echo $this->translate("Award");?></td>
+				<td><?php echo $this->lobjform->field19;?></td>
+				<td><?php echo $this->translate($this->Program);?></td>
+				<td><?php echo $this->lobjform->field20;?></td>
+			</tr>
+
+
+			<tr>
+				<td><?php echo $this->translate("Subject");?></td>
+				<td><?php echo $this->lobjform->field8;?></td>
+				<td><?php echo $this->translate("Active");?></td>
+				<td><?php echo $this->lobjform->field7;?></td>
+			</tr>
+
+
+			<tr>
+				<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+					<input type="button" class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Add"); ?>"
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'gradesetup', 'action'=>'addgradesetup'),'default',true);?>';" />
+					<?php echo $this->lobjform->Clear;?>
+				</td>
+			</tr>
+
+
+		</table>
+	</form>
+</fieldset>
+<br />
+<fieldset>
+
+	<table class="table" width="100%" cellpadding="5" cellspacing="1">
+		<?php if (count($this->paginator)=='0') { ?>
+		<tr>
+			<td colspan="6" align="center" style="color: red;"><?php echo $this->translate("No matching record
+				found. Try different keywords.")?></td>
+		</tr>
+		<?php }  ?>
+
+
+		<?php if (count($this->paginator)>0) { ?>
+
+		<tr>
+			<th><?php echo $this->translate("Semester");?></th>
+			<th><?php echo $this->translate('Based On');?></th>
+			<th><?php echo $this->translate("Scheme");?></th>
+			<th><?php echo $this->translate("Award");?></th>
+			<th><?php echo $this->translate($this->Program);?></th>
+			<th><?php echo $this->translate("Subject");?></th>
+
+		</tr>
+
+
+		<?php foreach ($this->paginator as $lobjprogram ){ ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+			<td><a
+				href="<?php echo $this->baseUrl();?>/examination/gradesetup/editgradesetup/id/<?php echo $lobjprogram['IdGradeSetUpMain'];?>"><?php echo ($this->escape($lobjprogram['SemesterMainName']));?>
+			</a></td>
+
+			<td><?php 
+
+			if($lobjprogram['BasedOn']=='0') {
+echo 'Scheme & Award';
+}
+else if ($lobjprogram['BasedOn']=='1') {
+echo 'Program & Subject';
+}
+else if ($lobjprogram['BasedOn']=='2') {
+echo 'Program';
+}else if ($lobjprogram['BasedOn']=='3') {
+echo 'University';
+}
+?>
+			</td>
+			<td><?php echo $this->escape($lobjprogram['SchemeName']);?></td>
+			<td><?php echo $this->escape($lobjprogram['AwardName']);?></td>
+			<td><?php echo $this->escape($lobjprogram['ProgramCode'].'-'.$lobjprogram['ProgramName']);?></td>
+			<td><?php echo $this->escape($lobjprogram['SubCode']).' - '.$this->escape($lobjprogram['SubjectName']);?></td>
+
+		</tr>
+		<?php } ?>
+
+		<tr>
+			<td colspan="6" align="right"><div class="pagination">
+					<?php echo $this->paginationControl($this->lobjpaginator,'Sliding',
+							'/partials/my_pagination_control.phtml'); ?>
+				</div></td>
+		</tr>
+
+		<?php } ?>
+	</table>
+
+</fieldset>
