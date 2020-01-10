@@ -1,0 +1,261 @@
+<script type="text/javascript">
+	function search_subject(){
+		
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var table = $("#result tbody");
+		
+		if(semester_id!=0 && faculty_id!=0){
+			$.ajax({
+				url: "/examination/answer-sheet-group/search-course",
+			    type: "post",
+			    async : false,
+			    data: {'semester_id':semester_id, 'faculty_id':faculty_id},
+			    dataType: 'json',
+			    success: function(data){
+			    	$('#subject').empty();
+					$('#subject').append('<option value="">Please Select</option>');
+				    	
+				    	$.each(data, function(index) {
+				    		$('#subject').append('<option value="'+data[index].IdSubject+'">'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+				    	});
+			          
+				},
+				error:function(){
+			          alert("failure");
+				},
+				beforeSend: function() {
+					showLoading('subject','subject','loading');
+
+			        $(table).empty();
+				},
+				complete: function() {
+					hideLoading('loading','subject');
+				}   
+			});
+		}
+	}
+
+	function search_group(){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var course_id = $('#subject').val();
+
+		if(semester_id!=0 && faculty_id!=0 &&  course_id!=0){
+			    	   $.ajax({
+			  		      url: "/examination/exam-record/search-course-group",
+			  		      type: "post",
+			  		      async : false,
+			  		      data: {'semester_id':semester_id, 'faculty_id':faculty_id, 'subject_id':course_id},
+			  		      dataType: 'json',
+			  		      beforeSend: function (){
+				  		    	showLoading('CourseGroup','CourseGroup','loading');
+
+			  		      },
+			  		      success: function(data){
+				  		    	$('#CourseGroup').empty();
+								$('#CourseGroup').append('<option value="">All</option>');
+							    	
+							    	$.each(data, function(index) {
+							    		$('#CourseGroup').append('<option value="'+data[index].IdCourseTaggingGroup+'">'+data[index].GroupCode+' - '+data[index].GroupName+ ' ( '+ data[index].FullName  +' )</option>');	
+							    	});
+			  		      },
+			  		      complete: function() {
+								hideLoading('loading','CourseGroup');
+						  },  
+			  		      error:function(){			  		    	  
+			  		          alert("failure");
+			  		      }   
+			  		      
+			  		});
+		}//end if
+       
+	}
+
+
+	function search_student(){
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var course_id = $('#subject').val();
+		var group_id = $('#CourseGroup').val();
+		var StudentName = $('#StudentName').val();
+		
+
+		var table = $("#result tbody");
+		var table_head = $("#result thead");
+        $(table).empty();
+        $(table_head).empty();
+
+
+        $.ajax({
+		      url: "/examination/exam-record/course-group-student",
+		      type: "post",
+		      async : false,
+		      data: {'semester_id':semester_id, 'faculty_id':faculty_id, 'subject_id':course_id, 'group_id':group_id,'StudentName':StudentName},
+		      dataType: 'json',
+		      beforeSend: function (){
+		    	  $(table).html('<tr><td colspan="6">Loading...</td></tr>');
+		      },
+		      success: function(data){
+		    	  $(table).empty();
+		    	  $(table_head).empty();
+	  				
+		    	  var head =    "<tr>"+
+		    	                    "<th><?php echo $this->translate('No'); ?></th>"+
+					  				"<th><?php echo $this->translate('Student Name'); ?></th>"+
+					  				"<th><?php echo $this->translate('NIM'); ?></th>"+
+					  				"<th><?php echo $this->translate('Semester Status'); ?></th>"+
+					  				"<th><?php echo $this->translate('Subject Status'); ?></th>"+
+								"</tr>"
+				 $(table_head).append(head);	
+	  				 
+		          if(data.length>0){
+			          var no=1;
+		        	  for(var i=0; i<data.length; i++){
+			        	
+			        	  url = "/examination/exam-record/view-mark/semester_id/"+semester_id+"/course_id/"+course_id+"/group_id/"+group_id+"/id/"+data[i].IdStudentRegistration+"/regSubId/"+data[i].IdStudentRegSubjects;
+				          var content = "<tr>" +
+				                        "<td align='center'>"+Math.abs(i+1)+"</td>"+
+	  				       			    "<td>"+data[i].appl_fname+' '+data[i].appl_mname+' '+data[i].appl_lname+"</a></td>"+
+				          				"<td align='center'><a href='"+url+"'>"+data[i].registrationId+"</a></td>"+		
+				          				"<td align='center'>"+data[i].semester_status+"</td>"+		
+				          				"<td align='center'>"+data[i].subject_status+"</td>"+				          						  				          				
+				          				"</tr>"
+			        	  $(table).append(content);
+			          }
+		          }else{
+		        	  var content = '<tr><td colspan="6"> No Search Result </td></tr>';
+		        	  $(table).append(content);
+		          }
+		      },
+		      error:function(){
+		    	  $(table).empty();
+		          alert("failure");
+		      }   
+		});
+		
+
+	}
+
+	function showLoading(target,target_div,loading_id){
+		$('#'+target).hide();
+		$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+	}
+
+	function hideLoading(loading_id,target){
+		$('#'+loading_id).remove();
+		$('#'+target).show();
+	}
+
+	function view_detail(gid,semester_id,course_id){
+		window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'group-detail'),'default',true);?>/id/'+gid+'/idSemester/'+semester_id+'/idSubject/'+course_id;
+	}
+
+	function view_detail2(cgid,semester_id,course_id){
+	
+		window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'answer-sheet-group','action'=>'course-group-detail'),'default',true);?>/id/'+cgid+'/idSemester/'+semester_id+'/idSubject/'+course_id;
+	}
+
+	
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?}?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdCollege"><?php echo $this->translate("Faculty"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdCollege" name="IdCollege" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->college_list as $college):
+			    		$select ='';
+			    		if( isset($this->default_faculty) && $this->default_faculty== $college["IdCollege"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $college["IdCollege"];?>" <?php echo $select; ?>><?php echo $college["CollegeCode"].' - '.$college["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="SubjectName-label">
+			<label class="optional" for="SubjectName"><?php echo $this->translate("Subject");?></label>
+		</dt>
+		<dd id="SubjectName-element">
+			<select name="subject" id="subject"  onchange="search_group();">
+				
+			</select>
+		</dd>
+		
+			
+		<dt id="CourseGroup-label">
+			<label class="optional" for="CourseGroup"><?php echo $this->translate("Course Group");?></label>
+		</dt>
+		<dd id="CourseGroup-element">
+			<select name="CourseGroup" id="CourseGroup"  onchange="search_student();">
+				
+			</select>
+		</dd>
+		
+		
+		<dt id="StudentName-label">
+			<label class="optional" for="Student"><?php echo $this->translate("Student Name/NIM");?></label>
+		</dt>
+		<dd id="StudentName-element">
+			<input type="text" name="StudentName"  id="StudentName"  value="" onkeyup="search_student()">
+		</dd>
+		
+		
+				
+	</dl>
+</form>
+
+<table class="table" id="result" width="100%">
+	<thead>
+	</thead>
+	<tbody>
+	</tbody>
+</table>

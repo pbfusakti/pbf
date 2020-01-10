@@ -1,0 +1,22 @@
+<form id="form_1" method="post">
+<table>
+	<tr>
+		<td><?php echo $this->translate('Transcript Profile Selection');?></td>
+		<td>:</td>
+		<td>
+			<select name="profile_id">
+				<option value="*"><?php echo $this->translate('Please select');?></option>
+				<?php 
+				foreach ($this->profile_list as $profile):
+				?>
+					<option value="<?php echo $profile['IdProfile'];?>" ><?php echo $profile['ProfileName'];?> </option>
+				<?php 
+				endforeach;
+				?>
+			</select>
+		</td>
+	</tr>
+</table>
+<div class="next_bar">
+	<input type="submit" value="<?php echo $this->translate("Next");?>" />
+</div>

@@ -1,0 +1,634 @@
+<style>
+	select#program{
+		width: 250px;
+	}
+	
+	ul.program, ul.program li{
+	  margin:0;
+	  padding:0;
+	}
+	ul.program li{
+	  margin: 0 0 0 20px;
+	}
+</style>
+<script type="text/javascript"><!--
+$(function() {
+
+	var wWidth = $(window).width();
+    var dWidth = wWidth * 0.8;
+    var wHeight = $(window).height();
+    var dHeight = wHeight * 0.8;
+    
+	$( "#dialog-supervisor" ).dialog({
+		autoOpen: false,
+		modal: true,
+		width: 450,
+		buttons: {
+			"Add": function() {
+		    	$('#form_supervisor').submit();      
+		    },
+		    Cancel: function() {
+		    	$( this ).dialog( "close" );
+		    }
+		}
+	});
+
+	$( "#dialog-student" ).dialog({
+		autoOpen: false,
+		modal: true,
+		width: dWidth,
+		height: dHeight,
+		buttons: {
+			"Save": function() {
+		    	$('#form_student').submit();      
+		    },
+		    Cancel: function() {
+		    	$( this ).dialog( "close" );
+		    }
+		}
+	});
+});
+
+function editGroup(){
+	window.location = "/examination/exam-grouping/group-edit/gid/<?php echo $this->group_id; ?>";	
+}
+
+function getStaff(element){
+
+	var faculty_id = $(element).val();
+
+	var targetElement = $('#supervisor');
+	
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping', 'action'=>'ajax-get-staff-list'),'default',true);?>",
+		data: {'idCollege':faculty_id},
+		type: 'POST',
+		dataType: 'json',
+		beforeSend: function() {
+			showLoading(targetElement,targetElement,'loading');
+		},
+		complete: function() {
+			hideLoading('loading',targetElement);
+		}	
+	}).done(function ( data ) {
+
+		
+		$(targetElement).empty().append('<option value="null"> <?php echo $this->translate("Please Select"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$(targetElement).append('<option value="'+data[index].IdStaff+'"> '+data[index].FullName+' </option>');
+		});
+	});
+}
+
+function showLoading(target,target_div,loading_id){
+	$(target).hide();
+	$(target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+}
+
+function hideLoading(loading_id,target){
+	$('#'+loading_id).remove();
+	$(target).show();
+}
+
+function remove_supervisor(id){
+	var msg = "<?php echo $this->translate('Confirm to submit?');?>";
+
+	if( confirm(msg) ){
+		window.location = "/examination/exam-grouping/remove-supervisor/sid/"+id+"/gid/<?php echo $this->group_id; ?>";
+	}
+}
+function generateSeat(){
+	var msg = "<?php echo $this->translate('All candidate will be reassigned a new seat. Confirm to generate?');?>";
+
+	if( confirm(msg) ){
+		window.location = "/examination/exam-grouping/generateseat/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->subject_id?>/program/<? echo $this->program_id?>";
+	}
+}
+function assign_student(){
+	
+	var program_id = $('#program').val();
+	var classgroup_id = $('#classgroup').val();
+	
+	$( "#dialog-student" ).dialog('open');
+
+	$("#student_list > tbody").html("");
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping', 'action'=>'add-student'),'default',true);?>",
+		data: {'semester_id':'<?php echo $this->group['eg_sem_id']; ?>', 'subject_id':'<?php echo $this->group['eg_sub_id'];?>', 'program_id':program_id, 'classgroup_id':classgroup_id, 'assessment_type':<?php echo $this->group['eg_assessment_type'];?>},
+		type: 'GET',
+		dataType: 'json',
+		beforeSend: function() {
+			$("#student_list > tbody").html("<tr><td colspan='5'>Loading...</td></tr>");
+		},
+		complete: function() {
+			
+		}	
+	}).done(function ( data ) {
+		
+		$("#student_list > tbody").html("");
+
+		if(data.length==0){
+			$("#student_list").find('tbody').append(
+				$('<tr>')
+				.append(
+					$('<td colspan="5">').text('<?php echo $this->translate('No Student Found.'); ?>')
+				)
+			);
+		}else{
+			$.each(data, function(index) {
+				$("#student_list").find('tbody').append(
+					$('<tr>')
+					.append(
+						$('<td>').text(index+1+".")
+					)
+					.append(
+						$('<td>').text(data[index].appl_fname + ' ' +data[index].appl_mname+' '+data[index].appl_lname)
+					)
+					.append(
+						$('<td>').text(data[index].registrationId)
+					)
+					.append(
+						$('<td>').text(data[index].ProgramName +' - '+data[index].ProgramCode)
+					)
+					.append(
+						$('<td>').text(data[index].GroupName+' ('+data[index].GroupCode+')')
+					)
+					.append(
+						$('<td align="center">')
+						.append('<input type="checkbox" name="student[]" value="'+index+'" />')
+						.append('<input type="hidden" name="student_id[]" value="'+data[index].IdStudentRegistration+'" />')
+						.append('<input type="hidden" name="student_nim[]" value="'+data[index].registrationId+'" />')
+					)
+				);
+			});
+		}
+	});
+	
+}
+
+function remove_student(id){
+	var msg = "<?php echo $this->translate('Confirm to submit?');?>";
+	
+	if( confirm(msg) ){
+		window.location = "/examination/exam-grouping/remove-student/sid/"+id+"/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->subject_id; ?>";
+	}
+}
+
+function check_student_all(element){
+
+	if( $(element).is(':checked') ){
+		$("input:checkbox[name='student[]']").prop('checked', true);
+	}else{
+		$("input:checkbox[name='student[]']").prop('checked', false);
+	}
+}
+function check_rstudent_all(element){
+
+	if( $(element).is(':checked') ){
+		$("input:checkbox[name='rstudent_id[]']").prop('checked', true);
+	}else{
+		$("input:checkbox[name='rstudent_id[]']").prop('checked', false);
+	}
+}
+function reportAttendancePdf(){
+	//open dialog box
+	$( "#dialog-attendance" ).dialog('open');		
+}
+
+function reportGradePdf(){
+	//open dialog box
+	$( "#dialog-grade" ).dialog('open');		
+	
+}
+function reportDenahPdf(){
+	cgid =$('#idGroup').val();
+	window.open(
+			'/examination/exam-grouping/report-denah-pdf/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->group["eg_sub_id"]; ?>/sem_id/ <?php echo $this->group["eg_sem_id"]; ?>/cgid/'+cgid,
+			  '_blank' // <- This is what makes it open in a new window.
+			);
+}
+function reportEventPdf(){
+	cgid =$('#idGroup').val();
+	window.open(
+			'/examination/exam-grouping/report-event-pdf/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->group["eg_sub_id"]; ?>/sem_id/ <?php echo $this->group["eg_sem_id"]; ?>/cgid/'+cgid,
+			  '_blank' // <- This is what makes it open in a new window.
+			);
+}
+
+function goBack(){
+	var sem = <?php echo $this->group['eg_sem_id']; ?>;
+	//var faculty= <?php //echo $this->group['faculty_id']; ?>;
+	var subject= <?php echo $this->group['eg_sub_id']; ?>;
+	var faculty= <?php echo $this->program_id; ?>;
+	
+	window.location = '/examination/exam-grouping/group/semid/'+sem+'/facid/'+faculty+'/subid/'+subject;
+}
+
+$(function() {
+		
+	$( "#dialog-attendance" ).dialog({
+	    autoOpen: false,
+	    width: 450,
+	    height: 150,
+	    modal: true,
+	    buttons: {          
+	        "Tutup": function() {
+	            $( this ).dialog( "close" );
+	        },
+	        "Cetak": function() {
+	        	
+		        	cgid =$('#idGroup').val();
+	        		url = '/examination/exam-grouping/report-attendance-pdf/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->group['eg_sub_id']; ?>/sem_id/ <?php echo $this->group['eg_sem_id']; ?>/program/<?php echo $this->program_id;?>/cgid/'+cgid;
+	        	    window.open(url, '_blank');
+		            $( this ).dialog( "close" );
+	        	
+	        }
+	    }
+	});
+});
+
+$(function() {
+	
+	$( "#dialog-grade" ).dialog({
+	    autoOpen: false,
+	    width: 450,
+	    height: 150,
+	    modal: true,
+	    buttons: {          
+	        "Tutup": function() {
+	            $( this ).dialog( "close" );
+	        },
+	        "Cetak": function() {
+    			
+		        	cgid =$('#idGroupNilai').val();
+	        		url = '/examination/exam-grouping/report-grade-pdf/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->group['eg_sub_id']; ?>/sem_id/ <?php echo $this->group['eg_sem_id']; ?>/cgid/'+cgid;
+                   
+	        	    window.open(url, '_blank');
+		            $( this ).dialog( "close" );
+	        	
+	        }
+	    }
+	});
+});
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onclick="editGroup();" >
+					<span class='edit'></span>
+					<?php echo $this->translate('Edit Group');?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>
+				<a href="#" onclick="assign_student();">
+					<span class='add'></span>
+					<?php echo $this->translate('Add Student');?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="$( '#dialog-supervisor' ).dialog('open');">
+					<span class='add'></span>
+					<?php echo $this->translate('Add Supervisor');?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>
+				<a href="#" onclick="reportAttendancePdf();" >
+					<span class='pdf'></span>
+					<?php echo $this->translate('Daftar Hadir');?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="reportGradePdf();">
+					<span class='pdf'></span>
+					<?php echo $this->translate('Daftar Nilai');?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onclick="reportDenahPdf();">
+					<span class='pdf'></span>
+					<?php echo $this->translate('Denah');?>
+				</a>
+			</li>			
+			<li>
+				<a href="#" onclick="reportEventPdf();">
+					<span class='pdf'></span>
+					<?php echo $this->translate('Berita Acara');?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>
+				<a href="#" onclick="goBack();">
+					<span class='back'></span>
+					<?php echo $this->translate('Back');?>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<fieldset>
+	<legend><?php echo $this->translate('Group Info');?></legend>
+<table>
+	<tr>
+		<td><?php echo $this->translate("Semester");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['semester_name'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Subject");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['subject_name'];?> - <?php echo $this->group['subject_code'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Name");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_exam_name'];?> <?php echo $this->group['eg_repeat_status']==1?"(".$this->translate("Repeat").")":"";?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Group Name");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_group_name'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Group Code");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_group_code'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Date");?></td>
+		<td>:</td>
+		<td><?php echo date('d-m-Y', strtotime($this->group['eg_date']));?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Time");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_start_time'];?> - <?php echo $this->group['eg_end_time'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Room");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['av_room_name_short'];?></td>
+	</tr>
+	<tr>
+		<td><?php echo $this->translate("Exam Capacity");?></td>
+		<td>:</td>
+		<td><?php echo $this->group['eg_capacity'];?></td>
+	</tr>
+	<tr>
+		<td valign="top"><?php echo $this->translate("Program");?></td>
+		<td valign="top">:</td>
+		<td>
+		  <?php if( isset($this->program) && sizeof($this->program)>0 ){?>
+		  <ul class="program">
+		    <?php foreach ($this->program as $program){?>
+		      <li><?php echo $program['ProgramCode']; ?> - <?php echo $program['ArabicName']; ?></li>
+		    <?php }?>
+		  </ul>
+		  <?php }else{
+		    echo $this->translate("Not set");
+		  }
+		  ?>
+		</td>
+	<tr>
+		<td>&nbsp;</td>
+		<td></td>
+		<td><input type="button" value="<?php echo $this->translate("Generate Seat No.");?>" onclick="generateSeat()"></input></td>
+	</tr>		
+	</tr>
+</table>
+</fieldset>
+
+<h2><?php echo $this->translate("Supervisor List");?></h2>
+<table class="table" width="100%">
+	<tr>
+		<th width="20px"><?php echo $this->translate('Bil');?></th>
+		<th><?php echo $this->translate('Name');?></th>
+		<th><?php echo $this->translate('NIK');?></th>
+		<th><?php echo $this->translate('Status');?></th>
+		<th>&nbsp;</th>
+	</tr>
+	<?php
+	if($this->supervisor_list) {
+		foreach($this->supervisor_list as $index=>$supervisor):
+	?>
+	<tr>
+		<td><?php echo $index+1;?>.</td>
+		<td><?php echo $supervisor['FullName'];?></td>
+		<td><?php echo $supervisor['StaffId'];?></td>
+		<td><?php echo $supervisor['status'];?></td>
+		<td>
+			<a href="#" onclick="remove_supervisor('<?php echo $supervisor['egs_id'];?>')"><?php echo $this->translate('Remove');?></a>
+		</td>
+	</tr>
+	<?php
+		endforeach;
+	}
+	?>
+</table>
+<form name="frmrm" method="POST" action="/examination/exam-grouping/remove-student/sid/multi/gid/<?php echo $this->group_id; ?>/subject_id/<?php echo $this->subject_id; ?>">
+<h2><?php echo $this->translate("Student List");?></h2>
+<table class="table" width="100%">
+	<tr>
+		<th width="20px"><?php echo $this->translate('Bil');?></th>
+		<th><?php echo $this->translate('Name');?></th>
+		<th><?php echo $this->translate('NIM');?></th>
+		<th><?php echo $this->translate('Program');?></th>
+		<th><?php echo $this->translate('Course Group');?></th>
+		<th><?php echo $this->translate('Seating');?></th>
+		 
+		<th>&nbsp;<input type="checkbox" id="rstudent_all" onchange="check_rstudent_all(this);" />
+		<input type="submit" value="Remove Selected"></th>
+	</tr>
+	<?php
+	if($this->student_list) {
+		foreach($this->student_list as $index=>$student):
+	?>
+	<tr>
+		<td><?php echo $index+1;?>.</td>
+		<td>
+			<?php echo $student['appl_fname']!=null?$student['appl_fname']." ":"";?>
+			<?php echo $student['appl_mname']!=null?$student['appl_mname']." ":"";?>
+			<?php echo $student['appl_lname']!=null?$student['appl_lname']." ":"";?>
+		</td>
+		<td><?php echo $student['egst_student_nim'];?></td>
+		<td><?php echo $student['ProgramName'];?> - <?php echo $student['ProgramCode'];?></td>
+		<td><?php echo '('.$student['GroupCode'].') '.$student['GroupName']; ?></td>
+		<td><?php echo $student['egst_seat'];?></td>
+		<td>
+		<input type="checkbox" name="rstudent_id[]" value="<?php echo $student['egst_id'];?>"></input>
+			<a href="#" onclick="remove_student('<?php echo $student['egst_id'];?>')"><?php echo $this->translate('Remove');?></a>
+		</td>
+	</tr>
+	<?php
+		endforeach;
+	}
+	?>
+</table>
+</form>
+<br>
+
+<!--  Supervisor -->
+<div id="dialog-supervisor" title="Assign Supervisor to Exam Group">
+<form id="form_supervisor" method="post" action="/examination/exam-grouping/add-supervisor">
+	<input type="hidden" name="group_id" value="<?php echo $this->group_id?>" />
+	<table>
+		<tr>
+			<td><?php echo $this->translate('Faculty');?></td>
+			<td>:</td>
+			<td>
+				<select name faculty_id onchange="getStaff(this);">
+					<option value=''><?php echo $this->translate('Please select');?></option>
+					<?php foreach ($this->faculty_list as $faculty):?>
+					<option value="<?php echo $faculty['IdCollege']; ?>"><?php echo $faculty['ArabicName']; ?></option>
+					<?php endforeach;?>
+				</select>
+			</td>
+			
+		</tr>
+		<tr>
+			<td><?php echo $this->translate('Staff Name');?></td>
+			<td>:</td>
+			<td>
+				<select name="supervisor" id="supervisor">
+				</select>
+			</td>
+		</tr>	
+		<tr>
+			<td><?php echo $this->translate('Status');?></td>
+			<td>:</td>
+			<td>
+				<select name="status" >
+					<option value=''><?php echo $this->translate('Please select');?></option>
+					<?php foreach ($this->supervisor as $list):?>
+					<option value="<?php echo $list['idDefinition']; ?>"><?php echo $list['BahasaIndonesia']; ?></option>
+					<?php endforeach;?>
+				</select>
+			</td>
+			
+		</tr>
+	</table>
+</form>	  
+</div>
+
+<!--  STUDENT -->
+<div id="dialog-student" title="Assign Student to Exam Group">
+	<form name="form_student" id="form_student" method="post" action="/examination/exam-grouping/add-student">
+	
+		<input type="hidden" name="semester_id" value="<?php echo $this->group['eg_sem_id'];?>" />
+		<input type="hidden" name="subject_id" value="<?php echo $this->group['eg_sub_id'];?>" />
+		<input type="hidden" name="group_id" value="<?php echo $this->group['eg_id'];?>" />
+		
+	<table id="student_list" class="table" width="100%">
+		<thead>
+		<tr>
+			<th rowspan="2"><?php echo $this->translate("Bil");?></th>
+			<th rowspan="2"><?php echo $this->translate("Name");?></th>
+			<th rowspan="2"><?php echo $this->translate("NIM");?></th>
+			<th width="250px"><?php echo $this->translate("Program");?></th>			
+			<th><?php echo $this->translate("Class Group");?></th>
+			<th rowspan="2" width="10px"><input type="checkbox" id="student_all" onchange="check_student_all(this);" /></th>
+		</tr>
+		<tr>
+			<th align="center">
+				<select id="program" onchange="assign_student();">
+					<option value="0"><?php echo $this->translate('All');?></option>
+					<?php 
+						foreach ($this->program_list as $faculty){
+					?>
+						<optgroup label="<?php echo $faculty['ArabicName'];?>">
+						<?php 
+						if($faculty['programs']){
+							foreach ($faculty['programs'] as $program):
+						?>
+							<option value="<?php echo $program['IdProgram'];?>"><?php echo $program['ArabicName'];?></option>
+						<?php 
+							endforeach;
+						}
+						?>
+						</optgroup>
+					<?php 
+						}
+					?>
+				</select>
+			</th>
+			
+			<th>
+				<select id="classgroup" onchange="assign_student();">
+					<option value="0"><?php echo $this->translate('All');?></option>
+					<?php 
+						foreach ($this->class_group_list as $group){
+					?>
+						<option value="<?php echo $group['IdCourseTaggingGroup'];?>"><?php echo $group['GroupName'];?> - <?php echo $group['GroupCode'];?></option>
+					<?php 
+						}
+					?>
+				</select>
+			</th>
+		</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+	</form>
+</div>
+
+
+
+<div id="dialog-attendance" title="Cetak Daftar Hadir">
+<form name="formCetak1" id="formCetak1" method="post" action="">
+	<table>
+		<tr>
+			<td>Course Group</td>
+			<td>: 
+				<select id="idGroup" name="idGroup">
+						<option value=""><?php echo $this->translate("All"); ?></option>			
+						<?php foreach($this->student_course_group as $cgroup){?>	
+						<option value="<?php echo $cgroup['IdCourseTaggingGroup']?>"><?php echo '('.$cgroup['GroupCode'].') '.$cgroup['GroupName'].'  -   '.$cgroup['Coordinator']; ?></option>			
+						<?php } ?>
+				</select>
+			</td>
+		</tr>
+	</table>
+</form>
+</div>
+
+
+
+<div id="dialog-grade" title="Cetak Daftar Hadir">
+<form name="formCetak" id="formCetak" method="post" action="">
+	<table>
+		<tr>
+			<td>Course Group</td>
+			<td>: 
+				<select id="idGroupNilai" name="idGroup">
+						<option value=""><?php echo $this->translate("All"); ?></option>			
+						<?php foreach($this->student_course_group as $cgroup){?>	
+						<option value="<?php echo $cgroup['IdCourseTaggingGroup']?>"><?php echo '('.$cgroup['GroupCode'].') '.$cgroup['GroupName'].'  -   '.$cgroup['Coordinator']; ?></option>			
+						<?php } ?>
+				</select>
+			</td>
+		</tr>
+	</table>
+</form>
+</div>

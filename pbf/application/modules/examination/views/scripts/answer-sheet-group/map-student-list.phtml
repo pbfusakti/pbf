@@ -1,0 +1,116 @@
+
+<script>
+function Pick(IdStudentRegistration,IdStudentRegSubjects,nim,name,idMaster,idDetails,IdStudentMarksEntry,groupid){
+
+	var counter = '<?php echo $this->no; ?>';
+		
+	element = '#IdStudentRegistration'+counter;             
+    $(element).val(IdStudentRegistration);
+
+    element1 = '#IdStudentRegSubjects'+counter;     
+    $(element1).val(IdStudentRegSubjects);
+
+    element2 = '#studentName'+counter;     
+    $(element2).text(name);
+
+    element3 = '#registrationId'+counter;     
+    $(element3).text(nim);
+
+    element4 = '#mapStatus'+counter;     
+    $(element4).text('Match');
+
+    element5 = '#idMaster'+counter;     
+    $(element5).val(idMaster);
+
+    element6 = '#idDetails'+counter;     
+    $(element6).val(idDetails);
+
+    element7 = '#IdStudentMarksEntry'+counter;     
+    $(element7).val(IdStudentMarksEntry);
+
+    element8 = '#student_groupid'+counter;     
+    $(element8).val(groupid);
+    
+    
+	$( '#dialog-mapping' ).dialog( "close" );
+}
+
+function search(){
+	
+	//$( '#dialog-mapping' ).load();
+	
+}
+</script>
+<!--
+<table class="" width="50%" cellpadding="5" cellspacing="2" border="0">
+<tr>
+<td>Student Name:</td>
+<td><input type="text" name="student_name" value=""></td>
+</tr>
+<tr>
+<td>Student NIM:</td>
+<td><input type="text" name="student_nim" value=""></td>
+</tr>
+<tr>
+<td colspan='2' align="center"><input type="button" value="Cari"  onclick="search()"></td>
+</tr>
+</table>
+
+-->
+<?php if(count($this->student_list)>0){?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>
+		<th><?php echo $this->translate("Student Name")?></th>
+		<th><?php echo $this->translate("NIM")?></th>	
+		<th><?php echo $this->translate("Program Name")?></th>	
+		<th><?php echo $this->translate("Exam Group")?></th>	
+		<th><?php echo $this->translate("Course Group")?></th>	
+		<th><?php echo $this->translate("Matching Scheme")?></th>	
+		<th><?php echo $this->translate("Mark Entry Status")?></th>			
+		<th><?php echo $this->translate("Action")?></th>
+	</tr>
+	<?php 
+	$i=1;	
+	foreach($this->student_list as $student){
+		//if($subject["total_student"]>0){
+	?>
+		
+	<tr>
+		<td><?php echo $i;?></td>
+		<td><?php echo $student["student_name"];?></td>
+		<td><?php echo $student["registrationId"];?></td>
+		<td><?php echo $student["program_name"];?></td>
+		<td><?php echo (isset($student["student_group"]) ? $student["student_group"]:'');?></td>
+		<td><?php echo (isset($student["student_course_group"]) ? $student["student_course_group"]:'');?></td>
+		<td><?php echo ($student["scheme_status"]==1) ? $this->translate("Match"):$this->translate("Not Match");?></td>
+		<td><?php 
+		//407=>ENTRY 409=>SUBMITTED 411=>APPROVED
+		if(isset($student["MarksEntryStatus"])){
+			if($student["MarksEntryStatus"]==407){
+				echo $this->translate("Entry");
+			}else if($student["MarksEntryStatus"]==409){
+				echo $this->translate("Submitted");
+			}else if($student["MarksEntryStatus"]==411){
+				echo $this->translate("Approved");
+			}else{
+				echo $this->translate("No Mark Entry");
+			}
+		}else{
+				echo $this->translate("No Mark Entry");
+		}
+		?></td>
+		<td>
+		<?php if($student["scheme_status"]==1){?>
+		<a href="#" onclick="Pick('<?php echo $student["IdStudentRegistration"];?>','<?php echo $student["IdStudentRegSubjects"];?>','<?php echo $student["registrationId"];?>','<?php echo $student["student_name"];?>','<?php echo $student["IdMarksDistributionMaster"];?>','<?php echo $student["IdMarksDistributionDetails"];?>','<?php echo $student["IdStudentMarksEntry"];?>','<?php echo $student["student_groupid"];?>');">Select</a>
+		<?php } ?>
+		<!-- <input type="radio" name="mapIdStudentRegistration" id="mapIdStudentRegistration" value="<?php echo $student["IdStudentRegistration"];?>">-->
+		</td>
+	</tr>
+		<?php 
+		$i++; }?>
+	
+</table>
+<?php }//end if?>
+
+<br>

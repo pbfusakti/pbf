@@ -1,0 +1,45 @@
+<table class="table" width="100%">
+	<tr>
+		<th colspan="4"><?php echo $this->translate("Marks Distribution History");?></th>
+	</tr>
+	<tr>
+		<th>#</th>
+		<th><?php echo $this->translate('Combination');?></th>
+		<th><?php echo $this->translate('Detail');?></th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>
+			<table class="table" width="100%">
+				<tr>
+					<th><?php echo $this->translate('Faculty');?></th>
+					<th><?php echo $this->translate('Scheme');?></th>
+					<th><?php echo $this->translate('Program');?></th>
+					<th><?php echo $this->translate('Course');?></th>
+					<th><?php echo $this->translate('Semester');?></th>
+				</tr>
+			</table>
+		</td>
+		<td>
+			<table class="table" width="100%">
+				<tr>
+					<th><?php echo $this->translate('Updated On');?></th>
+					<th><?php echo $this->translate('Updated By');?></th>
+					<th><?php echo $this->translate('Activity');?></th>
+					<th><?php echo $this->translate('Old Status');?>
+					</th>
+					<th><?php echo $this->translate('New Status');?>
+					</th>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4" align="right"><input type="button" class="NormalBtn"
+			dojoType=dijit.form.Button
+			label='<?php echo $this->translate("Back");?>' name="Back"
+			Value="<?php echo $this->translate("Back");?>"
+			onclick="fnToggleTabs('Back','tab-two','tab-one')">
+		</td>
+	</tr>
+</table>

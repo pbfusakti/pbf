@@ -1,0 +1,200 @@
+<script>
+$(function() {
+
+	if( $('#eg_room_id').val()=="" ){
+		$('#eg_room_id').empty();
+	}
+	
+	$( "#eg_date" ).datepicker({ 
+		changeMonth: true,
+		dateFormat: 'dd-mm-yy' 
+	});
+
+	$("#eg_start_time").timePicker({
+	  	  startTime: "06:00", // Using string. Can take string or Date object.
+	  	  endTime: new Date(0, 0, 0, 23, 30, 0), // Using Date object here.
+	  	  show24Hours: true,
+	  	  separator: ':',
+	  	  step: 10});
+
+	$("#eg_end_time").timePicker({
+	  	  startTime: "06:00", // Using string. Can take string or Date object.
+	  	  endTime: new Date(0, 0, 0, 23, 30, 0), // Using Date object here.
+	  	  show24Hours: true,
+	  	  separator: ':',
+	  	  step: 10});
+
+
+	//init program
+	<?php 
+	if(isset($this->data_program)){
+      foreach ($this->data_program as $program):
+	?>
+      $('#program tbody').append('<tr><td><?php echo $program['ArabicName']; ?> - <?php echo $program['ProgramCode']; ?></td><td align="center"><a href="#" onclick="to_remove_program(<?php echo $program['egp_id']; ?>,this); return false;"><img src="/images/icon/user_trash_full.png" title="Delete" /></a></td></tr>');
+	<?php 
+	  endforeach;
+    } 
+    ?>
+
+	$( "#dialog-program" ).dialog({
+		  autoOpen: false,
+	      modal: true,
+	      width: 550,
+	      buttons: {
+	    	  "<?php echo $this->translate('Add'); ?>": function() {  
+	    		  var sel_text = $('#program_sel').find('option:selected').text();
+	    		  var sel_id = $('#program_sel').val();
+	    		  
+	    		  var tappend = '<tr>'+
+	    		  '<td>'+
+	    		  '<input type="hidden" name="program_add[]" value="'+sel_id+'" />'+
+	    		  sel_text +
+	    		  '</td>'+
+	    		  '<td align="center"><a href="#" onclick="$(this).parent().parent().remove(); return false;"><img src="/images/icon/user_trash_full.png" title="Delete" /></td>'+
+	    		  '</tr>';
+		    	  $('#program tbody').append(tappend);
+		    	  
+	          $( this ).dialog( "close" );
+	        },
+	        Close: function() {
+	          $( this ).dialog( "close" );
+	        }
+	      }
+	    });
+
+	$('#assign-program').click(function(){
+    	$( "#dialog-program" ).dialog('open');
+
+    	return false;
+    });  
+});
+
+function to_remove_program(exam_program_id, element){
+	  $('#form_exam_group').append('<input type="hidden" name="program_remove[]" value="'+exam_program_id+'" />');
+
+	  $(element).parent().parent().remove();	
+}
+
+function getRoom(element){
+	var location_id = $(element).val();
+ 
+	if(location_id!=0 && location_id!="" && location_id!=null){
+		$('#eg_room_id').empty();
+		
+		$.ajax({
+			url: "/examination/exam-grouping/get-exam-room",
+		    type: "post",
+		    async : false,
+		    data: {'location_id':location_id},
+		    dataType: 'json',
+		    success: function(data){
+				$('#eg_room_id').append('<option value="">Please Select</option>');
+			    	
+			    	$.each(data, function(index) {
+			    		$('#eg_room_id').append('<option value="'+data[index].av_id+'">'+data[index].av_room_name+' - '+data[index].av_room_code+'</option>');	
+			    	});
+		          
+			},
+			error:function(){
+		          alert("failure");
+			},
+			beforeSend: function() {
+				showLoading('eg_room_id','eg_room_id','loading');
+			},
+			complete: function() {
+				hideLoading('loading','eg_room_id');
+			}   
+		});
+	}
+}
+
+function showLoading(target,target_div,loading_id){
+	$('#'+target).hide();
+	$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+}
+
+function hideLoading(loading_id,target){
+	$('#'+loading_id).remove();
+	$('#'+target).show();
+}
+
+function getCapacity(element){
+	var rid = $('#eg_room_id').val();
+	
+	$.ajax({
+		url: "/examination/exam-grouping/get-exam-room",
+	    type: "post",
+	    async : false,
+	    data: {'room_id':rid},
+	    dataType: 'json',
+	    success: function(data){
+			$('#eg_capacity').val(data.av_exam_capacity);
+		},
+		error:function(){
+	          alert("failure");
+		},
+		beforeSend: function() {
+			$('#eg_capacity').val(0);
+			showLoading('eg_capacity','eg_capacity','loading');
+		},
+		complete: function() {
+			hideLoading('loading','eg_capacity');
+		}   
+	});
+}
+</script>
+
+<style>
+.zend_form dt {
+    width: 175px;
+}
+.zend_form dd {
+    padding: 2px 0 0 175px;
+}
+.zend_form dd {
+    width: 360px;
+}
+</style>
+  
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php echo $this->form; ?>
+
+<div id="dialog-program" title="Add Program">
+  <table>
+    <tr>
+      <td><?php echo $this->translate('Program'); ?></td>
+      <td>:</td>
+      <td>
+        <select name="program_sel" id="program_sel">
+          <option><?php echo $this->translate("Please select"); ?></option>
+          <?php 
+          foreach($this->program_list as $list):
+          ?>
+          <optgroup label="<?php echo $list['faculty']['ArabicName'];?> - <?php echo $list['faculty']['CollegeCode'];?>">
+              <?php 
+              if(isset($list['program'])){
+                foreach ($list['program'] as $program){
+              ?>
+              <option value="<?php echo $program['IdProgram'];?>"><?php echo $program['ArabicName'];?> - <?php echo $program['ProgramCode'];?></option>
+              <?php
+                } 
+              }
+              ?>
+          </optgroup>
+          <?php 
+          endforeach;
+          ?>
+        </select>
+      </td>
+    </tr>
+   </table>
+</div>

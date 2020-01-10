@@ -1,6 +1,7 @@
 <?php
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
+
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 
     protected function _initSession() {
@@ -100,6 +101,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 					'driver_options' => array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES UTF8')
 				);
 		
+			//	echo var_dump($parameters);exit;
 		try {
 		    $db = Zend_Db::factory('Pdo_Mysql', $parameters);
 		    $db->getConnection();

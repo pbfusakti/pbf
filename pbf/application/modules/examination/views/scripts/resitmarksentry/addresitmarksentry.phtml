@@ -1,0 +1,196 @@
+<head>
+<style>
+.makebold {
+	font-weight: bold;
+}
+</style>
+<script>
+dojo.addOnLoad(function(){
+	//dijit.byId('field23').set('value','');
+	//dijit.byId('field23').set('placeHolder','Select');
+        //dijit.byId('field27').set('value','');
+	//dijit.byId('field27').set('placeHolder','Select');
+
+});
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+        var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+
+
+
+ function formsubmit() {
+        $('#savedata').val('submitdata');
+        document.searchstudents.submit();
+ }
+
+
+
+ function positivevalue1(val1, val2 ,val3) {
+     var TotalMarks =  parseInt(val3);
+     var value1 = $('#'+val2).val();
+
+      if((isNaN(value1))){
+           $('#'+val2).val('');
+           alert('Please insert numeric value in New Marks');
+           return false;
+       }
+
+     if(value1<0 || value1>TotalMarks ) {
+         $('#'+val2).val('');
+         alert("New Marks should be postive and less than Total Marks");
+         return false;
+     }
+
+ }
+
+
+
+</script>
+</head>
+
+
+<div id="target">
+	<form name="searchstudents" id="searchstudents" method="post">
+		<input type="hidden" name="savedata" id="savedata" value="searchdata">
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Exam Resit Marks Entry Add");?>
+			</legend>
+
+			<table class="table" width="100%">
+
+				<tr>
+
+					<td width="25%" class="makebold"><?php echo $this->translate("Application ID");?>
+					</td>
+					<td width="25%"><?php echo $this->resultResit[0]['ExaminationResitApplicationCode'];?>
+					</td>
+
+					<td width="25%" class="makebold"><?php echo $this->translate("Student ID");?>
+					</td>
+					<td width="25%"><?php echo $this->resultResit[0]['StudentCode'];?>
+					</td>
+
+				</tr>
+
+				<tr>
+					<td width="25%" class="makebold"><?php echo $this->translate('Semester');?>
+					</td>
+					<td width="25%"><?php echo $this->resultResit[0]['SemesterCode'];?>
+					</td>
+
+					<td class="makebold"><?php echo $this->translate('Program');?></td>
+					<td><?php echo $this->resultResit[0]['ProgramName'];?></td>
+				</tr>
+
+				<tr>
+					<td width="25%" class="makebold"><?php echo $this->translate('Examiner1');?>
+					</td>
+					<td width="25%"><?php echo $this->lobjform->field23;?></td>
+
+				</tr>
+
+
+			</table>
+
+		</fieldset>
+		<br />
+
+		<fieldset>
+
+			<table class="table" width="100%" cellpadding="5" cellspacing="1">
+				<form>
+
+					<tr>
+						<th><?php echo $this->translate('Course');?></th>
+						<th><?php echo $this->translate('Component');?></th>
+						<th><?php echo $this->translate("Detail Component");?>
+						</th>
+						<th><?php echo $this->translate("Old Marks");?></th>
+						<th><?php echo $this->translate("New Marks");?>
+						</th>
+						<th><?php echo $this->translate("Total Marks");?>
+						</th>
+					</tr>
+
+
+					<?php if (count($this->finalResult)) {
+						$i=1;
+						foreach ($this->finalResult as $lobjprogram ) {
+          ?>
+
+
+
+					<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+						<input type="hidden" name="IdExaminationResitApplicationMarks[]"
+							id="IdExaminationResitApplicationMarks"
+							value="<?php echo $lobjprogram['IdExaminationResitApplicationMarks'];?>">
+						<td><?php echo $lobjprogram['SubjectName'];?></td>
+						<td><?php echo $lobjprogram['ComponentName'];?></td>
+						<td><?php echo $lobjprogram['MainSubComponentName'];?></td>
+						<td><input readonly="readonly" dojoType="dijit.form.TextBox"
+							type="text" value="<?php echo $lobjprogram['OldMarks'];?>"
+							style="width: 50px;">
+						</td>
+
+						<td><input type="text"
+						<?php if($this->larrresultApplicationEntryStatus[0]['Status']!='192') { ?>
+							readonly="readonly" <?php } ?>
+							onkeyup="positivevalue1(this.value,this.id,'<?php echo $lobjprogram['TotalMarks'];?>');"
+							name="NM[<?php echo $lobjprogram['IdExaminationResitApplicationMarks'];?>]"
+							id="nm_<?php echo $i; ?>"
+							value="<?php echo $lobjprogram['NewMarks'];?>"
+							dojoType="dijit.form.TextBox">
+						</td>
+						<td><input readonly="readonly" dojoType="dijit.form.TextBox"
+							type="text" value="<?php echo $lobjprogram['TotalMarks'];?>"
+							style="width: 50px;">
+						</td>
+
+					</tr>
+					<?php  $i++;
+}
+} ?>
+
+					<tr>
+						<td align="right" colspan="6">
+							<?php if ($this->disableSubmit=='1') { ?>
+							<?php if (count($this->finalResult)) { ?>
+							<input type='button'
+							<?php if($this->larrresultApplicationEntryStatus[0]['Status']!='192') { ?>
+							disabled="disabled" <?php } ?> class="NormalBtn"
+							dojotype="dijit.form.Button" name="Submit" id="Submit"
+							label="<?php echo $this->translate('Submit');?>" value='Submit'
+							OnClick="formsubmit();" /> <?php  } ?>
+							<?php  }  else {  ?>
+							<span style="color: red"><?php echo $this->translate("Sorry, Student's Profile Status is not eligible for Exam Resit Marks Entry.");?></span>
+							<?php } ?>
+
+
+							<input type='button'
+							class="NormalBtn" dojotype="dijit.form.Button"
+							label="<?php echo $this->translate('Back')?>" value='click'
+							onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'resitmarksentry', 'action'=>'index'),'default',true);?>';" />
+
+						</td>
+
+					</tr>
+
+			</table>
+
+		</fieldset>
+
+	</form>
+</div>
+
+
+

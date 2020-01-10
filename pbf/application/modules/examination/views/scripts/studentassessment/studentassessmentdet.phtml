@@ -1,0 +1,87 @@
+<?php 
+$studentdet = array();
+if(!empty($this->studdet)){
+	$studentdet = $this->studdet;
+}
+
+?>
+<script
+	type="text/javascript"
+	src="<?php echo $this->baseUrl(); ?>/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script
+	type="text/javascript"
+	src="<?php echo $this->baseUrl(); ?>/js/jquery.printElement.js"></script>
+<link
+	rel="stylesheet" type="text/css"
+	href="<?php echo $this->baseUrl(); ?>/css/jqueryui/smoothness/jquery-ui-1.8.21.custom.css" />
+<script
+	type="text/javascript"
+	src="<?php echo $this->baseUrl(); ?>/js/jquery.colorbox.js"
+	djConfig="parseOnLoad: true,locale:'<?php echo $locale; ?>'"></script>
+	
+<script type="text/javascript">
+$(document).ready(function(){
+    $(".Btn").click(function(){
+        var id = $(this).attr('widgetid');
+        var n = id.split("-");        
+        $.ajax({
+            type: 'GET',
+            async: false,
+            url: '<?php echo $this->url(array('module' => 'examination', 'controller' => 'studentassessment', 'action' => 'studentassesment'), 'default', true); ?>',
+            data: "Idstudent="+n[1]+"&semcode="+n[2],
+            success: function(data) {
+                $(".Btn").colorbox({html:data});
+               
+            }
+        });
+    });
+});
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Student Assessment"); ?>
+	</legend>	
+		<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Student Id");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['registrationId'] : '';?></td>
+				<td><?php echo $this->translate("Student Name");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['name'] : '';?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Program");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['ProgramName'] : '';?></td>
+				<td><?php echo $this->translate("Intake");?></td>
+				<td><?php echo (!empty($studentdet)) ? $studentdet['IntakeId'].'-'.$studentdet['IntakeDesc'] : '';?></td>
+			</tr>			
+			</tr>
+		</table>
+		<br>
+		<table class="table" width="100%">
+			<tr>
+				<th><?php echo $this->translate("Semester");?></th>
+				<th><?php echo $this->translate("GPA Mark");?></th>
+				<th><?php echo $this->translate("GPA Point");?></th>
+				<th><?php echo $this->translate("GPA Grade");?></th>
+				<th><?php echo $this->translate("CGPA Mark");?></th>
+				<th><?php echo $this->translate("CGPA Point");?></th>
+				<th><?php echo $this->translate("CGPA Grade");?></th>
+				<th><?php echo $this->translate("View");?></th>
+			</tr>
+			<?php if(!empty($this->studentgpadet)){?>
+				<?php foreach($this->studentgpadet as $data){?>
+					<td><?php echo (isset($data['semester']) && $data['semester']!='') ? $data['semester'] : '';?></td>
+					<td><?php echo (isset($data['cgpagpadet']) && (!empty($data['cgpagpadet'])) && $data['cgpagpadet'][0]['Gpa']!='') ? $data['cgpagpadet'][0]['Gpa'] : '';?> </td>
+					<td><?php echo (isset($data['gpaGradepoint']) && $data['gpaGradepoint']!='') ? $data['gpaGradepoint'] : '';?></td>
+					<td><?php echo (isset($data['gpaGradevalue']) && $data['gpaGradevalue']!='') ? $data['gpaGradevalue'] : '';?></td>
+					<td><?php echo (isset($data['cgpagpadet']) && (!empty($data['cgpagpadet'])) && $data['cgpagpadet'][0]['Cgpa']!='') ? $data['cgpagpadet'][0]['Cgpa'] : '';?></td>
+					<td><?php echo (isset($data['cgpaGradepoint']) && $data['cgpaGradepoint']!='') ? $data['cgpaGradepoint'] : '';?></td>
+					<td><?php echo (isset($data['cgpaGradevalue']) && $data['cgpaGradevalue']!='') ? $data['cgpaGradevalue'] : '';?></td>
+					<td><input type="button" id="new_button-<?php echo $data['IdStudentRegistration'].'-'.$data['semester'];?>" class="Btn"
+											dojotype="dijit.form.Button"
+											label="<?php echo $this->translate("View"); ?>" onclick="" /></td>
+				<?php  } ?>
+			<?php } ?>
+			
+		</table>
+</fieldset>

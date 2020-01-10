@@ -1,0 +1,76 @@
+<style>
+.makebold {
+	font-weight: bold;
+}
+</style>
+
+<table width="100%" border='1'>
+
+	<tr>
+
+		<td>
+			<table width="100%" class="table" border="1">
+
+				<tr>
+					<th colspan="7"><h3 align="center"><?php echo $this->translate("Complete Student List");?></h3></th>
+				</tr>
+
+				<tr>
+					<th align="left"><?php echo $this->translate('Student Name');?>
+					</th>
+					<th align="left"><?php echo $this->translate('Student ID');?>
+					</th>
+					<th align="left"><?php echo $this->translate("Semester");?></th>
+					<th align="left"><?php echo $this->translate("Program");?></th>
+					<th align="left"><?php echo $this->translate("Program Credit Hours");?>
+					</th>
+					<th align="left"><?php echo $this->translate("Credit Hours Taken");?>
+					</th>
+					<th align="left"><?php echo $this->translate("Status");?></th>
+				</tr>
+
+
+				<?php 
+				if(count($this->larrresult)>0) {
+                                foreach($this->larrresult as $larrresult) { ?>
+				<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+					<td align="left"><?php echo $larrresult['StudentName'];?></td>
+					<td align="left"><?php echo $larrresult['registrationId'];?></td>
+					<td align="left"><?php echo $larrresult['IdSemester'];?></td>
+					<td align="left"><?php echo $larrresult['ProgramName'];?></td>
+					<td align="left"><?php echo $larrresult['ProgramHours'];?></td>
+					<td align="left"><?php echo $larrresult['CreditHoursTaken'];?></td>
+					<td align="left"><?php echo $larrresult['DefinitionDesc'];?></td>
+				</tr>
+				<?php } 
+}  ?>
+
+
+
+
+			</table>
+
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<table width="100%" border="1">
+
+				<tr>
+					<td colspan="7" align="left"></td>
+				</tr>
+
+				<tr>
+					<td colspan="7" align="left">Date: <?php echo date('Y-m-d H:i:s');?>
+					</td>
+				</tr>
+
+
+			</table>
+		</td>
+	</tr>
+
+
+
+</table>

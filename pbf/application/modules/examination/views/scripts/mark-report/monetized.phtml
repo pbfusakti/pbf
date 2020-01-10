@@ -1,0 +1,142 @@
+<script>
+$(document).ready(function(){
+   // $("#searchForm").submit(function(){
+    $("#print").click(function(){    
+        if($("#print").prop("checked") == true)
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/indexpdf');
+           // alert('here');
+        }
+        else
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/');
+        }
+    })
+});
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="<?php echo $this->baseUrl()?>/examination/mark-report/monetized" method="post" id="searchForm">
+	<dl class="zend_form">
+	
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"<?php if($this->semesterId == $semester["key"]){ echo 'selected';}?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdProgram-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdProgram-element">
+			<select id="IdProgram" name="IdProgram">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>"<?php if($this->programId == $program["IdProgram"]){ echo 'selected';}?>><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+        <dt><label>&nbsp;</label></dt>
+        
+        <dt><label>&nbsp;</label></dt>
+        <dd>
+        <input type="submit" value="Submit" name="submit" />
+        </dd>
+    
+    </dl>
+    
+</form>
+
+<?php if(isset($this->subjects)):?>
+<form action="<?php echo $this->baseUrl()?>/examination/mark-report/monetized" method="post" id="arvhivedForm">
+<input type="hidden" name="IdProgram" value="<?php echo $this->programId;?>">
+<input type="hidden" name="IdSemester" value="<?php echo $this->semesterId;?>">
+<table class="table" id="result" width="100%">
+	<thead>
+        <tr>
+            <th>No</th>
+            <th>Kode</th>
+            <th>Matakuliah</th>
+            <th>Kelas</th>
+            <th>Nik</th>
+            <th>Dosen</th>
+            <th>Jumlah Mahasiswa</th>
+            <?php if (count($this->payments) >0) {
+            	foreach ($this->payments as $item) {?>
+            <th><?php  echo $item['FeeName']?></th>
+            <?php }
+            } else echo '<th></th>'?>
+        </tr>
+	</thead>
+	<tbody>
+        <?php 
+        $i = 0;
+        foreach ($this->subjects as $key => $value)
+        {
+            foreach($value['courseGroup'] as $index => $val)
+            {
+                $i++;
+        ?>
+        <tr <?php echo $i%2==0?"class='shade'":""; ?>>
+            <td><?php echo $i;?></td>
+            <td><?php echo $value['SubCode'];?></td>
+            <td><?php echo $value['SubjectName'];?></td>
+            <td><?php echo $val['GroupName'];?></td>
+            <td><?php echo $val['StaffId'];?></td>
+            <td><?php echo $val['FullName'];?></td>
+            <td align="center"><?php echo $val['totalStudentGroup'];?></td>
+             <td align="center"> <?php 
+             	if (count($this->payments)>0) {
+	             	foreach ($this->payments as $item) {
+	             	if ($val['archived_by']!='') {?>
+	             		<a href="<?php echo $this->url(array('module'=>'stafffinance','controller'=>'staff-payment','action'=>'generate','idItem'=>$item['idItem'],'idSemester'=>$this->semesterId,'idProgram'=>$this->programId,'idSubject'=>$val["IdSubject"],'id'=>$val["IdCourseTaggingGroup"]),'default',true)?>" target='_blank'><img src="/images/icon/idr.png"  style="width:25px;height:25px;" title="<?php echo 'Generate Payment'?>"></a> 
+            <?php }
+            	}
+             } else echo 'No payment setup';?></td>
+        </tr>
+        <?php
+            }
+        }
+        ?>
+	</tbody>
+	<tr ><td align="center" colspan="11" bgcolor="grey"><input type="submit" name="archivebtn" value="Archive It"></td>
+</table>
+</form>
+<?php endif;?>

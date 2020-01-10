@@ -1,0 +1,144 @@
+<script>
+$(document).ready(function(){
+   // $("#searchForm").submit(function(){
+    $("#print").click(function(){    
+        if($("#print").prop("checked") == true)
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/parentpdf');
+           // alert('here');
+        }
+        else
+        {
+            $("#searchForm").attr('action','<?php echo $this->baseUrl()?>/examination/mark-report/parent');
+        }
+    })
+});
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="<?php echo $this->baseUrl()?>/examination/mark-report/parent" method="post" id="searchForm">
+	<dl class="zend_form">
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"<?php if($this->semesterId == $semester["key"]){ echo 'selected';}?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="IdProgram-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdProgram-element">
+			<select id="IdProgram" name="IdProgram">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>"<?php if($this->programId == $program["IdProgram"]){ echo 'selected';}?>><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="IdLandscape-label">
+			<label class="required" for="IdLandscape"><?php echo $this->translate("Landscape"); ?></label>
+		</dt>
+		<dd id="IdProgram-element">
+			<select id="IdLandscape" name="IdLandscape">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->landscape_list as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["IdLandscape"];?>"<?php if($this->landscapeId == $program["IdLandscape"]){ echo 'selected';}?>><?php echo $program["ProgramDescription"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+        <dt><label>&nbsp;</label></dt>
+        <dd>
+          <input type="checkbox" name="print" value="1" id="print" /> Print <br />
+        </dd>
+        <dt><label>&nbsp;</label></dt>
+        <dd>
+        <input type="submit" value="Submit" name="submit" />
+        </dd>
+    
+    </dl>
+    
+</form>
+
+<?php if(isset($this->subjects)):?>
+<table class="table" id="result" width="100%">
+	<thead>
+        <tr>
+            <th>No</th>
+            <th>Kode</th>
+            <th>Matakuliah</th>
+            <th>Credit Hours</th>
+            
+        </tr>
+	</thead>
+	<tbody>
+        <?php 
+        $i = 0;
+        foreach ($this->subjects as $key => $value)
+        {
+        	//echo var_dump($value);
+        	$groups=$value['GroupId'];
+        	$id="";
+        	if ($groups!=array()) {
+	        	foreach ($groups as $groupid) {
+					$id=$id.$groupid.",";
+				}
+			}
+            //foreach($value['courseGroup'] as $index => $val)
+           // {
+             $i++;
+        ?>
+        <tr>
+            <td><?php echo $i;?></td>
+            <td><?php echo $value['SubCode'];?></td>
+            <td><?php if ($id!='') {?><a href="/examination/mark-report/bookmark-parent/programid/<?php echo $this->programId;?>/idparent/<?php echo $value['IdLandscapeblocksubject']?>/idsubjectparent/<?php echo $value['subjectid']?>/id/<?php echo $id;?>/idsemester/<?php echo $this->semesterId;?>"> <?php }?><?php echo $value['NamaSubjek'];?></a></td>
+            <td><?php echo $value['CreditHours'];?></td>
+            
+        </tr>
+        <?php
+          //  }
+        }
+        ?>
+	</tbody>
+</table>
+<?php endif;?>

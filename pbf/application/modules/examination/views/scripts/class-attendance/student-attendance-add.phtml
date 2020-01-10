@@ -1,0 +1,364 @@
+<?php 
+	$attDtlDb = new Examination_Model_DbTable_CourseGroupStudentAttendanceDetail();
+?>
+<style>
+select{
+	width: 150px;
+}
+</style>
+<script type="text/javascript">
+$(function() {
+	
+	$("#start_time, #end_time").timePicker({
+	  	  startTime: "06:00", // Using string. Can take string or Date object.
+	  	  endTime: new Date(0, 0, 0, 23, 30, 0), // Using Date object here.
+	  	  show24Hours: true,
+	  	  separator: ':',
+	  	  step: 10});
+
+	 
+	 var oldTime = $.timePicker("#start_time").getTime();
+
+	// Keep the duration between the two inputs.
+	 $("#start_time").change(function() {
+	   if ($("#end_time").val()) { // Only update when second input has a value.
+	     // Calculate duration.
+	     var duration = ($.timePicker("#end_time").getTime() - oldTime);
+	     var time = $.timePicker("#start_time").getTime();
+	     // Calculate and update the time in the second input.
+	     $.timePicker("#end_time").setTime(new Date(new Date(time.getTime() + duration)));
+	     oldTime = time;
+	   }
+	 });
+	 // Validate.
+	 $("#end_time").change(function() {
+	   if($.timePicker("#start_time").getTime() > $.timePicker(this).getTime()) {
+	     $(this).addClass("error");
+	   }
+	   else {
+	     $(this).removeClass("error");
+	   }
+	 });
+	 
+    $( ".datepicker" ).datepicker({
+        'dateFormat' : 'dd-mm-yy'
+    });
+});
+  
+function addAttendance(){
+	window.location = '/examination/class-attendance/student-attendance-add';
+
+	return false;
+}
+
+function change_all_status(element){
+	$('select[name="status[]"]').val( $(element).val() ) 
+}
+
+function change_lecturer(element){
+	if($(element).val()!=""){
+		$.ajax({
+			url: "<?php echo $this->url(array('module'=>'examination','controller'=>'class-attendance', 'action'=>'ajax-get-schedule'),'default',true);?>",
+			data: {'sc_id':$(element).val()},
+			type: 'POST',
+			dataType: 'json',
+			async : false,
+			beforeSend: function(){
+				$('#lecturer').hide().parent().append('<div class="loading">Loading...</div>');
+				$('#start_time').hide().parent().append('<div class="loading">Loading...</div>');
+				$('#end_time').hide().parent().append('<div class="loading">Loading...</div>');
+			}	
+		}).done(function ( data ) {
+
+			$('.loading').remove();
+			$('#lecturer').show();
+			$('#start_time').show();
+			$('#end_time').show();
+
+			$('#start_time').val(data.sc_start_time);
+			$('#end_time').val(data.sc_end_time);
+			
+			if(data.IdLecturer!=null){
+				$('#lecturer').val(data.IdLecturer);
+			}
+		});
+	}
+}
+
+function validate(){
+	if($('#class_date').val()==''){
+		alert('<?php echo $this->translate('Please fill in date');?>');
+		$("#class_date").stop().css("background-color", "#FFFF9C").animate({ backgroundColor: "#FFFFFF"}, 1500);
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="<?php echo $this->url(array('module'=>'examination','controller'=>'class-attendance','action'=>'student-attendance', 'group'=>$this->group['IdCourseTaggingGroup']),'default',true);?>" >
+					<span class='back'></span>
+					Back
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form method="post" onsubmit="return validate();">
+<fieldset>
+		<legend><?php echo $this->translate("Group Info");?></legend>
+		
+		<div style="float:left; width:33%; margin: 0 1% 0 0;">
+			<table>
+				<tr>
+					<td><?php echo $this->translate("Subject"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->subject['subjectMainDefaultLanguage'];?> - <?php echo $this->subject['SubCode'];?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupName"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("GroupCode"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['GroupCode']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Coordinator"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['FullName']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Semester"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['semester_name']; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Total Student"); ?></td>
+					<td>:</td>
+					<td><?php echo $this->group['total_student']; ?></td>
+				</tr>
+			</table>
+		</div>
+		
+		<div style="float:left; width:33%;">
+			<table>
+				<tr>
+					<td><?php echo $this->translate("Schedule");?></td>
+					<td>:</td>
+					<td>
+						<select name="schedule_id" onchange="change_lecturer(this);">
+							<option><?php echo $this->translate('Please Select');?></option>
+						<?php foreach ($this->schedule as $schedule):?>
+							<option value="<?php echo $schedule['sc_id'];?>"><?php echo $schedule['sc_day'];?> :: <?php echo $schedule['sc_start_time'];?> - <?php echo $schedule['sc_end_time'];?> (<?php echo $schedule['sc_venue'];?>)</option>
+						<?php endforeach;?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Lecturer");?></td>
+					<td>:</td>
+					<td>
+						<select name="lecturer_id" id="lecturer">
+						<option><?php echo $this->translate('Please Select');?></option>
+						<?php 
+							foreach ($this->academic_staff as $staff):
+								$select ="";
+								if( $this->group['IdLecturer']!=0 && $staff['IdStaff']==$this->group['IdLecturer']){
+									$select = 'selected="selected"';
+								}
+						?>
+						<option value="<?php echo $staff['IdStaff'];?>" <?php echo $select;?> ><?php echo $staff['FullName'];?></option>
+						<?php endforeach;?>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Date");?></td>
+					<td>:</td>
+					<td>
+						<input type="text" name="class_date" id="class_date" value="" class="datepicker" placeholder="dd-mm-yyyy" />
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Time Start");?></td>
+					<td>:</td>
+					<td>
+						<input type="text" name="class_time_start" id="start_time" value="" />
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Time End");?></td>
+					<td>:</td>
+					<td>
+						<input type="text" name="class_time_end" id="end_time" />
+					</td>
+				</tr>
+				<tr>
+					<td valign="top"><?php echo $this->translate("Remarks");?></td>
+					<td valign="top">:</td>
+					<td valign="top">
+						<textarea name="remark"></textarea>
+					</td>
+				</tr>
+			</table>	
+			
+		</div>
+		
+		
+		<div style="float:left; width:33%;">
+			<table width="100%">
+				<tr>
+					<td valign="top"><?php echo $this->translate("Lecturer Activity");?></td>
+					<td valign="top">:</td>
+					<td valign="top">
+						<textarea name="lecturer_activity" style="width:100%;"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top"><?php echo $this->translate("Student Assignment");?></td>
+					<td valign="top">:</td>
+					<td valign="top">
+						<textarea name="student_assignment" style="width:100%;"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top"><?php echo $this->translate("Evaluation");?></td>
+					<td valign="top">:</td>
+					<td valign="top">
+						<textarea name="evaluation" style="width:100%;"></textarea>
+					</td>
+				</tr>
+			</table>
+		</div>
+</fieldset>
+
+<br />
+<?php if (count($this->coursedetail)>0) {?>
+<fieldset><?php echo $this->translate('Detai Lecturer Activity')?>
+<table class="table" width="100%">
+	<tr>
+		<th rowspan="2"><?php echo $this->translate("Take")?></th>
+		<th rowspan="2"><?php echo $this->translate("Course Substance");?></th>
+		<th rowspan="2"><?php echo $this->translate("Learning Methods");?></th>
+		<th rowspan="2"><?php echo $this->translate("Evaluation");?></th>
+		<th><?php echo $this->translate("Evaluation Criteria");?></th>
+	</tr>
+	
+</table>
+</fieldset>
+<?php }?>
+
+<table class="table" width="100%">
+	<tr>
+		<th rowspan="2">&nbsp;</th>
+		<th rowspan="2"><?php echo $this->translate("Name");?></th>
+		<th rowspan="2"><?php echo $this->translate("NIM");?></th>
+		
+		<th rowspan="2"><?php echo $this->translate("Total Session");?></th>
+		<th><?php echo $this->translate("Status");?></th>
+		<th colspan="<?php echo sizeof($this->attendanceStatusList);?>" style="text-align:center;"><?php echo $this->translate('Attendance Status');?></th>
+		
+	</tr>
+	<tr>
+		<th align="center" style="text-align: center;">
+			<select name="" id="status_all" onchange="change_all_status(this);">
+				<option value="null"></option>
+				<?php foreach ($this->attendanceStatusList as $status):?>
+				<option value="<?php echo $status['idDefinition'];?>"><?php echo $status['BahasaIndonesia'];?></option>
+				<?php endforeach;?>
+			</select>
+		</th>
+		<?php
+			foreach ($this->attendanceStatusList as $status):
+				$arr_status_count[$status['idDefinition']] = 0;
+		?>
+		<th style="text-align:center;" width="<?php echo 50/sizeof($this->attendanceStatusList);?>%">
+				<?php echo $status['BahasaIndonesia'];?>
+		</th>
+		<?php 
+			endforeach;
+		?>
+		
+	</tr>
+	<?php 
+		$i=0;
+		if($this->studentList){
+		foreach ($this->studentList as $student):
+	?>
+	<tr <?php echo $i%2==0?"class='shade'":""?>>
+		<td><?php echo $i+1;?>.</td>
+		<td width="30%">
+			<?php echo $student['appl_fname']!=null?$student['appl_fname']." ":""; ?> 
+			<?php echo $student['appl_mname']!=null?$student['appl_mname']." ":""; ?>
+			<?php echo $student['appl_lname']!=null?$student['appl_lname']:""; ?>
+			
+			<input type="hidden" name="registration_id[]" value="<?php echo $student['IdStudent']; ?>" />
+			<input type="hidden" name="nim[]" value="<?php echo $student['registrationId']; ?>" />
+		</td>
+		<td align="center"><?php echo $student['registrationId'];?></td>
+		
+		<td align="center">
+			<?php echo $ses_count = $attDtlDb->getAttendanceSessionCount($this->group_id, $student['IdStudent']);?>
+		</td>
+		<td align="center">
+			<select name="status[]">
+				<?php foreach ($this->attendanceStatusList as $status):?>
+				<option value="<?php echo $status['idDefinition'];?>"><?php echo $status['BahasaIndonesia'];?></option>
+				<?php endforeach;?>
+			</select>
+		</td>
+		<?php
+		foreach ($this->attendanceStatusList as $status):
+			$count = $attDtlDb->getAttendanceStatusCount($this->group_id, $student['IdStudent'], $status['idDefinition']);
+				
+		?>
+		<td style="text-align:center;">
+			<?php echo $count; ?>
+		</td>
+		<?php 
+		endforeach;
+		?>
+		
+	</tr>
+	<?php 
+		$i++;
+		endforeach;
+		}else{
+	?>
+	<tr>
+		<td align="center" colspan="9"><?php echo $this->translate('No student assigned to this course group');?></td>
+	</tr>
+	<?php 
+	}
+	?>
+</table>
+<div style="text-align: center; background: #ccc; padding: 2px 10px; margin: 10px 0 5px 0;">
+	<input type="hidden" name="group_id" value="<?php echo $this->group['IdCourseTaggingGroup'];?>" />
+	<input type="hidden" name="total_student" value="<?php echo $this->group['total_student'];?>" />
+	<input type="submit" value="Save" />
+</div>
+<br />
+</form>

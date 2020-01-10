@@ -1,0 +1,310 @@
+<head>
+<style>
+.makebold {
+	font-weight: bold;
+}
+</style>
+<script>
+dojo.addOnLoad(function(){
+	//dijit.byId('field23').set('value','');
+	//dijit.byId('field23').set('placeHolder','Select');
+	//dijit.byId('field24').set('value','');
+	//dijit.byId('field24').set('placeHolder','Select');
+       // dijit.byId('field25').set('value','');
+	//dijit.byId('field25').set('placeHolder','Select');
+       // dijit.byId('field26').set('value','');
+	///dijit.byId('field26').set('placeHolder','Select');
+       // dijit.byId('field27').set('value','');
+	//dijit.byId('field27').set('placeHolder','Select');
+
+});
+
+
+
+function formsave() {
+        $('#savedata').val('savedata');
+        document.markssave.submit();
+ }
+
+ function formsubmit() {
+        $('#savedata').val('submitdata');
+        document.markssave.submit();
+ }
+
+ function formapprove() {
+        $('#savedata').val('approvedata');
+        document.markssave.submit();
+ }
+
+  function formreject() {
+        $('#savedata').val('rejectdata');
+        document.markssave.submit();
+ }
+
+ function getStudstatus(val1,val2,val3) {
+     //alert(val1);
+     if(val1!='278') {
+     $('.marks_'+val3).each(function(){
+         console.log(this);
+         //var a = $("input[type=text][name=xxx]").val();
+         $(this).find('input[type=text]').val('');
+     })
+     }
+
+ }
+
+
+
+ function positivevalue(val1, val2 ,val3, val4,val5) {
+     //alert(val4);
+     var TotalMarks =  parseInt(val3);
+     var value1 = $.trim($('#'+val2).val());
+
+     var valueAttendance = $('#AttendanceStatus_'+val4+'_'+val5).val();
+     //alert(valueAttendance);
+
+     if(valueAttendance!='Attend') {
+           $('#'+val2).val('');
+           alert('You can enter Marks only when Status is "Attend" ');
+           return false;
+     } else if(valueAttendance=='Attend') {
+
+      if((isNaN(value1)) || value1==''){
+           $('#'+val2).val('');
+           alert('Please insert numeric value in Marks Obtained');
+           return false;
+       }
+
+     if(value1=='' || value1<0 || value1>TotalMarks ) {
+         $('#'+val2).val('');
+         //dijit.byId('AttendanceStatus_'+val4).set('readOnly',false);
+         alert("Marks Obtained should be postive and less than Total Marks");
+         return false;
+     } else {
+                //dijit.byId('AttendanceStatus_'+val4).set('readOnly',true);
+     }
+
+    }
+
+
+
+ }
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks Entry List");?>
+	</legend>
+
+	<table class="table" width="100%">
+
+		<tr>
+
+			<td class="makebold"><?php echo $this->translate("Student ID");?>
+			</td>
+			<td><?php echo $this->idstudentregistration;?></td>
+
+			<td class="makebold"><?php echo $this->translate('Course');?></td>
+			<td><?php echo $this->coursename;?></td>
+
+		</tr>
+
+		<tr>
+			<td class="makebold"><?php echo $this->translate('Program');?></td>
+			<td><?php echo $this->prgName;?></td>
+
+			<td class="makebold"><?php echo $this->translate('Semester');?></td>
+			<td><?php echo $this->semName;?></td>
+
+		</tr>
+
+	</table>
+
+</fieldset>
+<br />
+
+
+<fieldset>
+	<form name="markssave" id="markssave" method="post">
+		<input type="hidden" name="savedata" id="savedata" value="savedata">
+
+		<table id="myTable" class="table" width="100%" cellpadding="5"
+			cellspacing="1">
+			<form>
+
+				<tr>
+					<th><?php echo $this->translate("Select");?></th>
+					<th><?php echo $this->translate("Component Type");?></th>
+					<th><?php echo $this->translate("Item");?></th>
+					<th><?php echo $this->translate("Status");?></th>
+					<th><?php echo $this->translate("Detail Item");?></th>
+					<th><?php echo $this->translate("Marks");?></th>
+
+				</tr>
+
+
+				<?php if (count($this->finalResult)) {
+          			$i=1; $currentDate = date('Y-m-d');  $entryStatus = '0'; ?>
+				<?php foreach ($this->finalResult as $lobjprogram ) {
+
+					$StartDate = $lobjprogram['StartDate'];
+					$EndDate = $lobjprogram['EndDate'];
+
+					if($currentDate>=$StartDate && $currentDate<=$EndDate && $StartDate!=='' && $EndDate!='') {
+						$entryStatus = '1';
+					} else {
+						$entryStatus = '0';
+					}
+
+
+					if(isset($lobjprogram['IdcomponentsDetails'])) {
+				  $tot = count($lobjprogram['IdcomponentsDetails'])+1;
+				} else {  $tot=NULL;
+				}
+				?>
+				<input type="hidden" name="Component[]" id="Component[]"
+					value="<?php echo $lobjprogram['IdComponentTypeMain'];?>"> <input
+					type="hidden" name="Course" id="Course"
+					value="<?php echo $this->course;?>"> <input type="hidden"
+					name="IdSemester" id="IdSemester"
+					value="<?php echo $this->semName;?>"> <input type="hidden"
+					name="Instructor" id="Instructor"
+					value="<?php echo $this->instructor;?>"> <input type="hidden"
+					name="IdStudentRegistration" id="IdStudentRegistration"
+					value="<?php echo $this->IdStudentRegistration;?>"> <input
+					type="hidden" name="IdStudentRegSubjects" id="IdStudentRegSubjects"
+					value="<?php echo $this->IdStudentRegSubjects;?>"> <input
+					type="hidden" name="UpdUser" id="UpdUser"
+					value="<?php echo $this->iduser;?>"> <input type="hidden"
+					name="TotalMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					id="TotalMarks" value="<?php echo $lobjprogram['MarksTotal'];?>"> <input
+					type="hidden" name="MainComponentItem[]" id="MainComponentItems"
+					value="<?php echo $lobjprogram['IdComponentItemMain'];?>">
+
+
+
+				<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>" id="<?php echo $i;?>">
+
+					<td rowspan="<?php echo $tot;?>">
+					<input	name="cb_<?php echo $lobjprogram['IdComponentTypeMain'];?>" id="cb_<?php echo $i; ?>"
+							dojoType="dijit.form.CheckBox"
+							value="1" type="checkbox" <?php if($lobjprogram['AttendanceStatus']!='') { ?> checked="checked" <?php } ?> <?php if($entryStatus=='0' ) {  ?> readonly="readonly" <?php } ?> >
+					</td>
+
+					<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['ComponentName'];?>
+					</td>
+					<td rowspan="<?php echo $tot;?>"><?php echo $lobjprogram['ComponentItemName'];?>
+					</td>
+					<td rowspan="<?php echo $tot;?>"><select
+					<?php if($lobjprogram['MarksEntryStatus']=='312' || $lobjprogram['MarksEntryStatus']=='313' || $entryStatus=='0' ) {  ?>
+						readonly="readonly" <?php } ?>
+						name="AttendanceStatus_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+						id="AttendanceStatus_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+						dojoType="dijit.form.FilteringSelect" placeHolder="select"
+						value="<?php echo $lobjprogram['AttendanceStatus'];?>"
+						required="false"
+						onChange="getStudstatus(this.value,'<?php echo $lobjprogram['IdComponentTypeMain'];?>','<?php echo $i;?>');">
+							<?php foreach($this->attendancestatus as $att) { ?>
+							<option value="<?php echo $att['key'];?>"
+							<?php if($att['key']==$lobjprogram['AttendanceStatus']) { echo 'SELECTED'; } ?>>
+								<?php echo $att['value'];?>
+							</option>
+							<?php } ?>
+					</select>
+					</td>
+					<?php
+					if(isset($lobjprogram['IdcomponentsDetails']) && count($lobjprogram['IdcomponentsDetails'])>0) {
+$j=1;
+                         foreach($lobjprogram['IdcomponentsDetails'] as $values) {   ?>
+
+
+				<tr  style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))?>" >
+
+					<td><?php echo $values['ComponentItemName'];?></td>
+					<td><input class='marks_<?php echo $i;?>'
+						id="comp_<?php echo $i;?>_<?php echo $j;?>"
+						<?php if($lobjprogram['MarksEntryStatus']=='312' || $lobjprogram['MarksEntryStatus']=='313' || $entryStatus=='0' ) {  ?>
+						readonly="readonly" <?php } ?> dojoType="dijit.form.TextBox"
+						onkeyup="positivevalue(this.value,this.id,'<?php echo $values['Weightage'];?>','<?php echo $lobjprogram['IdComponentTypeMain'];?>','<?php echo $lobjprogram['IdComponentItemMain'];?>');"
+						type="text"
+						name="<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>[<?php echo $values['IdMarksDistributionDetails'];?>]"
+						value="<?php echo $values['MarksObtainedDetail'];?>"
+						style="width: 50px;"> <?php echo '/ ';?> <?php if($this->recordEx=='1') { ?>
+						<input
+						name="IndividualTMarks_<?php echo $values['IdMarksDistributionDetails'];?>"
+						readonly="readonly" dojoType="dijit.form.TextBox" type="text"
+						value="<?php echo $values['Weightage'];?>" style="width: 50px;"> <?php } else { ?>
+						<input
+						name="IndividualTMarks_<?php echo $values['IdMarksDistributionDetails'];?>"
+						readonly="readonly" dojoType="dijit.form.TextBox" type="text"
+						value="<?php echo $values['Weightage'];?>" style="width: 50px;"> <?php } ?>
+					</td>
+				</tr>
+				<?php $j++;
+}
+} else {   ?>
+
+
+				<td></td>
+				<td><input class='marks_<?php echo $i;?>'
+				<?php if($this->larrresultMES[0]['MarksEntryStatus']=='312' || $this->larrresultMES[0]['MarksEntryStatus']=='313' ) {  ?>
+					readonly="readonly" <?php } ?>
+					id="SingleMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					dojoType="dijit.form.TextBox"
+					onkeyup="positivevalue(this.value,this.id,'<?php echo $lobjprogram['MarksTotal'];?>','<?php echo $lobjprogram['IdComponentTypeMain'];?>','<?php echo $lobjprogram['IdComponentItemMain'];?>');"
+					type="text"
+					name="SingleMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					value="<?php echo $lobjprogram['TotalMarkObtained'];?>"
+					style="width: 50px;"> <?php echo '/ ';?> <?php  if($this->recordEx=='1') { ?>
+					<input
+					name="SingleTMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					readonly="readonly" dojoType="dijit.form.TextBox" type="text"
+					value="<?php echo $lobjprogram['MarksTotal'];?>"
+					id="SingleTMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					style="width: 50px;"> <?php } else { ?> <input
+					name="SingleTMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					id="SingleTMarks_<?php echo $lobjprogram['IdComponentTypeMain'];?>_<?php echo $lobjprogram['IdComponentItemMain'];?>"
+					readonly="readonly" dojoType="dijit.form.TextBox" type="text"
+					value="<?php echo $lobjprogram['MarksTotal'];?>"
+					style="width: 50px;"> <?php } ?>
+				</td>
+
+				<?php } ?>
+
+				</tr>
+				<?php $i++;
+				}
+} ?>
+
+				<tr>
+					<td align="right" colspan="6">
+						<?php if ($this->disbaleSubmit=='1') { ?>
+						<?php if (count($this->finalResult)) { ?>
+						<?php if($this->larrresultApprCompStatus=='243') { ?> <?php if($this->larrresultMES[0]['MarksEntryStatus']=='311'  || $this->larrresultMES[0]['MarksEntryStatus']=='') {  ?>
+						<input type='button' class="NormalBtn" dojotype="dijit.form.Button" name="Save" id="Save" label="<?php echo $this->translate('Save');?>" value='Save' OnClick="return formsave();" /> 
+						<input type='button' class="NormalBtn" dojotype="dijit.form.Button" name="Submit" id="Submit" label="<?php echo $this->translate('Submit');?>" value='Submit' OnClick="formsubmit();" /> 
+							<?php } else if($this->larrresultMES[0]['MarksEntryStatus']=='312' ) {  ?>
+						<input type='button' class="NormalBtn" dojotype="dijit.form.Button" name="Approve" id="Approve" label="<?php echo $this->translate('Approve');?>" value='Approve' OnClick="formapprove();" />
+						<?php } else if($this->larrresultMES[0]['MarksEntryStatus']=='313'  ) {  ?>
+						<input type='button' class="NormalBtn" dojotype="dijit.form.Button" name="Reject" id="Reject" label="<?php echo $this->translate('Revert');?>" value='Approve' OnClick="formreject();" /> 
+						<?php } ?> <?php } else {  ?> <span style="color: red"><?php echo $this->translate("Status for Marks Distribution is Entry, Please
+							change it to Approved to save marks.");?></span> <?php } ?> <?php } else {  ?>
+						<span style="color: red"><?php $this->translate("Please enter Marks Distribution Entry.");?></span>
+						<?php } ?>
+						<?php } else { ?>
+						<span
+						style="color: red"><?php echo $this->translate("Sorry, Student's Profile Status is not eligible for Marks Entry.");?></span>
+						<?php } ?>
+
+						<input type='button' class="NormalBtn"
+						dojotype="dijit.form.Button"
+						label="<?php echo $this->translate('Back')?>" value='click'
+						onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'marksentryindividual', 'action'=>'index'),'default',true);?>';" />
+					</td>
+
+				</tr>
+
+		</table>
+	</form>
+</fieldset>

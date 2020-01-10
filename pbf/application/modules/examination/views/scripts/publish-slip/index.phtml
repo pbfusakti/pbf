@@ -1,0 +1,188 @@
+<script type="text/javascript">
+
+$(function () {
+
+	$( "#dialog-box" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "save": function() {            	
+    			url="<?php echo $this->url(array('module'=>'examination','controller'=>'publish-slip','action'=>'save'), 'default', true);?>";
+    			$("#formAdd").attr('action',url);
+
+    			var semester = $("#idProgram option:selected").val();
+    			var program = $("#idProgram option:selected").val();
+    			var tarikh = $("#DisplayDate").val();
+    			
+             	if(semester==0 || program==0 || tarikh==''){
+            		alert('Nilai diperlukan dan tidak boleh kosong.');
+             	}else{                 	
+    				$("#formAdd").submit();    
+             	}     	
+            },
+            "Cancel": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });	
+
+
+	$("#DisplayDate").datepicker({
+		"dateFormat":"yy-mm-dd",
+		"changeMonth":"true"		
+	});
+
+	
+});
+
+
+
+function add(){
+	$( "#dialog-box" ).dialog('open');	
+}
+
+
+function del(){
+	
+	var pm_id = $('input[name=pm_id]:checked').val();
+	
+	 if(pm_id){
+		 window.location = "<?php echo $this->url(array('module'=>'examination','controller'=>'publish-slip','action'=>'delete'), 'default', true);?>/id/"+pm_id;
+	 }else{
+		 alert("You did not select any date.");
+	 }
+ 
+}
+</script>
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>		
+			<li>							
+				<a href="#" onClick="add()">
+				<span class='add'></span>Add</a>				
+			</li>	
+			<?php  if(count($this->publish_data) > 0 ){ ?>
+			<li>							
+				<a href="#" onClick="del()">
+				<span class='delete'></span>Delete</a>				
+			</li>			
+			<?php } ?>
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+
+<div style="width:100%;">
+<?php echo $this->form; ?>
+
+<br>
+<?php  if(count($this->publish_data) > 0 ){ ?>
+<table class="table" width="80%" cellpadding="5" cellspacing="1" border="0">
+	<tr>		
+	    <th width="10%" align="center">&nbsp;</th>
+		<th width="30%"><?php echo $this->translate("Program"); ?></th>
+		<th width="30%"><?php echo $this->translate("Semester"); ?></th>
+		<th width="30%"><?php echo $this->translate("Slip Type"); ?></th>
+		<th width="30%"><?php echo $this->translate("Publish Date"); ?></th>
+		
+	</tr>
+	<?php
+			foreach($this->publish_data as $data){
+	?>
+	<tr>
+	    <td align="center">
+	    <input type="radio" name="pm_id" id="pm_id" value="<?php echo $data["pm_id"]?>"></td>
+		<td><?php echo $data["ProgramCode"].' - '.$data["ProgamName"]?></td>
+		<td><?php echo $data["SemesterName"]?></td>
+		<td><?php echo $data["value"]?></td>
+		<td><?php echo date("d-m-Y",strtotime($data["pm_date"]));?></td>
+		
+	</tr>
+	<?php } ?>
+		
+</table>
+	<?php }else{ echo $this->translate("No record found"); } ?>
+</div>
+
+
+<div id="dialog-box" title="<?php echo $this->translate("Setup Publish Slip Form"); ?>">
+<form id="formAdd" method="post">
+<dl class="zend_form">
+	
+		
+		 <dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="idSemester" name="idSemester" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>"><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdProgram-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdProgram-element">
+			<select id="idProgram" name="idProgram" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->program_list as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["IdProgram"];?>"><?php echo $program["ProgramCode"].' - '.$program["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="IdAssess-label">
+			<label class="required" for="IdProgram"><?php echo $this->translate("Assessment"); ?></label>
+		</dt>
+		<dd id="IdAssessment-element">
+			<select id="idAssess" name="idAssess" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->assesstype as $program):
+			    		
+			    ?>
+			    		<option value="<?php echo $program["key"];?>"><?php echo $program["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="DisplayDate-label">
+			<label class="optional" for="DisplayDate"><?php echo $this->translate("Display Date");?></label>
+		</dt>
+		<dd id="DisplayDate-element">
+			<input type="text" name="DisplayDate" id="DisplayDate" value="">
+		</dd>
+				
+	</dl>
+</form>  
+</div>
