@@ -1,0 +1,166 @@
+<script>
+function onclickUpload(semester,subject,program,examtype) {
+	//alert(id);
+	//document.getElementById("items_id").value=n;
+	 
+	$('#dialog-upload-scripts').dialog('open');
+}
+$(function() {
+
+	$( "#dialog-upload-scripts" ).dialog({
+		autoOpen: false,
+    	resizable: false,
+      	height:140,
+      	modal: true,
+      	buttons: {
+        	"Upload Exam Script": function() {
+        		$('#form_script').submit();
+        	},
+        	Cancel: function() {
+          		$( this ).dialog( "close" );
+        	}
+      	}
+    });
+	 
+	$( "#dialog-contributor" ).dialog({
+		  autoOpen: false,
+	      modal: true,
+	      width: 550,
+	      buttons: {
+	    	  "<?php echo $this->translate('Add'); ?>": function() {  
+	    		  var sel_text = $('#select_contri').find('option:selected').text();
+	    		  var sel_id = $('#select_contri').val();
+	    		  var pos_text = $('#position_contri').find('option:selected').text();
+	    		  var pos_id = $('#position_contri').val(); 
+	    		  
+	    		  
+	    		  var tappend = '<tr>'+
+	    		  '<td>'+
+	    		  '<input type="hidden" name="contributors[]" value="'+sel_id+'" />'+
+	    		  sel_text +
+	    		  '</td><td>'+
+	    		  '<input type="hidden" name="contributorspos[]" value="'+pos_id+'" />'+
+	    		  pos_text +
+	    		  	   
+	    		  '</td>'+
+	    		  '<td align="center"><a href="#" onclick="$(this).parent().parent().remove(); return false;"><img src="/images/icon/user_trash_full.png" title="Delete" /></td>'+
+	    		  '</tr>';
+		    	  $('#contributor tbody').append(tappend);
+		    	  
+	          $( this ).dialog( "close" );
+	        },
+	        Close: function() {
+	          $( this ).dialog( "close" );
+	        }
+	      }
+	    });
+
+	$('#assign-contributor').click(function(){
+    	$( "#dialog-contributor" ).dialog('open');
+
+    	return false;
+    });
+});
+
+function getLecturer(element,targetElement){
+	var nama = $(element).val();
+
+	$.ajax({
+		url: "<?php echo $this->url(array('module'=>'generalsetup','controller'=>'course-group', 'action'=>'ajax-get-lecturer'),'default',true);?>",
+		data: {'nama':$(element).val()},
+		type: 'POST',
+		dataType: 'json',	
+		beforeSend: function(){
+			$(targetElement).hide();
+			$(targetElement).parent().append('<div class="loading">Loading...</div>');	
+		}	
+	}).done(function ( data ) {
+
+		$('.loading').remove();  
+		$(targetElement).show();
+		
+		$(targetElement).empty().append('<option value="0"> <?php echo $this->translate("Please Select"); ?> </option>');
+	
+		$.each(data, function(index) {
+			$(targetElement).append('<option value="'+data[index].IdStaff+'"> '+data[index].FullName+' </option>');
+		});
+	});
+}
+
+
+function showLoading(target,target_div,loading_id){
+	$('#'+target).hide();
+	$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+}
+
+function hideLoading(loading_id,target){
+	$('#'+loading_id).remove();
+	$('#'+target).show();
+}
+
+ 
+</script>
+  
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			
+		</ul>
+	</div>
+</div>
+<br />
+
+<?php echo $this->form; ?>
+
+ 
+<div id="dialog-contributor" title="Add Contributor">
+  <table>
+    <tr>
+      <td><?php echo $this->translate('Contributor Search'); ?></td>
+      <td>:</td>
+      <td> <input type="text" name="lec_search"  onChange="getLecturer(this,('#select_contri'))"> 
+      </td>
+      
+    </tr>
+    <tr>
+      <td><?php echo $this->translate('Contributor'); ?></td>
+      <td>:</td>
+      <td>
+      <select name="select_contri" id="select_contri" >
+      </select>
+      </td>
+      
+    </tr>
+    <tr>
+      <td><?php echo $this->translate('Position'); ?></td>
+      <td>:</td>
+      <td>
+      <select name="position_contri" id="position_contri" >
+      <?php foreach ($this->positions as $item) {?>
+      	<option value="<?php echo $item['key']?>"><?php echo $this->translate($item['value'])?></option>
+      <?php }?>
+      </select>
+      </td>
+      
+    </tr>
+     
+   </table>
+</div>
+
+<div id="dialog-upload-scripts" title="<?php echo $this->translate("Upload Exam Scripts");?>">
+  	<form name="form_script" id="form_script" method="post" action="/examination/exam-script/upload-exam-script" enctype="multipart/form-data">
+  		<input type="file" name="file" />
+  		<input type="hidden" name="document_name" id="document_name">
+  		<input type="hidden" id="exam_script_id" name="exam_script_id">
+  		<input type="hidden" id="semester" name="semester" value="<?php echo $this->semester?>">
+  		<input type="hidden" id="program" name="program" value="<?php echo $this->program?>">
+  		<input type="hidden" id="subject" name="subject" value="<?php echo $this->subject?>">
+  		<input type="hidden" id="examtype" name="examtype" value="<?php echo $this->examtype?>"> 
+  		
+  		<input type="hidden" id="idStudentRegistrationUp" name="idStudentRegistrationUp">
+  		<input type="hidden" name="redirect_path" id="redirect_path" value="/examination/exam-script/script-add/semester_id/<?php echo $this->semester?>/subject_id/<?php echo $this->subject?>/program_id/<?php echo $this->program ?>/examtype/<?php echo $this->examtype?>/idDistribution/<?php echo $this->idDistribution;?>/group_id/<?php echo $this->group_id?>" > 
+  		
+  	</form>
+</div>
+

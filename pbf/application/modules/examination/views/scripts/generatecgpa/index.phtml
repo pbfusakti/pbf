@@ -1,0 +1,86 @@
+<head>
+<script>
+dojo.addOnLoad(function(){	
+	dijit.byId('field24').set('value','');
+	dijit.byId('field24').set('placeHolder','Select');
+        dijit.byId('field27').set('value','');
+	dijit.byId('field27').set('placeHolder','Select');	
+});
+
+function formsubmit() {   
+    var sem = $('#field27').val();
+    var program = $('#field24').val();
+    var student = $('#field2').val();
+    
+    if(student=='')
+    {  
+        if(sem==''  || program=='' ) {   
+          alert('Semester & Program cannot be left blank');
+          return false;
+        } else {  document.searchF.submit();  } 
+    
+    } else {  document.searchF.submit();  }
+    
+    
+    
+}
+
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Generate GPA / CGPA");?>
+	</legend>
+	<form
+		action="<?php echo $this->baseUrl();?>/examination/generatecgpa/index/search/1"
+		name="searchF" id="searchF" method="POST">
+		<input type="hidden" name='Search' id="Search" value="Search">
+		<table width="100%">
+
+
+
+			<tr>
+				<td><?php echo $this->translate('Program');?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjform->field24;?></td>
+
+				<td><?php echo $this->translate('Semester');?><span class="reqMark">*</span>
+				</td>
+				<td><?php echo $this->lobjform->field27;?></td>
+
+			</tr>
+
+			<tr>
+
+
+				<td><?php echo $this->translate("Student ID");?>
+				</td>
+				<td><?php echo $this->lobjform->field2;?></td>
+
+			</tr>
+
+			<tr>
+				<td align="center" colspan="4"><input type="submit"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Process GPA/CGPA"); ?>"
+					onclick="return formsubmit();" /> <input type="button"
+					dojotype="dijit.form.Button"
+					label="<?php echo $this->translate("Clear"); ?>"
+					onclick="window.location.href='<?php echo $this->baseUrl();?>/examination/generatecgpa' " />
+				</td>
+			</tr>
+
+
+		</table>
+	</form>
+</fieldset>
+<br />
+
+<?php if($this->errMsg=='0') { ?>
+<table class="table" width="100%" cellpadding="5" cellspacing="1">
+	<tr>
+		<td align="center" style="color: red"><?php echo $this->translate("No matching record found. Try
+			different keywords.");?></td>
+	</tr>
+</table>
+<?php } ?>

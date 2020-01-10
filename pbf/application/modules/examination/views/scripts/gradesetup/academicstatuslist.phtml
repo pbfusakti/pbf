@@ -1,0 +1,74 @@
+<head>
+
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+dojo.addOnLoad(function(){
+	});
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Academic Status");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/academicstatus/academicstatuslist/id/<?php echo $this->IdAcademicStatus; ?>"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Academic Status Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Program Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjAcademicstatusForm->IdProgram;?></td>
+				<td><?php echo $this->translate("Semester Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjAcademicstatusForm->IdSemester;?></td>
+				<?php echo $this->lobjAcademicstatusForm->IdAcademicStatus;?>
+				<?php echo $this->lobjAcademicstatusForm->UpdDate;?>
+				<?php echo $this->lobjAcademicstatusForm->UpdUser;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Academic Status");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjAcademicstatusForm->AcademicStatus;?></td>
+				<td><?php echo $this->translate("Minimum");?><span>*</span></td>
+				<td><?php echo $this->lobjAcademicstatusForm->Minimum;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Maximum");?><span>*</span></td>
+				<td><?php echo $this->lobjAcademicstatusForm->Maximum;?></td>
+				<td><?php echo $this->translate("Status English Name");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjAcademicstatusForm->StatusEnglishName;?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Status Bahana Indonesia Name");?><span>*</span>
+				</td>
+				<td><?php echo $this->lobjAcademicstatusForm->StatusArabicName;?></td>
+				<td><?php echo $this->translate("Active");?><span></span></td>
+				<td><?php echo $this->lobjAcademicstatusForm->Active;?></td>
+
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjAcademicstatusForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label='<?php echo $this->translate('Back')?>' value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'studentfinance','controller'=>'chargemaster', 'action'=>'index'),'default',true);?>';" >
+				</td>
+			</tr>
+		</table>
+
+	</Form>
+
+</fieldset>

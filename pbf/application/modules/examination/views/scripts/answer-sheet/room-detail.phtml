@@ -1,0 +1,133 @@
+<script type="text/javascript">
+$(function() {
+	$( "#search-dialog" ).dialog({ 
+		autoOpen: false,
+		width: 400,
+		modal: true,
+		buttons: { 
+			"Search": function() {
+				 
+				$("#course_form").submit();
+				$(this).dialog("close"); 
+			},
+			"Close": function() { 
+				$(this).dialog("close"); 
+			} 
+		} 
+	});
+
+	$( "#dialog-upload" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Upload": function() {
+                //$( this ).dialog( "close" );
+                $('#upload').submit();
+
+            	/*var data = new FormData($('input[name^="file"]'));     
+            	jQuery.each($('input[name^="file"]')[0].files, function(i, file) {
+            	    data.append(i, file);
+            	});
+
+            	console.log(data);*/
+            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+	
+});
+
+function searchbox(){
+	$( "#search-dialog" ).dialog('open');
+}
+
+function uploadOMR(){
+	$( "#dialog-upload" ).dialog('open');
+}
+function uploadOMR2(roomid){
+	$( "#dialog-upload" ).dialog('open');
+	document.upload.tmproomID.value=roomid;
+}
+function changeMapping(element){
+	$('input:checkbox').removeAttr('checked');
+
+	 $(element).attr('checked','checked');
+}
+</script>
+
+<script type="text/javascript">
+	function printMe(){
+		
+		print_url = '<?php echo $this->url(array('module'=>'application','controller'=>'placement-test-report', 'action'=>'print-report','scid'=>$this->schedule_id),'default',true); ?>';
+
+		window.open(print_url,'mywindow','width=400,height=200');
+	}
+	
+	function uploadOMR(){
+		$( "#dialog-upload" ).dialog('open');
+		//window.location = "<?php echo $this->url(array('module'=>'application','controller'=>'placement-test-marking', 'action'=>'upload-omr'),'default',true); ?>";
+	}
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a id="search" href="#" onclick="javascript:uploadOMR2('99')">
+					<span class='upload_omr'></span>
+					<?php echo $this->translate("Upload Answer OMR"); ?>
+				</a>
+			</li>
+			<li>
+				<a id="search" href="<?php echo $this->url(array('module'=>'application','controller'=>'placement-test-marking', 'action'=>'process-omr','scid'=>$this->schedule_id),'default',true); ?>">
+					<span class='upload_omr'></span>
+					<?php echo $this->translate("Process OMR"); ?>
+				</a>
+			</li>			
+			<li class="divider"></li>
+			<li>
+				<a id="search" href="#" onclick="javascript:searchbox()">
+					<span class='search'></span>
+					<?php echo $this->translate("Search"); ?>
+				</a>
+			</li>
+			<li>
+				<a href="#" >
+					<span class='info'></span>
+					<?php echo $this->translate("Info"); ?>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<br />
+
+<fieldset>
+	
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+</table>
+</fieldset>
+<br />
+
+<br />
+<div id="dialog-upload" title="<?php echo $this->translate("Upload Answer OMR"); ?>">
+    <?php echo $this->form; ?> 
+</div>

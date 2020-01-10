@@ -1,0 +1,38 @@
+<?php $studentData = $this->StudentData[0];?>
+<table border="1" cellpadding="2" cellspacing="2">
+<!-- Html -->
+	<thead>
+	<tr>
+		<td><b><?php echo $this->translate('Name');?></b></td>
+		<td><?php echo $studentData['name'];?></td>
+		<td><b><?php echo $this->translate('Student Id');?></b></td>
+		<td><?php echo $studentData['registrationId'];?></td>
+	</tr>
+	<tr>
+		<td><b><?php echo $this->translate('Program');?></b></td>
+		<td><?php echo $studentData['ProgramName'];?></td>
+		<td><b><?php echo $this->translate('Intake');?></b></td>
+		<td><?php echo $studentData['IntakeDesc'];?></td>
+	</tr>
+	<tr>
+		<td><b><?php echo $this->translate('Scheme');?></b></td>
+		<td><?php echo $studentData['EnglishDescription'];?></td>
+		<td><b><?php echo $this->translate('Gender');?></b></td>
+		<td>
+			<?php if($studentData['Gender'] == 0){?>
+				<?php echo $this->translate('Female');?>
+			<?php }else{?>
+				<?php echo $this->translate('Male');?>
+			<?php }?>
+		</td>
+	</tr>
+	<tr>
+		<td><b><?php echo $this->translate('Nationality');?></b></td>
+		<td><?php echo $studentData['CountryName'];?></td>
+		<td><b><?php echo $this->translate('Status');?></b></td>
+		<td><?php echo $studentData['DefinitionDesc'];?></td>
+	</tr>
+	</thead>
+</table>
+<p></p>
+<?php echo $this->html;?>

@@ -1,0 +1,34 @@
+
+<!--
+<fieldset><legend><?php echo $this->translate("Search Options")?></legend>
+<?php echo $this->form; ?>
+</fieldset>
+<br>
+-->
+
+<?php if(count($this->student_list)>0){?>
+<input type="hidden" name="mapID"  id="mapID" >
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>
+		<th><?php echo $this->translate("Student Name")?></th>
+		<th><?php echo $this->translate("NIM")?></th>		
+		<th><?php echo $this->translate("Action")?></th>
+	</tr>
+	<?php 
+	$i=1;	
+	foreach($this->student_list as $student){
+		//if($subject["total_student"]>0){
+	?>
+		
+	<tr>
+		<td><?php echo $i;?></td>
+		<td><?php echo $student["student_name"];?></td>
+		<td><?php echo $student["registrationId"];?></td>
+		<td><input type="radio" name="mapIdStudentRegistration" id="mapIdStudentRegistration" value="<?php echo $student["IdStudentRegistration"];?>"></td>
+	</tr>
+		<?php 
+		$i++; }?>
+	
+</table>
+<?php }//end if?>

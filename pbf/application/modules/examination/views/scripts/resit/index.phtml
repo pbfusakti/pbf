@@ -1,0 +1,135 @@
+<script>
+function approve(){
+	var sr_id = $('input[name=sr_id]:checked').val();
+	
+	if(!sr_id){
+		alert('Please select student first.');
+	}else{	
+		openDialog(sr_id);
+	}
+}
+
+function openDialog(sr_id){	
+	$( "#dialog-box" ).dialog('open');	
+}
+
+$(function() {
+
+	$( "#dialog-box" ).dialog({
+	    autoOpen: false,
+	    width: 750,
+	    height: 350,
+	    modal: true,
+	    buttons: {          
+	        "Submit": function() {
+
+	        	var dosen = $("#dosen option:selected").val();
+	        	var status = $("#status option:selected").val();
+	        	
+	        	if($("#meeting_date").val()=='' || dosen==0 || status==0){
+	        		alert('Nilai diperlukan dan tidak boleh kosong.');
+	        	}else{                 	
+    				$("#appealApproval").submit();    
+             	}      
+	        },
+	        "Close": function() {
+	            $( this ).dialog( "close" );
+	        }
+	    }
+	});
+
+	$("#meeting_date").datepicker({
+		"dateFormat":"yy-mm-dd",
+		"changeMonth":"true"		
+	});
+});
+
+</script>
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+		<li>
+				<a href="#" onclick="javascript:approve()">
+					<span class='process'></span>
+					Approve
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+
+<div style="width:100%;">
+<?php echo $this->form; ?>
+<br>
+
+<?php 
+	//echo $this->paginationControl($this->paginator,'Sliding','paginationTop.phtml');
+?>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px">&nbsp;</th>		
+		<th><?php echo $this->translate("Student Name");?></th>
+		<th><?php echo $this->translate("Student NIM");?></th>
+		<th><?php echo $this->translate("Date Apply for Resit");?></th>
+		<th><?php echo $this->translate("Semester");?></th>
+		<th><?php echo $this->translate("Subject");?></th>
+		<th><?php echo $this->translate("Status");?></th>
+	</tr>
+	<?php 
+	if(count($this->paginator)>0){
+		foreach($this->paginator as $key=>$student){
+	?>
+	<tr>
+		<td><input type="radio" name="sr_id" id="sr_id" value="<?php echo $student['sr_id']; ?>"></td>
+		<td><?php echo $student["appl_fname"].' '.$student["appl_mname"].' '.$student["appl_lname"]?></td>
+		<td><?php echo $student['registrationId']; ?></td>
+		<td><?php echo date("d-m-y",strtotime($student['sr_applyDate'])); ?></td>
+		<td><?php echo $student["SemesterMainName"];?></td>
+		<td><?php echo $student["SubjectCode"].' - '.$student["SubjectName"];?></td>
+		<td>
+		<?php 
+		if($student['sr_status']==1) echo $this->translate("Apply");
+		if($student['sr_status']==2) echo $this->translate("Approved"); 
+		if($student['sr_status']==3) echo $this->translate("Rejected");?></td>		
+	</tr>
+	<?php }} ?>
+</table>
+</div>
+
+<div id="dialog-box" title="Resit Application Approval">
+<h2><?php echo $this->translate("Resit Application Info");?></h2>
+<form name="appealApproval" id="appealApproval">
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th><?php echo $this->translate("Subject");?></th>
+		<td></td>
+			
+	</tr>
+	<tr>
+		
+		<th><?php echo $this->translate("Semester");?></th>
+		<td></td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Component");?></th>
+		<td></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Charges");?></th>
+		<td></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Status");?></th>
+		<td>
+		<select name="status" id="status">
+		<option value="2"><?php echo $this->translate("Approve");?></option>
+		<option value="3"><?php echo $this->translate("Reject");?></option>
+		</select></td>
+	</tr>
+	
+</table>
+</form>
+</div>

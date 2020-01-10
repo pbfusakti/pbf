@@ -1,0 +1,81 @@
+<script type="text/javascript">
+    dojo.addOnLoad(function(){        
+            dijit.byId('IdScheme').set('value','');
+            dijit.byId('IdScheme').set('placeHolder','Select');
+            dijit.byId('IdProgram').set('value','');
+            dijit.byId('IdProgram').set('placeHolder','Select');
+    });
+
+    function fngetname(){
+    	var IdStudent = $('#IdStudent').val();    	
+        if(IdStudent!=''){
+                    $.ajax({
+                      type: "GET",
+                      async: false,
+                      url: '<?php echo $this->url(array('module' => 'examination', 'controller' => 'studentassessment', 'action' => 'getstudentdet'), 'default', true); ?>',
+                      data: "IdStudent="+IdStudent,
+                      success: function(data) {
+                          $('#studetail').html(data);
+                      }
+                    });
+        }else{
+            var scheme =  dijit.byId("IdScheme").value;
+            var program =  dijit.byId("IdProgram").value;
+            if(scheme!='' && program!=''){
+            	 $.ajax({
+                     type: "GET",
+                     async: false,
+                     url: '<?php echo $this->url(array('module' => 'examination', 'controller' => 'studentassessment', 'action' => 'getstudentdet'), 'default', true); ?>',
+                     data: "scheme="+scheme+"&program="+program,
+                     success: function(data) {
+                   	 		$('#studetail').html(data);
+                     }
+                   });
+            }
+        }
+    }
+    
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Student Assessment"); ?>
+	</legend>
+	<table width="100%">
+			<tr>
+				<td><?php echo $this->translate("Scheme");?></td>
+				<td><?php echo $this->lobjStudentAssessmentForm->IdScheme; ?></td>
+				<td><?php echo $this->translate("Program");?></td>
+				<td><?php echo $this->lobjStudentAssessmentForm->IdProgram; ?></td>				
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Student Id");?></td>
+				<td>
+					<?php echo $this->lobjStudentAssessmentForm->IdStudent; ?>
+					&nbsp;<a
+					href='#' onclick='fngetname()'><?php echo $this->translate("Search");?></a></td>
+				</td>
+				<td><?php echo $this->translate("Student Name");?></td>
+				<td><?php echo $this->lobjStudentAssessmentForm->StudentName; ?></td>
+			</tr>
+			<tr>
+				<td colspan="6" style="height: 10px"></td>
+			</tr>			
+	</table>
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Student Listing"); ?>
+		</legend>
+		<div id="studetail">
+			<table class="table" width="100%">		
+				<tr>
+					<th><b>#</b></th>
+					<th><?php echo $this->translate("Student Id");?></th>
+					<th><?php echo $this->translate("Student Name");?></th>
+				</tr>
+			</table>
+		</div>
+	</fieldset>	
+</fieldset>
+</br>
+

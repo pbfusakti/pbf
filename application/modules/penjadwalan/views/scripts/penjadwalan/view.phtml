@@ -1,9 +1,15 @@
 <form name = "datamhsform" method="post">
 <style>
 body {
+ 
  background-image: url('/images/images/index/vector2.jpg');
 }
 .ade {
+ 
+ background-image: url('/images/images/index/penjadwalan.jpeg'); 
+ 
+}
+.salsa { 
   background-color: #ffffff;
   width: 900px;
   margin: auto;
@@ -87,116 +93,46 @@ img.two {
 
 <div class="topnav">
   <a  href="/homepage/homepage/view">Home</a>
-  <a href="/referensi/referensi/view" class="active">Referensi</a>
-  <a href="/kurikulum/kurikulum/view">Kurikulum</a>
-  <a href="/penjadwalan/penjadwalan">Penjadwalan</a>
-  <a href="/krs/krs/view">KRS</a>
-  <a href="/data-personal/mahasiswa/view>Transcript"></a>
-  
+ 
+  <a href="#referensi">Referensi</a>
+   <a href="#Kurikulum" >Kurikulum</a>
+  <a href="#penjadwalan" class="active">Penjadwalan</a>
+  <a href="#krs">KRS</a>
+  <a href="#transcript">Transcript</a>
+ 
   <div class="topnav-right">
     <a href="/index">Logout</a>
     
   </div>
 </div>
 </style>
-
-<style>
-.sisi {
-  background-color: #C4B65C;
-  width: 900px;
-  margin: auto;
-  padding: 30px;
-  opacity: 0.95;
-  font-size: 16px;
-}
-</style>
-
-<style>
-/* Add a black background color to the top navigation */
-.topnav {
-  background-color: #333;
-  overflow: hidden;
-}
-
-/* Style the links inside the navigation bar */
-.topnav a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  border-bottom: 3px solid transparent;
-}
-
-.topnav a:hover {
-  border-bottom: 3px solid red;
-}
-
-.topnav a.active {
-  border-bottom: 3px solid red;
-}
-</style>
-<br><br>
-
-<div class="topnav">
-  <a href="/pelajaran/pelajaran/view">Matakuliah</a>
-  <a href="/siswa/siswa/view">Mahasiswa</a>
-  <a href="/dosen/dosen/view">Dosen</a>
-  <a href="/ruangan/ruangan/view">Ruangan</a>
-  <a href="/akademik/akademik/view">Tahun Akademik</a>
-  <a href="/pengisian/pengisian/view">Batas Pengisian Krs</a>
-  <a href="/penjadwalan/penjadwalan/view">Penjadwalan Aktivasi</a>
-</div>
-
-<br><br><div class="sisi">
-<fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
-<style>
-/* Add a black background color to the top navigation */
-.topnav {
-  background-color: #333;
-  overflow: hidden;
-}
-
-/* Style the links inside the navigation bar */
-.topnav a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  border-bottom: 3px solid transparent;
-}
-
-.topnav a:hover {
-  border-bottom: 3px solid red;
-}
-
-.topnav a.active {
-  border-bottom: 3px solid red;
-}
-</style>
-<br><br>
-
-
-
-
-<input type = "hidden" id= "id" name="id" value="<?php echo $this->datapersonal['id']?>">
+ 
+<div class="salsa"><fieldset><legend> <?php echo "Group Info"?></legend>
+<input type = "hidden" id= "id" name="id" value="<?php echo $this->jadwalan['id']?>">
 <table>
-<tr><th>Penjadwalan Aktivasi</th>
-<td><input type="date" name="penjadwalanaktivasi" id= "penjadwalanaktivasi" value="<?php echo $this->datapersonal['penjadwalanaktivasi']?>">
-<tr><th>Kode MK</th>
-<td><input type="text" name="kodemk" value="<?php echo $this->datapersonal['kodemk']?>">
-<tr><th>Matakuliah</th>
-<td><input type="text" name = "matakuliah" id="matakuliah" value="<?php echo $this->datapersonal['matakuliah']?>" >
-<tr><th>SKS</th>
-<td><input type="text" name = "sks" id="sks" value="<?php echo $this->datapersonal['sks']?>" >
-<tr><th>Dosen</th>
-<td><input type="text" name = "dosen" id="dosen" value="<?php echo $this->datapersonal['dosen']?>" >
-
+<tr><th>SEMESTER</th>
+<td><input type="text" name="semester" id= "semester" value="<?php echo $this->jadwalan['semester']?>">
+<tr><th> PENJADWALAN AKTIVASI</th>
+<td><input type="text" name="penjadwalanaktivasi" id= "penjadwalanaktivasi" value="<?php echo $this->jadwalan['penjadwalanaktivasi']?>">
+<tr><th>KODE MK</th>
+<td><input type="text" name="kodemk" id= "kodemk" value="<?php echo $this->jadwalan['kodemk']?>">
+<tr><th>MATA KULIAH</th>
+<td><input type="text" name="matakuliah" id= "matakuliah" value="<?php echo $this->jadwalan['matakuliah']?>">
+<tr><th>DOSEN</th>
+<td><input type="text" name="dosen" id= "dosen" value="<?php echo $this->jadwalan['dosen']?>">
+<tr><th>RUANG</th>
+<td><input type="text" name="ruang" id= "ruang" value="<?php echo $this->jadwalan['ruang']?>">
+<tr><th>KAPASITAS KELAS</th>
+<td><input type="text" name="kapasitas_kelas" id= "kapasitas_kelas" value="<?php echo $this->jadwalan['kapasitas_kelas']?>">
+<tr><th>HARI</th>
+<td><input type="text" name="hari" id= "hari value="<?php echo $this->jadwalan['hari']?>">
+<tr><th>MULAI WAKTU</th>
+<td><input type="text" name="mulai_waktu" id= "mulai_waktu" value="<?php echo $this->jadwalan['mulai_waktu']?>">
+<tr><th>AKHIR WAKTU</th>
+<td><input type="text" name="akhir_waktu" id= "akhir_waktu" value="<?php echo $this->jadwalan['akhir_waktu']?>">
+<tr><td colspan="2">
+</td></tr>
+</div> 
 
 <br><br>
 <tr><td colspan="2">
@@ -210,14 +146,19 @@ img.two {
 </div>
 </fieldset>
 
-<br><br><div class="sisi">
-<fieldset><legend><table class="table" border="1"><h1> Data Penjadwalan Aktivasi</h1><tr><th>Penjadwalan Aktivasi</th><th>Kode MK</th><th>Matakuliah</th><th>SKS</th><th>Dosen</th></legend><?php foreach($this->refmhs as $mhs) {?> 
-<tr><td><?php echo $mhs['penjadwalanaktivasi'];?></td></th> 
-<td><?php echo $mhs['kodemk'];?></td> 
-<td><?php echo $mhs['matakuliah'];?></td>
-<td><?php echo $mhs['sks'];?></td>
-<td><?php echo $mhs['dosen'];?></td>
+ 
+<br><br><div class="salsa">
+<legend><table border ="" width = "100%"><h1> Data Penjadwalan</h1><tr><th>SEMESTER</th><th>PENJADWALAN AKTIVASI</th><th>KODE MK</th><th>DOSEN</th><th>MATA KULIAH</th><th>RUANG</th><th>KAPASITAS KELAS</th><th>HARI</th><th>MULAI WAKTU</th><th>AKHIR WAKTU</th></legend>
+<?php foreach($this-> datajdw as $mhs) {?> 
+<Tr><td><?php echo $mhs['semester'];?></td>
+  <td><?php echo $mhs['penjadwalanaktivasi'];?></td>
+  <td><?php echo $mhs['kodemk'];?></td>
+  <td><?php echo $mhs['dosen'];?></td>
+  <td><?php echo $mhs['matakuliah'];?></td>
+  <td><?php echo $mhs['ruang'];?></td>
+  <td><?php echo $mhs['kapasitas_kelas'];?></td>
+  <td><?php echo $mhs['hari'];?></td>
+  <td><?php echo $mhs['mulai_waktu'];?></td>
+  <td><?php echo $mhs['akhir_waktu'];?></td></Tr>
 <?php }?>
-
-  </table>
-
+  </table> 

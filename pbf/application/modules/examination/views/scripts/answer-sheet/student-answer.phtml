@@ -1,0 +1,24 @@
+
+<?php if(count($this->student_answer)>0){?>
+
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="25px"><?php echo $this->translate("Question No")?></th>
+		<th><?php echo $this->translate("Student Answer")?></th>		
+		<th><?php echo $this->translate("Result")?></th>
+	</tr>
+	<?php 
+	foreach($this->student_answer as $student){
+		//if($subject["total_student"]>0){
+	?>
+		
+	<tr>
+		<td><?php echo $student["soad_ques_no"];?></td>
+		<td><?php echo $student["soad_student_ans"];?></td>
+		<td><?php echo ($student["soad_status_ans"]==1 ? $this->translate("Correct"):$this->translate("False"));?></td>
+	</tr>
+		<?php 
+		}?>
+	
+</table>
+<?php }//end if?>
