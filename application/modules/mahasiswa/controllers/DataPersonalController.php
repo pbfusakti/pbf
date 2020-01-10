@@ -1,5 +1,6 @@
 <?php 
 class Mahasiswa_DataPersonalController extends Zend_Controller_Action {
+ 
 	
 	
 	public function viewAction()
@@ -43,7 +44,7 @@ class Mahasiswa_DataPersonalController extends Zend_Controller_Action {
 		$this->view->datamhs=$data;
 	}
 	
-	
+	 
 }
 
 

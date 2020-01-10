@@ -1,4 +1,5 @@
 <?php
+ 
 class Kurikulum_Bootstrap extends Zend_Application_Module_Bootstrap
 {
 	
@@ -13,3 +14,4 @@ class Kurikulum_Bootstrap extends Zend_Application_Module_Bootstrap
 }
 
 ?>
+ 
