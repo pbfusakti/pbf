@@ -1,6 +1,7 @@
 <?php 
 
 class Penjadwalan_PenjadwalanController extends Zend_Controller_Action{
+ 
  public function viewAction(){
  
   $dbJdw = new Penjadwalan_Model_DbTable_PenjadwalanMahasiswa();
@@ -37,6 +38,6 @@ class Penjadwalan_PenjadwalanController extends Zend_Controller_Action{
   $data=$dbJdw->getData(); 
    $this->view->datajdw=$data;
  }
-
+ 
 }
 ?>
