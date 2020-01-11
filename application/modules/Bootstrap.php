@@ -1,17 +1,10 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
 
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
 <?php
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
 //setup the frontController
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+ 
   Zend_Loader_Autoloader::autoload(Zend_Controller_Front); 
   $frontController = Zend_Controller_Front::getInstance();
   
@@ -20,62 +13,7 @@ ini_set('max_execution_time', 300); //300 seconds = 5 minutes
   $frontController->setDefaultModule('default');
       $frontController->setModuleControllerDirectoryName('controllers');
 
-class penjadwalan_Bootstrap extends Zend_Application_Module_Bootstrap{
-=======
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
-		Zend_Loader_Autoloader::autoload(Zend_Controller_Front); 
-		$frontController = Zend_Controller_Front::getInstance();
-		
-		// frontController Configuration
-		$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
-		$frontController->setDefaultModule('default');
-      $frontController->setModuleControllerDirectoryName('controllers');
-
-<<<<<<< HEAD
-class krs_Bootstrap extends Zend_Application_Module_Bootstrap {
-
- }
-
- class Mahasiswa_Model_DbTable_BiodataMahasiswa extends Zend_Db_Table {
- }
-class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
-
- protected function _initAutoload()
-   {
-=======
-class kurikulum_Bootstrap extends Zend_Application_Module_Bootstrap {
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
-
- }
-
- class mahasiswa_Bootstrap extends Zend_Application_Module_Bootstrap {
-
- }
-<<<<<<< HEAD
-=======
- 
-  class homepage_Bootstrap extends Zend_Application_Module_Bootstrap {
-
- }
- 
-   class kurikulumsearch_Bootstrap extends Zend_Application_Module_Bootstrap {
-
- }
- 
-    class homepageuser_Bootstrap extends Zend_Application_Module_Bootstrap {
-
- }
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
-
-class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
-
- protected function _initAutoload()
-<<<<<<< HEAD
-   
-=======
-   {
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+  
             $moduleLoader = new Zend_Application_Module_Autoloader(
  
                                          array(   
@@ -87,9 +25,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
  
               return $moduleLoader;
      }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
  
  protected function _initSession() {
         //Zend_Session::start();
@@ -99,8 +34,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
    $sis->initialized = true;
   endif;
   Zend_Registry::set('sis',$sis);
-=======
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
 	
 	protected function _initSession() {
         //Zend_Session::start();
@@ -110,10 +44,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 			$sis->initialized = true;
 		endif;
 		Zend_Registry::set('sis',$sis);
-<<<<<<< HEAD
-=======
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
 
          
         Zend_Locale::setDefault('id_ID');
@@ -123,20 +54,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initAppAutoload() {
         $autoloader = new Zend_Application_Module_Autoloader(array(
             'namespace' => 'App',
-<<<<<<< HEAD
-            'basePath'  => dirname(_FILE_),));
-=======
             'basePath'  => dirname(__FILE__),));
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
         Zend_Loader_Autoloader::getInstance()->suppressNotFoundWarnings(false);
         
         return $autoloader;
     }
       
    
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+ 
  
  protected function _initViewHelpers() {
   
@@ -165,9 +90,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
  }
  
   
- protected function setconstants($constants){
-=======
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+  
 	
 	protected function _initViewHelpers() {
 		
@@ -197,18 +120,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 	
 	 
 	protected function setconstants($constants){
-<<<<<<< HEAD
-=======
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
         foreach ($constants as $key=>$value){
             if(!defined($key)){
                 define($key, $value);
             }
         }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+ 
  }
   
  protected function _initTranslate(){
@@ -222,8 +140,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
   $file = APPLICATION_PATH . DIRECTORY_SEPARATOR .'languages'. DIRECTORY_SEPARATOR . "id_ID.php";
 
   $translate = new Zend_Translate('array',
-=======
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
 	}
 	 
 	protected function _initTranslate(){
@@ -237,10 +154,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		$file = APPLICATION_PATH . DIRECTORY_SEPARATOR .'languages'. DIRECTORY_SEPARATOR . "id_ID.php";
 
 		$translate = new Zend_Translate('array',
-<<<<<<< HEAD
-=======
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
             $file, $locale,
             array(
             'disableNotices' => true,    // This is a very good idea!
@@ -253,9 +167,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
        
         
         return $registry;
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
+ 
  }
   
  
@@ -295,8 +207,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
   set_include_path("/var/www/html/sis/library/dompdf/" . PATH_SEPARATOR . get_include_path());
   
  } */
-=======
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
+ 
 	}
 	 
 	
@@ -336,9 +247,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
 		set_include_path("/var/www/html/sis/library/dompdf/" . PATH_SEPARATOR . get_include_path());
 		
 	} */
-<<<<<<< HEAD
-=======
->>>>>>> 42ef2360412a2489043137b89e5d6fb202bcea24
->>>>>>> 3ab65f8b212da4368f2167b8b27140869c7e9338
-}
+ 
+}  
 ?>

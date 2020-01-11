@@ -1,6 +1,7 @@
 <?php 
 
 class Kurikulum_KurikulumController extends Zend_Controller_Action{
+  
 	public function viewAction(){
 	
 		$dbKur = new Kurikulum_Model_DbTable_KurikulumMahasiswa();
@@ -37,7 +38,7 @@ class Kurikulum_KurikulumController extends Zend_Controller_Action{
 		}
 		$data=$dbKur->getData(); 
 			$this->view->kurmhs=$data;
-	}
+	} 
 
 }
 ?>

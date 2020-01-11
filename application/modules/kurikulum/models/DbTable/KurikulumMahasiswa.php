@@ -37,9 +37,11 @@ public function searchData($filter){
      }
      
      public function updateData($data,$key) {
+ 
  	$db = Zend_Db_Table::getDefaultAdapter();
  	$id=$db->update($this->_name,$data,$key);
  	return $id;
+ 
 }
      
 

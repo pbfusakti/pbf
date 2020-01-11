@@ -1,10 +1,15 @@
 <form name = "datamhsform" method="post">
 <style>
 body {
+ 
+ background-image: url('/images/images/index/vector2.jpg');
+}
+.ade {
+ 
  background-image: url('/images/images/index/penjadwalan.jpeg'); 
  
 }
-.salsa {
+.salsa { 
   background-color: #ffffff;
   width: 900px;
   margin: auto;
@@ -88,17 +93,20 @@ img.two {
 
 <div class="topnav">
   <a  href="/homepage/homepage/view">Home</a>
+ 
   <a href="#referensi">Referensi</a>
    <a href="#Kurikulum" >Kurikulum</a>
   <a href="#penjadwalan" class="active">Penjadwalan</a>
   <a href="#krs">KRS</a>
   <a href="#transcript">Transcript</a>
+ 
   <div class="topnav-right">
     <a href="/index">Logout</a>
     
   </div>
 </div>
 </style>
+ 
 <div class="salsa"><fieldset><legend> <?php echo "Group Info"?></legend>
 <input type = "hidden" id= "id" name="id" value="<?php echo $this->jadwalan['id']?>">
 <table>
@@ -124,7 +132,7 @@ img.two {
 <td><input type="text" name="akhir_waktu" id= "akhir_waktu" value="<?php echo $this->jadwalan['akhir_waktu']?>">
 <tr><td colspan="2">
 </td></tr>
-</div>
+</div> 
 
 <br><br>
 <tr><td colspan="2">
@@ -138,6 +146,7 @@ img.two {
 </div>
 </fieldset>
 
+ 
 <br><br><div class="salsa">
 <legend><table border ="" width = "100%"><h1> Data Penjadwalan</h1><tr><th>SEMESTER</th><th>PENJADWALAN AKTIVASI</th><th>KODE MK</th><th>DOSEN</th><th>MATA KULIAH</th><th>RUANG</th><th>KAPASITAS KELAS</th><th>HARI</th><th>MULAI WAKTU</th><th>AKHIR WAKTU</th></legend>
 <?php foreach($this-> datajdw as $mhs) {?> 
@@ -152,4 +161,4 @@ img.two {
   <td><?php echo $mhs['mulai_waktu'];?></td>
   <td><?php echo $mhs['akhir_waktu'];?></td></Tr>
 <?php }?>
-  </table>
+  </table> 
