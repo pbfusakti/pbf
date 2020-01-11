@@ -1,3 +1,4 @@
+ 
 <?php 
 class Mahasiswa_DataPersonalController extends Zend_Controller_Action {
  
@@ -47,5 +48,5 @@ class Mahasiswa_DataPersonalController extends Zend_Controller_Action {
 	 
 }
 
-
+ 
 ?>

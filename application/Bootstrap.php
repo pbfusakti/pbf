@@ -21,7 +21,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap {
     protected function _initAppAutoload() {
         $autoloader = new Zend_Application_Module_Autoloader(array(
             'namespace' => 'App',
-            'basePath'  => dirname(__FILE__),));
+            'basePath'  => dirname(_FILE_),));
         Zend_Loader_Autoloader::getInstance()->suppressNotFoundWarnings(false);
         
         return $autoloader;

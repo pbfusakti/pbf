@@ -1,3 +1,4 @@
+ 
 <?php 
 class Mahasiswa_Model_DbTable_BiodataMahasiswa extends Zend_Db_Table {
 
@@ -67,5 +68,5 @@ public function approveData($data,$id){
  
 }
 
-}
+} 
 ?>
