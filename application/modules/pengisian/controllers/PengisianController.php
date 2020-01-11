@@ -1,6 +1,7 @@
 <?php 
 
 class Pengisian_PengisianController extends Zend_Controller_Action{
+ 
 	public function viewAction(){
 	
 	$dbRef = new Pengisian_Model_DbTable_PengisianMenu();
@@ -34,6 +35,6 @@ class Pengisian_PengisianController extends Zend_Controller_Action{
 		}
 		$data=$dbRef->getData(); 
 			$this->view->refmhs=$data;
-	}
+	} 
 }
 ?>

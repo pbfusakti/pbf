@@ -28,10 +28,12 @@ public function searchData($filter){
   $db= Zend_Db_Table::getDefaultAdapter();
      $select=$db->select()
          ->from($this->_name);
+ 
 	if (isset($filter['kodemk']) && $filter['kodemk']!=null) 
      $select->where('kodemk=?',$filter['kodemk']);
      if (isset($filter['mata_kuliah']) && $filter['mata_kuliah']!=null) 
      $select->where('mata_kuliah like "%',$filter['mata_kuliah'].'%"');
+ 
       $row=$db->fetchRow($select);
      return $row;
      }

@@ -1,6 +1,7 @@
 <?php 
 
 class Siswa_SiswaController extends Zend_Controller_Action{
+ 
 	public function viewAction(){
 	
 	$dbRef = new Siswa_Model_DbTable_SiswaMenu();
@@ -35,6 +36,6 @@ class Siswa_SiswaController extends Zend_Controller_Action{
 		}
 		$data=$dbRef->getData(); 
 			$this->view->refmhs=$data;
-	}
+	} 
 }
 ?>

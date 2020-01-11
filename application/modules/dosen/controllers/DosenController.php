@@ -22,14 +22,18 @@ class Dosen_DosenController extends Zend_Controller_Action{
    
   else if(isset($formData['search']))
    {
+ 
     $row=$dbRef->searchData(array('nik'=>$formData['nik']));
+ 
      $this->view->dosen=$row;
    }
    
   else if(isset($formData['update']))
    {
     unset($formData['update']);
+ 
      $dbRef->updateData($formData, 'kodemk="'.$formData['kodemk'].'"');
+ 
  
     
    }

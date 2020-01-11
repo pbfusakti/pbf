@@ -1,6 +1,7 @@
 <?php 
 
 class Akademik_AkademikController extends Zend_Controller_Action{
+ 
 	public function viewAction(){
 	
 	$dbRef = new Akademik_Model_DbTable_AkademikMenu();
@@ -35,5 +36,6 @@ class Akademik_AkademikController extends Zend_Controller_Action{
 		$data=$dbRef->getData(); 
 			$this->view->refmhs=$data;
 	}
+ 
 }
 ?>

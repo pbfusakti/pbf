@@ -1,6 +1,7 @@
 <?php 
 
 class Ruangan_RuanganController extends Zend_Controller_Action{
+ 
 	public function viewAction(){
 	
 	$dbRef = new Ruangan_Model_DbTable_RuanganMenu();
@@ -34,6 +35,6 @@ class Ruangan_RuanganController extends Zend_Controller_Action{
 		}
 		$data=$dbRef->getData(); 
 			$this->view->refmhs=$data;
-	}
+	} 
 }
 ?>

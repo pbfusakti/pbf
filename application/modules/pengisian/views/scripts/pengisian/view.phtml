@@ -1,6 +1,7 @@
 <form name = "datamhsform" method="post">
 
 <style>
+ 
 body {
  background-image: url('/images/images/index/vector2.jpg');
 }
@@ -102,7 +103,7 @@ img.two {
 </style>
 
 <style>
-.sisi {
+.sisi { 
   background-color: #C4B65C;
   width: 900px;
   margin: auto;
@@ -151,7 +152,9 @@ img.two {
   <a href="/penjadwalan/penjadwalan/view">Penjadwalan Aktivasi</a>
 </div>
 
+ 
 <br><br><div class="sisi">
+ 
 <fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
 <br>
 <input type = "hidden" id= "id" name="id" value="<?php echo $this->datapersonal['id']?>">
@@ -178,7 +181,9 @@ img.two {
 </div>
 </fieldset>
 
+ 
 <br><br><div class="sisi">
+ 
 <fieldset><legend><table class="table" border="1"><h1> Data Batas Pengisian Krs</legend>
 
 </h1><tr><th>Batas Pengisian Krs</th><th>Kode MK</th><th>Matakuliah</th><th>SKS</th><?php foreach($this->refmhs as $mhs) {?> 
@@ -188,5 +193,6 @@ img.two {
 <td><?php echo $mhs['sks'];?></td>
 <?php }?>
 
+ 
   </table>
-
+ 

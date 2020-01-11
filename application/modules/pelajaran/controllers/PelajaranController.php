@@ -1,6 +1,7 @@
 <?php 
 
 class Pelajaran_PelajaranController extends Zend_Controller_Action{
+ 
 	public function viewAction(){
 	
 	$dbRef = new Pelajaran_Model_DbTable_PelajaranMenu();
@@ -36,4 +37,4 @@ class Pelajaran_PelajaranController extends Zend_Controller_Action{
 			$this->view->refmhs=$data;
 	}
 }
-?>
+?> 

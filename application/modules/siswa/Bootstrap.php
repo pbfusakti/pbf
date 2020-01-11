@@ -2,6 +2,7 @@
 class Siswa_Bootstrap extends Zend_Application_Module_Bootstrap
 {
 
+ 
 	protected function _initAutoload() {
 		$autoloader = new Zend_Application_Module_Autoloader(array (
 				'namespace'	=> 'Siswa_'	,
@@ -10,6 +11,7 @@ class Siswa_Bootstrap extends Zend_Application_Module_Bootstrap
 
 		return $autoloader;
 	}
+ 
 
 }
 ?>

@@ -1,4 +1,5 @@
 <form name = "datamhsform" method="post">
+ 
 <style>
 body {
  background-image: url('/images/images/index/vector2.jpg');
@@ -100,7 +101,7 @@ img.two {
 </div>
 </style>
 <style>
-.sisi {
+.sisi { 
   background-color: #C4B65C;
   width: 900px;
   margin: auto;
@@ -149,8 +150,10 @@ img.two {
   <a href="/penjadwalan/penjadwalan/view">Penjadwalan Aktivasi</a>
 </div>
 
+ 
 <br><br><div class="sisi">
 <fieldset><legend> <?php echo "Data Entry Referensi"?></legend>
+ 
 
 <style>
 /* Add a black background color to the top navigation */
@@ -208,7 +211,9 @@ img.two {
 </div>
 </fieldset>
 
+ 
 <br><br><div class="sisi">
+ 
 <fieldset><legend><table class="table" border="1"><h1> Data Matakuliah</h1><tr><th>Matakuliah</th><th>Kode MK</th><th>SKS</th><th>Semester</th></legend><?php foreach($this->refmhs as $mhs) {?> 
 <tr><td><?php echo $mhs['matakuliah'];?></td></th> 
 <td><?php echo $mhs['kodemk'];?></td> 
@@ -216,5 +221,6 @@ img.two {
 <td><?php echo $mhs['semester'];?></td>
 <?php }?>
 
+ 
   </table>
-
+ 
