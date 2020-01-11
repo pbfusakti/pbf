@@ -28,7 +28,8 @@ public function searchData($filter){
   $db= Zend_Db_Table::getDefaultAdapter();
      $select=$db->select()
          ->from($this->_name);
- if (isset($filter['kodemk']) && $filter['kodemk']!=null) 
+ 
+	if (isset($filter['kodemk']) && $filter['kodemk']!=null)  
      $select->where('kodemk=?',$filter['kodemk']);
      if (isset($filter['ruangan']) && $filter['ruangan']!=null) 
      $select->where('ruangan like "%',$filter['ruangan'].'%"');

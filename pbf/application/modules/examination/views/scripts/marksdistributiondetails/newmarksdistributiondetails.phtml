@@ -1,0 +1,258 @@
+<head>
+
+<script type="text/javascript">
+dojo.require("dijit.form.TimeTextBox");
+var rowid=1;
+dojo.addOnLoad(function(){
+	dijit.byId('idStaff').set('value','');
+	dijit.byId('idStaff').set('placeHolder','Select');
+	dijit.byId('idSemester').set('value','');
+	dijit.byId('idSemester').set('placeHolder','Select');
+	});
+
+function addMarksDistributionDetails() {
+	var flag = true;
+	if(dijit.byId("ComponentName").value==''){
+	    dijit.byId("ComponentName").attr('required','true');
+		dijit.byId("ComponentName").focus();flag = false;
+	}
+	if(dijit.byId("Weightage").value==''){
+	    dijit.byId("Weightage").attr('required','true');
+		dijit.byId("Weightage").focus();flag = false;
+	}
+	if(dijit.byId("PassMark").value==''){
+	    dijit.byId("PassMark").attr('required','true');
+		dijit.byId("PassMark").focus();flag = false;
+	}
+	if(dijit.byId("TotalMark").value==''){
+	    dijit.byId("TotalMark").attr('required','true');
+		dijit.byId("TotalMark").focus();flag = false;
+	}
+	if(dijit.byId("PassStatus").value==''){
+	    dijit.byId("PassStatus").attr('required','true');
+		dijit.byId("PassStatus").focus();flag = false;
+	}
+	if(flag == true) {
+		MarksDistributionDetailsInsert();	
+	}			
+	return flag;
+}
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+
+function MarksDistributionDetailsInsert() {
+	var ComponentName = dijit.byId("ComponentName").value;
+	var Weightage = dijit.byId("Weightage").value;
+	var PassMark = dijit.byId("PassMark").value;
+	var TotalMark = dijit.byId("TotalMark").value;
+	var PassStatus = dijit.byId("PassStatus");
+	var PassStatusname = dijit.byId("PassStatus").displayedValue;
+
+	var idStaff = dijit.byId("idStaff");
+	var idStaffname = dijit.byId("idStaff").displayedValue;
+
+	var idSemester = dijit.byId("idSemester");
+	var idSemestername = dijit.byId("idSemester").displayedValue;
+		var trow = document.getElementById('hor').insertRow(rowid);
+			
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		var tcol5=trow.insertCell(4);
+		var tcol6=trow.insertCell(5);
+		var tcol7=trow.insertCell(6);
+		var tcol8=trow.insertCell(7);
+
+		tcol1.innerHTML="<input type='hidden' value='"+idStaff+"' name=idStaffgrid[]>"+idStaffname;
+		tcol2.innerHTML="<input type='hidden' value='"+idSemester+"' name=idSemestergrid[]>"+idSemestername;
+		tcol3.innerHTML="<input type='hidden' value='"+ComponentName+"' name=ComponentNamegrid[]>"+ComponentName;
+		tcol4.innerHTML="<input type='hidden' value='"+Weightage+"' name=Weightagegrid[]>"+Weightage;
+		tcol5.innerHTML="<input type='hidden' value='"+PassMark+"' name=PassMarkgrid[]>"+PassMark;
+		tcol6.innerHTML="<input type='hidden' value='"+TotalMark+"' name=TotalMarkgrid[]>"+TotalMark;
+		tcol7.innerHTML="<input type='hidden' value='"+PassStatus+"' name=PassStatusgrid[]>"+PassStatusname;
+		tcol8.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl();?>/images/delete.png'  border=0 width='16' height='16'></a>";
+		rowid++;
+	
+}
+function clearpageAdd() {
+	dijit.byId("ComponentName").set("value","");
+	dijit.byId("Description").set("value","");
+}
+function deleteRow(r)
+{
+	rowid--;
+	
+	var i=r.parentNode.parentNode.rowIndex;
+	batchArray.splice(parseInt(i-1),1);
+	document.getElementById('hor').deleteRow(i);
+	
+}
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+	var i, j, n;
+	n=A.length;
+                                         // to ensure the fewest possible comparisons
+	for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+		for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+			if (A[i]==A[j]) return true;
+	}	}
+	return false;
+}
+
+Array.prototype.unique = function () {
+    var r = new Array();
+    o:for(var i = 0, n = this.length; i < n; i++)
+    {
+        for(var x = 0, y = r.length; x < y; x++)
+        {
+                if(r[x]==this[i])
+                {
+                	continue o;
+                }
+                
+        }
+        r[r.length] = this[i];
+    }
+    return r;
+}
+
+function deletemarksdistributiondtls(IdMarksDistributionDetails) {
+	
+	var xhrArgs = {url: "<?php echo $this->baseUrl();?>"+"/examination/marksdistributiondetails/deletemarksdistributiondtls/IdMarksDistributionDetails/"+IdMarksDistributionDetails,
+			handleAs:'json',
+			load:function(data){ 
+				if(data == '1') {
+					window.location = "<?php echo $this->baseUrl(); ?>/examination/marksdistributiondetails/newmarksdistributiondetails/id/<?php echo $this->IdMarksDistributionMaster;?>"
+				}
+			}
+	}
+	dojo.xhrPost(xhrArgs); 
+}
+	
+</script>
+</head>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Marks").' '.$this->translate("Distribution").' '.$this->translate("Details");?>
+	</legend>
+	<Form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl();?>/examination/marksdistributiondetails/newmarksdistributiondetails"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+                if (this.validate()) {
+					return true;
+                } else {
+                    return false;
+                }
+				</script>
+		<table class="table" width="100%">
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Marks").' '.$this->translate("Distribution").' '.$this->translate("Master").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Marks").' '.$this->translate("Distribution").' '.$this->translate("Name");?></span></span>
+				</td>
+				<td><?php echo $this->Name;?></td>
+				<td><?php echo $this->translate("Program"); ?></td>
+				<td><?php echo $this->ProgramName;?></td>
+			</tr>
+			<tr>
+				<th colspan="4"><?php echo $this->translate("Marks").' '.$this->translate("Distribution").' '.$this->translate("Details");?>
+				</th>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Id Staff");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->idStaff;?></td>
+				<td><?php echo $this->translate("Id Semester");?><span>*</span></td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->idSemester;?>
+				</td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Component").' '.$this->translate("Name");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->ComponentName;?>
+				</td>
+				<td><?php echo $this->translate("Weightage");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->Weightage;?>
+				</td>
+
+				<?php echo $this->lobjMarksdistributiondetailsForm->IdMarksDistributionMaster;?>
+				<?php echo $this->lobjMarksdistributiondetailsForm->UpdDate;?>
+				<?php echo $this->lobjMarksdistributiondetailsForm->UpdUser;?>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate("Pass Mark");?><span>*</span></span>
+				</td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->PassMark;?>
+				</td>
+				<td><?php echo $this->translate("Total Marks");?><span>*</span></td>
+				<td><?php echo $this->lobjMarksdistributiondetailsForm->TotalMark;?>
+				</td>
+			</tr>
+			<td><?php echo $this->translate("Pass Status");?><span></span></td>
+			<td><?php echo $this->lobjMarksdistributiondetailsForm->PassStatus;?>
+			</td>
+			</tr>
+
+			<td align="right" colspan="4"><?php echo $this->lobjMarksdistributiondetailsForm->Add;?>
+				<?php echo $this->lobjMarksdistributiondetailsForm->Clear;?>
+			</td>
+			</tr>
+
+		</table>
+
+
+
+
+
+
+
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Staff Name");?></th>
+				<th><?php echo $this->translate("Semester");?></th>
+				<th><?php echo $this->translate("Component").' '.$this->translate("Name");?>
+				</th>
+				<th><?php echo $this->translate("Weightage");?></th>
+				<th><?php echo $this->translate("Pass Mark");?></th>
+				<th><?php echo $this->translate("Total Marks");?></th>
+				<th><?php echo $this->translate("Pass Status");?></th>
+				<th><?php echo $this->translate("Delete")?></th>
+			</tr>
+			<?php if($this->larrresult) {?>
+			<?php 
+      	foreach($this->larrresult as $gradesetup) {?>
+
+			<tr>
+				<td><?php print_r($this->escape($gradesetup['staffname']));?></td>
+				<td><?php print_r($this->escape($gradesetup['semestername']));?></td>
+				<td><?php print_r($this->escape($gradesetup['ComponentName']));?></td>
+				<td><?php print_r($this->escape($gradesetup['Weightage']));?></td>
+				<td><?php echo $this->escape($gradesetup['PassMark']);?></td>
+				<td><?php echo $this->escape($gradesetup['TotalMark']);?></td>
+				<td><?php echo $this->escape($gradesetup['DefinitionDesc']);?></td>
+				<td><a href="#"
+					onClick="deletemarksdistributiondtls(<?php echo $gradesetup['IdMarksDistributionDetails'];?>);">
+						<img src='<?php echo $this->baseUrl();?>/images/delete.png'
+						border=0 width='16' height='16'>
+				</a></td>
+			</tr>
+			<?php   }?>
+			<?php } ?>
+			<tr>
+				<td align="right" colspan="10"><?php echo $this->lobjMarksdistributiondetailsForm->Save;?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back')?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'marksdistributiondetails', 'action'=>'index'),'default',true);?>';" />
+				</td>
+			</tr>
+
+		</table>
+
+</fieldset>
+</Form>

@@ -1,0 +1,74 @@
+<style>
+/*Style*/
+.makebold {
+	font-weight: bold;
+}
+</style>
+	<?php $CCC = 0;
+		  $CCE = 0;
+		  $CGP = 0;
+		  $Cgpa = '';
+	?>
+	<table border="1" cellpadding="1" cellspacing="2">
+	<thead>
+		<tr>
+			<th  class="makebold"><?php echo $this->translate("Course Code");?></th>
+			<th  class="makebold"><?php echo $this->translate("Course Description");?></th>
+			<th class="makebold"><?php echo $this->translate("Credit Hours");?></th>
+			<th  class="makebold"><?php echo $this->translate("Grade");?></th>
+			<th  class="makebold"><?php echo $this->translate("Grade Point");?></th>
+			<th  class="makebold"><?php echo $this->translate("Total Grade Point");?></th>
+		</tr>
+	</thead>
+	
+		<tbody>
+			<?php	
+			if(count($this->larrsemesterlist)>0) {
+			$i=1;
+			foreach($this->larrsemesterlist as $key => $block) { 
+			$total = 0;
+			?>
+			
+			<tr>
+			<td class="makebold"><?php echo $this->translate("Semester");?></td>
+			<td  colspan="6"><?php echo 'Sem'.$i.'  '.$key; ?></td>
+			</tr>
+			
+		
+			<?php foreach($block as $item) { ?>
+			<tr>			
+			<td><?php echo $item['SubCode']; ?></td>
+			<td ><?php echo $item['SubjectName']; ?></td>
+			<td ><?php echo $item['CreditHours']; ?></td>
+			<td><?php echo $item['GradeP']; ?></td>
+			<td><?php echo $item['GradePoint']; ?></td>
+			<td><?php echo $item['CreditHours']*$item['GradePoint']; ?></td>
+			</tr>
+			<?php $total = $total + $item['CreditHours'];
+				  $CGP = $CGP + ($item['CreditHours']*$item['GradePoint']);
+				  $Cgpa = $item['Cgpa'];
+			?>
+		<?php  }$i++; ?>
+			<?php $CCC = $total+$CCC;
+				  $CCE = $CCC;
+			?>
+			<tr>
+				<td class="makebold"><?php echo $this->translate("TOTAL");?></td>
+				<td colspan="5"><?php echo $total;?></td>
+			</tr>
+			<tr>
+				<td class="makebold"><?php echo $this->translate("CUMMULATIVE CREDIT COUNT");?></td>
+				<td colspan="2"><?php echo $CCC;?></td>
+				<td class="makebold"><?php echo $this->translate("CUMMULATIVE GRADE POINT");?></td>
+				<td colspan="2"><?php echo $CGP;?></td>
+			</tr>
+			<tr>
+				<td class="makebold"><?php echo $this->translate("CUMMULATIVE CREDIT EARN");?></td>
+				<td colspan="2"><?php echo $CCE;?></td>
+				<td class="makebold"><?php echo $this->translate("CGPA");?></td>
+				<td colspan="2"><?php echo $Cgpa;?></td>
+			</tr>
+		<?php } } ?>
+			
+		</tbody>	
+</table>

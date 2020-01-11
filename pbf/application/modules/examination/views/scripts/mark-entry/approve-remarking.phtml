@@ -1,0 +1,132 @@
+<script>
+function getVal(id,element){
+
+	
+	var element_semester = "#idsemesterstatus"+id;
+	
+	var isChecked = $(element).is(':checked');
+
+	if(isChecked==true){		
+		$(element_semester).removeAttr("disabled"); 
+	}else{
+		$(element_semester).attr("disabled", "disabled"); 
+	}
+}
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').each(function() {
+				    if(this.disabled==false){
+				    	$(this).prop('checked',true);
+				    	$('.chk2').removeAttr("disabled"); 
+				    }
+			 });
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+			 $('.chk2').attr("disabled", "disabled"); 
+		 }
+	 });
+	
+	 $('#rejectall').click(function () {	
+
+		 var isChecked = $('#rejectall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.reject').each(function() {
+				    if(this.disabled==false){
+				    	$(this).prop('checked',true);
+				    	//$('.chk2').removeAttr("disabled"); 
+				    }
+			 });
+		 }else{
+			 // Un-check
+			 $('.reject').prop('checked', false);
+			// $('.chk2').attr("disabled", "disabled"); 
+		 }
+	 });
+});
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+
+<form name="formStudent" id="formStudent" method='post' >
+<input type="hidden" name='ApprovedBy' value='<?php echo $this->iduser;?>'>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="5px"><?php echo $this->translate("No");?>.</th>	
+		<th width="5px"><?php echo $this->translate("Semester");?></th>
+		<th width="5px"><?php echo $this->translate("NIM");?></th>
+		<th width="10%"><?php echo $this->translate("Student Name");?></th>
+		<th width="10%"><?php echo $this->translate("Code");?></th>
+		<th width="40%"><?php echo $this->translate("Subject Name");?></th>
+		<th width="10%"><?php echo $this->translate("Credit Hours");?></th>
+		<th width="20%"><?php echo $this->translate("Component");?></th>
+		<th width="20%"><?php echo $this->translate("Mark");?></th>
+		<th width="20%"><?php echo $this->translate("New Mark");?></th>
+		<th width="20%"><?php echo $this->translate("Reasoning");?></th>
+		<th width="20%"><?php echo $this->translate("Proposed By");?></th>
+		<th width="20%"><?php echo $this->translate("Proposed Date");?></th>
+		<th>
+		<input type="checkbox" id="checkall"  value="" > <?php echo $this->translate("Approve All"); ?>				
+		</th>
+		<th>
+		<input type="checkbox" id="rejectall"  value="" > <?php echo $this->translate("Reject All"); ?>				
+		</th>		
+	</tr>
+	
+	<?php if(count($this->subjects)>0){
+		foreach ($this->subjects as $key=>$subject) { ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+	    <td><?php echo $key+1;?></td>
+	    <td><?php echo $subject["Semester"];?></td>
+	    <td><?php echo $subject["registrationId"];?></td>
+		<td><?php echo $subject["student_name"]?></td>
+		<td><?php echo $subject["ShortName"];?></td>
+		<td><?php echo $subject["SubjectName"]?></td>
+		<td><?php echo $subject["CreditHours"]?></td>
+		<td bgcolor="Yellow"><?php echo $subject["ComponentName"]?></td>
+		<td bgcolor="#ffffdd"><?php echo $subject["oldmark"]?></td>
+		<td bgcolor="Yellow"><?php echo $subject["remarking"]?></td>
+		<td><?php echo $subject["Note"]?></td>
+		<td><?php echo $subject["proposer"]?></td>
+		<td><?php echo $subject["update_date"]?></td>
+		<td>		
+		<input class='chk' type="checkbox" name='IdRemarkingHistory[]' id='IdRemarkingHistory' value='<?php echo $subject["idRemarkingHistory"];?>'></td>
+		<td><input class='reject' type="checkbox" name='reject[]' id='reject' value='<?php echo $subject["idRemarkingHistory"];?>'></td>
+	</tr>
+	<?php 
+		} 
+	}?>
+</table>
+<table width="100%" >
+<tr bgcolor="gray" align="right" ><td><INPUT type="submit" name="submit"></td></tr></table>
+</form>
+<?php //} ?>
+</div>
+
+<br>

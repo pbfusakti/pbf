@@ -1,0 +1,180 @@
+<script>
+(function($) {
+	$.fn.serializefiles = function() {
+	    var obj = $(this);
+	    /* ADD FILE TO PARAM AJAX */
+	    var formData = new FormData();
+	    $.each($(obj).find("input[type='file']"), function(i, tag) {
+	        $.each($(tag)[0].files, function(i, file) {
+	            formData.append(tag.name, file);
+	        });
+	    });
+	    var params = $(obj).serializeArray();
+	    $.each(params, function (i, val) {
+	        formData.append(val.name, val.value);
+	    });
+	    return formData;
+	};
+	})(jQuery);
+	
+$(function() {
+    $( "#dialog-upload" ).dialog({
+        autoOpen: false,
+        width: 650,
+        modal: true,
+        buttons: {
+            "Upload": function() {
+                $( this ).dialog( "close" );
+                $('#upload').submit();            	              	
+            },
+            Cancel: function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+});
+
+function uploadData(){
+	$( "#dialog-upload" ).dialog('open');
+}
+function back(){
+	window.location="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-schema','action'=>'view','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject), 'default', true);?>";
+}
+
+function deleteData(){
+
+	var id = $('input[name=id]:checked').val();
+
+	if(!id){
+		alert("Please select item first");
+	}else{
+		if( confirm("<?php echo $this->translate("Are you sure to delete?"); ?>") ){
+			window.location = "<?php echo $this->url(array('module'=>'examination','controller'=>'answer-schema', 'action'=>'delete','idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'idMaster'=>$this->IdMarksDistributionMaster,'idDetail'=>$this->IdMarksDistributionDetails),'default',true); ?>/id/"+id;
+		}
+	}
+}
+</script>
+
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		<ul>
+			<li>
+				<a href="#" onClick="uploadData();" >
+					<span class='upload'></span>
+					<?php echo $this->translate("Upload Schema"); ?>
+				</a>
+			</li>
+			<li>
+				<a href="#" onClick="deleteData();" >
+					<span class='delete'></span>
+					<?php echo $this->translate("Delete"); ?>
+				</a>
+			</li>
+			<li class="divider"></li>
+			<li>							
+				<a href="#" onClick="back()">
+					<span class='back'></span>
+					<?php echo $this->translate("Back"); ?>
+				</a>				
+			</li>
+		</ul>
+	</div>
+</div>
+<br>
+<?if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><? echo $this->noticeMessage;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><? echo $this->noticeSuccess;?></strong>.</div>
+<?}?>
+<?if(isset($this->noticeError)){?>
+<div class="message error"><strong><? echo $this->noticeError;?></strong>.</div>
+<?}?>
+<br>
+<fieldset>
+		
+<table class="table" width="600px" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Programme Name"); ?></th>   
+		    <td><?php echo $this->program['ArabicName'];?></td>   
+	</tr>
+	<tr>
+		    <th width="20%"><?php echo $this->translate("Semester Name "); ?></th>   
+		    <td><?php echo $this->semester[0]['SemesterMainName'];?></td>   
+	</tr>
+	<tr>
+		    <th><?php echo $this->translate("Subject Name "); ?></th>   
+		    <td><?php echo $this->subject['BahasaIndonesia'];?> (<?php echo $this->subject['SubCode'];?>)</td>   
+	</tr>
+	<tr>
+			<th width="150px"><?php echo $this->translate("Component Name"); ?></th>
+			<td>
+			  <?php 
+			  echo $this->main_component["component_name"]; 
+			  
+			  if($this->component_item){
+			  echo ' - '.$this->component_item["ComponentName"];
+			  }
+			  ?>
+			</td>				
+			
+	</tr>
+	
+</table>
+
+</fieldset>
+
+<br />
+<div style="width:100%;">
+<?php 
+	//echo $this->paginationControl($this->paginator,'Sliding','paginationTop.phtml');
+?>
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		<th width="5px">&nbsp;</th>
+		<th><?php echo $this->translate("Set Code"); ?></th>
+		<th><?php echo $this->translate("Total Question"); ?></th>
+	</tr>
+	
+	<?php
+	if($this->sets){ 
+		$i=0;
+		foreach ($this->sets as $entry): 
+		?>
+		<tr <?php echo $i%2==0?"class='shade'":""; ?>>
+			<td><input type="radio" name="id" value="<?php echo $entry['sas_id']; ?>" /></td>
+			<td><a href="<?php echo $this->url(array('module'=>'examination','controller'=>'answer-schema', 'action'=>'schema-detail','id'=>$entry['sas_id'],'idSemester'=>$this->idSemester,'idProgram'=>$this->idProgram,'idSubject'=>$this->idSubject,'idMaster'=>$this->IdMarksDistributionMaster,'idDetail'=>$this->IdMarksDistributionDetails),'default',true); ?>"><?php echo $entry['sas_set_code']; ?></a></td>
+			<td align="center"><?php echo $entry['sas_total_quest']; ?></td>
+		</tr>
+		<?php 
+		$i++;
+		endforeach;
+	}else{
+		?>
+		<tr>
+			<td colspan="3" align="center">
+				<?php echo $this->translate("No Data Available"); ?>
+			</td>
+		</tr>
+		<?php 
+	}
+	?>
+
+</table>
+</div>
+<?php 
+	//echo $this->paginationControl($this->paginator,'Sliding','paginationBottom.phtml');
+?>
+
+<div id="dialog-upload" title="<?php echo $this->translate("Upload Answer Schema"); ?>">
+    <?php echo $this->form; ?>
+</div>
+
+
+
+
+
+
+

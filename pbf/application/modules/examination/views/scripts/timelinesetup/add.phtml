@@ -1,0 +1,430 @@
+
+<head>
+<script>
+dojo.addOnLoad(function(){	
+	
+	     dijit.byId('Activity').set('value','');
+		 dijit.byId('Activity').set('placeHolder','Select');	 
+		 dijit.byId('AssessmentType').set('value','');
+		 dijit.byId('AssessmentType').set('placeHolder','Select');	 
+
+	 
+});
+
+
+<?php $tot = count($this->result); 
+if($tot=='0') { ?>
+var rowid=1;
+<?php } else {   ?>
+var rowid=<?php echo $tot+1;?>;   
+<?php } ?>
+
+
+function saveValidation() {
+	var Activity = dijit.byId("Activity").displayedValue;
+	
+	//if(Activity == 'Mark Entry' || Activity == 'Remarking Application' || Activity == 'Resit Exam Application' ) {
+		if(rowid==0 || rowid==1){
+	            alert("Please add data");
+	            return false;
+	    } 
+	    else{  
+		    return true; 
+		}
+	//}
+}
+
+function clearpageAdd() {
+    
+    dijit.byId("AssessmentType").reset();
+    dijit.byId("AssessmentType").set("value",null);
+    //dijit.byId("Activity").reset();
+    //dijit.byId("Activity").set("value",null);
+    dijit.byId("StartDate").reset();
+    dijit.byId("StartDate").set("value",null); 
+    dijit.byId("EndDate").reset();
+    dijit.byId("EndDate").set("value",null);
+    
+
+}
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+        var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+
+
+function checkactivity(val) {
+	var Activity = dijit.byId("Activity").displayedValue;
+	var data = [];
+	if(Activity == 'Resit Exam Application'){
+		<?php 
+		$this->lobjexamassementtypeModel = new Examination_Model_DbTable_Assessmenttype();
+		$larrDefId = $this->lobjexamassementtypeModel->fngetassessmentid();
+		$keyCheck = $larrDefId[0]['IdExaminationAssessmentType'];
+		?>
+
+		data = [{'key':<?php echo $keyCheck?>,'name':'Final Exam'}];
+		AutoFillNextEditableDropDown("AssessmentType",data);
+	}
+	else {
+		<?php 
+			$this->lobjexamassementtypeModel = new Examination_Model_DbTable_Assessmenttype();
+			$larrvalue = array();
+			$larrDefId = $this->lobjexamassementtypeModel->fngetassessment();
+			foreach($larrDefId as $lrowdata) {
+				$larrvalue[] = array('key' => $lrowdata['IdExaminationAssessmentType'], 'name' => $lrowdata['Description']); 
+			}
+		?>
+		AutoFillNextEditableDropDown("AssessmentType",<?php echo json_encode($larrvalue); ?>);
+	}
+	
+	
+		
+	if(Activity == 'Mark Entry' || Activity == 'Remarking Application' || Activity == 'Resit Exam Application' ) {
+		$('#assessmenttype').show();
+        $('#enddate').show();
+        $('#enddate1').show();
+        clearpageAdd(); 
+          
+	}
+
+	if(Activity == 'Release exam result'){
+		$('#assessmenttype').hide();
+        $('#enddate').hide();
+        $('#enddate1').hide();
+        clearpageAdd();
+	}
+    
+}
+
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+	dijit.byId(EditableDropDownId).setValue("");
+	var ddwidget = dijit.byId(EditableDropDownId);
+	ddwidget.setAttribute('disabled', false);
+        var options = {
+					label:"name",
+					identifier:"key",
+					items:JSONText
+				  };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+}
+
+ function remarkValidation() {
+	var flag = true;
+	var Activity = dijit.byId("Activity").displayedValue;
+	var activity = dijit.byId("Activity").value;
+	var AssessmentType = dijit.byId("AssessmentType").value;
+
+	var startdateDV = dijit.byId("StartDate").displayedValue;
+	var enddateDV = dijit.byId("EndDate").displayedValue;
+
+	var StartDate = dijit.byId("StartDate").value;
+	var EndDate = dijit.byId("EndDate").value;
+
+	if(Activity=='' && startdateDV==''){
+		dijit.byId("Activity").set( "state", "Error" );
+		dijit.byId("StartDate").set( "state", "Error" );
+		flag = false;    
+	}
+	
+	if(Activity==''){
+		dijit.byId("Activity").set( "state", "Error" );
+	}
+	
+	if(Activity == 'Mark Entry' || Activity == 'Remarking Application' || Activity == 'Resit Exam Application' ) {
+		    if(AssessmentType=='' && startdateDV=='' && enddateDV=='' && StartDate == null && !EndDate){
+			   dijit.byId("AssessmentType").set( "state", "Error" );
+			   dijit.byId("StartDate").set( "state", "Error" );
+			   dijit.byId("EndDate").set( "state", "Error" );
+		       flag = false;      
+			}
+		        
+			if(AssessmentType==''){                         
+		              dijit.byId("AssessmentType").set( "state", "Error" );
+		              flag = false;     
+			}
+		        
+		    if(startdateDV == ''){
+			      dijit.byId("StartDate").set( "state", "Error" );
+		              flag = false; 
+			}
+		        
+		    if(enddateDV == ''){
+			      dijit.byId("EndDate").set( "state", "Error" );
+		              flag = false; 
+			}
+		
+		    if(StartDate!='' && EndDate!=''){
+				var result = dojo.date.compare(StartDate, EndDate);
+				if(result == 1) {
+					alert("Start date cannot be greater than end date");
+					return false;
+				}
+				
+			}
+	}
+
+	else if(Activity == 'Release exam result'){
+		
+  		if(startdateDV == ''){
+	      	dijit.byId("StartDate").set( "state", "Error" );
+            flag = false; 
+		}
+		
+	}
+
+	if(flag == true) {
+		RemarkdetailsInsert();	
+	}
+				
+	return flag;
+}
+
+var batchArray  = new Array();
+
+<?php if(isset($this->result) && count($this->result) != 0){?>
+		<?php foreach($this->result as $result) {?>
+			batchArray.push("<?php echo $result["AssessmentType"].'_'.$result["Activity"]?>");
+			console.log(batchArray);
+<?php }} ?>
+
+
+function RemarkdetailsInsert() {
+
+	var ActivityDV = dijit.byId("Activity").displayedValue;
+	var Activity = dijit.byId("Activity").value;
+	
+	var AssessmentTypeDV = dijit.byId("AssessmentType").displayedValue;
+	var AssessmentType = dijit.byId("AssessmentType").value;
+     
+    var StartDateDV = dijit.byId("StartDate").displayedValue;
+	var StartDate = dijit.byId("StartDate").value;
+        
+    var EndDateDV = dijit.byId("EndDate").displayedValue;
+	var EndDate = dijit.byId("EndDate").value;
+
+	
+    if(ActivityDV == 'Release exam result'){
+    	AssessmentType ='0';
+    }
+    
+	batchArray.push(AssessmentType+'_'+Activity);
+
+    console.log(batchArray);
+
+	if(arrHasDupes(batchArray)){
+			batchArray= batchArray.unique();
+			alert("Cannot be duplicate");
+			
+	}
+	else{
+		//if(rowid=='0') { rowid = '1'; }
+		if(ActivityDV == 'Release exam result'){
+			var trow = document.getElementById('hor').insertRow(rowid);	
+			var tcol1=trow.insertCell(0);
+			var tcol2=trow.insertCell(1);
+			var tcol3=trow.insertCell(2);
+			var tcol4=trow.insertCell(3);
+			var tcol5=trow.insertCell(4);
+			
+			tcol1.innerHTML="<input type='hidden' value='"+Activity+"' name=ActivityGrid[]>"+ActivityDV;
+			tcol2.innerHTML="<input type='hidden' value='' name=AssessmentTypeGrid[]>";		
+			tcol3.innerHTML="<input type='hidden' value='"+StartDateDV+"' name=StartDateGrid[]>"+StartDateDV;
+			tcol4.innerHTML="<input type='hidden' value='"+StartDateDV+"' name=EndDateGrid[]>"+StartDateDV;
+			tcol5.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';        
+			rowid++;
+			
+			clearpageAdd();
+		}
+		else{
+			var trow = document.getElementById('hor').insertRow(rowid);	
+			var tcol1=trow.insertCell(0);
+			var tcol2=trow.insertCell(1);
+			var tcol3=trow.insertCell(2);
+			var tcol4=trow.insertCell(3);
+			var tcol5=trow.insertCell(4);
+			
+			tcol1.innerHTML="<input type='hidden' value='"+Activity+"' name=ActivityGrid[]>"+ActivityDV;
+			tcol2.innerHTML="<input type='hidden' value='"+AssessmentType+"' name=AssessmentTypeGrid[]>"+AssessmentTypeDV;		
+			tcol3.innerHTML="<input type='hidden' value='"+StartDateDV+"' name=StartDateGrid[]>"+StartDateDV;
+			tcol4.innerHTML="<input type='hidden' value='"+EndDateDV+"' name=EndDateGrid[]>"+EndDateDV;
+			tcol5.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';        
+			rowid++;
+			
+			clearpageAdd();
+		}		
+	}
+	
+}
+
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+		var i, j, n;
+		n=A.length;   						// to ensure the fewest possible comparisons
+		for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+			for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+				if (A[i]==A[j])
+					return true;
+			}
+		}
+		return false;
+	}
+
+	Array.prototype.unique = function () {
+	    var r = new Array();
+	    o:for(var i = 0, n = this.length; i < n; i++) {
+	        for(var x = 0, y = r.length; x < y; x++) {
+	        	if(r[x]==this[i]) {
+	                	continue o;
+	              }
+	        }
+	        r[r.length] = this[i];
+	    }
+	    return r;
+	}
+
+function deleteRow(r)
+	{      
+
+		var dStat = confirm("Are you sure to delete the Component?");
+	    if(dStat == true){     
+	    	rowid--;	
+			var i=r.parentNode.parentNode.rowIndex;
+			batchArray.splice(parseInt(i-1),1);        
+			document.getElementById('hor').deleteRow(i);
+	    }
+		
+	}
+</script>
+
+
+</head>
+<body class="claro">
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Exam Calendar"); ?>
+		</legend>
+		<form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+			name="myForm">
+			<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                
+            }else {
+                return false;
+            }
+        </script>
+<table width="100%" class='table'>
+				<?php echo $this->lobjExamCalendarForm->IdUniversity?>
+				<?php echo $this->lobjExamCalendarForm->UpdDate?>
+				<?php echo $this->lobjExamCalendarForm->UpdUser?>
+				<tr>
+					<td><?php echo $this->translate("Semester")  ;?> 
+					<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjExamCalendarForm->Semester; ?></td>
+					<td><?php echo $this->translate("Activity");?>
+					<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjExamCalendarForm->Activity; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Semester Start Date")  ;?> 
+					<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjExamCalendarForm->SemesterStartDate; ?></td>
+					<td><?php echo $this->translate("Semester End Date")  ;?>
+					<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjExamCalendarForm->SemesterEndDate; ?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Start Date");?>
+					<span class="reqMark">*</span></td>
+					<td><span id="startdate"><?php echo $this->lobjExamCalendarForm->StartDate; ?></span></td>
+					
+					<td><span id="enddate" style="display: none;"><?php echo $this->translate("End Date");?>
+					<span class="reqMark">*</span></span></td>
+					<td><span id="enddate1" style="display: none;"><?php echo $this->lobjExamCalendarForm->EndDate; ?></span></td>	
+					
+				</tr>
+				
+				<tr id = "assessmenttype"  style="display: none;" >
+					<td ><?php echo $this->translate("Assessment Type");?>
+					<span class="reqMark">*</span></td>
+					<td><?php echo $this->lobjExamCalendarForm->AssessmentType; ?></td>
+				</tr>
+				
+				<tr>
+				<td align="right" colspan="13">
+				
+					<?php echo $this->lobjExamCalendarForm->Add; ?>
+					<?php echo $this->lobjExamCalendarForm->Clear; ?>
+				
+				</td>
+				</tr>
+				
+			</table>
+			
+			<table class="table" width="100%" id="hor" cellpadding="4" cellspacing="1">
+				<tr>
+					<th><?php echo $this->translate('Activity');?></th>
+					<th><?php echo $this->translate("Assessment Type");?></th>
+					<th><?php echo $this->translate("Start Date (DD-MM-YYY)");?></th>
+					<th><?php echo $this->translate("End Date (DD-MM-YYY)");?></th>
+					<th><?php echo $this->translate("Delete");?></th>
+				</tr>
+
+				<?php if(isset($this->result) && count($this->result) != 0){?>
+				<?php foreach($this->result as $result) {?>
+				<tr>
+				
+					<td><input type='hidden'
+						value='<?php echo $result["Activity"];?>'
+						name=ActivityGrid[]>
+						<?php echo $result["activitycode"];?>
+					</td>
+					
+					<td><input type='hidden'
+						value='<?php echo $result["AssessmentType"];?>'
+						name=AssessmentTypeGrid[]>
+						<?php echo $result["assessment"];?>
+					</td>
+					<td>
+						<input type='hidden'
+						value='<?php echo $result["StartDate"];?>'
+						name=StartDateGrid[]>
+						<?php echo date('d-m-Y',strtotime($result["StartDate"]));?>
+					</td>
+					<td>
+						<input type='hidden'
+						value='<?php echo $result["EndDate"];?>'
+						name=EndDateGrid[]><?php echo date('d-m-Y',strtotime($result["EndDate"]));?>
+					</td>
+					<td><a href="javascript:void(0);" onClick="deleteRow(this); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>'
+					</td>
+				</tr>
+				<?php }?>
+				<?php }?>
+			</table>
+			
+			
+			
+			
+<table class="table" width="100%" cellpadding="4" cellspacing="1">
+		<tr>
+			<td align="right" colspan="13">
+				<?php echo $this->lobjExamCalendarForm->Save; ?>
+				<input type='button' class="NormalBtn"
+				dojotype="dijit.form.Button"
+				label="<?php echo $this->translate('Back') ?>" value='click'
+				onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'timelinesetup', 'action' => 'index'), 'default', true); ?>';" />
+			</td>
+		</tr>
+</table>
+	
+	</form>
+	</fieldset>

@@ -1,0 +1,68 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+	dijit.byId('field3').focus();
+	});
+</script>
+</head>
+	<fieldset>
+		<legend><?php echo $this->translate("Group Name").' '.$this->translate("Search");?></legend>
+         <form action="<?php echo $this->baseUrl();?>/generalsetup/user/index/search/1" method="POST">
+            <table width="100%">
+            	<?php echo $this->lobjform->idGroup;?>
+                <tr>
+                   <td><?php echo $this->translate("Group Name");?></td>
+                   <td ><?php echo $this->lobjform->groupname;?></td>
+                   <td><?php echo $this->translate("Group Name Bahasa");?></td>
+                   <td ><?php echo $this->lobjform->groupnamebahasa;?></td>
+                </tr>
+                <tr>
+                     <td><?php echo $this->translate("Order");?></td>
+                     <td ><?php echo $this->lobjform->order;?></td>
+                     <td><?php echo $this->translate("Last Name");?></td>
+                     <td ><?php echo $this->lobjform->field6;?></td>
+                </tr>
+                <tr>
+                    <td ><?php echo $this->translate("Active");?></td>
+                    <td ><?php echo $this->lobjform->field7;?></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+	               <td align = "center" colspan = "4">
+						<?php echo $this->lobjform->Search;?>
+						<input type="button" class="NormalBtn" dojotype="dijit.form.Button" label="<?php echo $this->translate("Add"); ?>" onclick="window.location.href='<?php echo $this->url(array('module'=>'generalsetup','controller'=>'user', 'action'=>'newuser'),'default',true);?>';" />
+						<?php echo $this->lobjform->Clear;?>
+				   </td>
+                </tr>
+            </table>
+        </form>
+    </fieldset>
+    <br/>
+	<fieldset>
+		<table class="table" width="100%" cellpadding="5" cellspacing="1">
+
+	    	<tr>
+	        	<th><?php echo $this->translate("Login Name");?></th>
+	       	    <th><?php echo $this->translate("Staff Name");?></th>
+	        	<th><?php echo $this->translate("Email");?></th>
+	        	<th><?php echo $this->translate("College");?></th>
+	        	<th><?php echo $this->translate("Role");?></th>
+	    	</tr>
+	        <?php if (count($this->paginator)): ?>
+	        <?php foreach ($this->paginator as $lobjuser ): ?>
+	  		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+	        	<td><a href="<?php echo $this->url(array('module'=>'generalsetup','controller'=>'user', 'action'=>'userlist' , 'id'=>$lobjuser['iduser']),'default',true);?>" ><?php print_r($this->escape($lobjuser['loginName']));?></a></td>
+	    	    <td><?php echo $this->escape($lobjuser['FullName']);?></td>
+	    		<td><?php echo $this->escape($lobjuser['email']);?></td>
+	    		<td><?php echo $this->escape($lobjuser['ShortName']);?></td>
+	    		<td><?php echo $this->escape($lobjuser['DefinitionDesc']);?></td>
+	            <?php endforeach; ?>
+	            <?php endif; ?>
+			</tr>
+	    	<tr>
+	        	<td colspan="8" align="right"><div class="pagination"><?php echo $this->paginationControl($this->lobjpaginator,'Sliding',
+	                                    '/partials/my_pagination_control.phtml'); ?></div></td>
+   			</tr>
+		</table>
+	</fieldset>

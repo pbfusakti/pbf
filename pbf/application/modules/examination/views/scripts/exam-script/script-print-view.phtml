@@ -1,0 +1,313 @@
+<script type="text/javascript">
+
+$(function() {
+	<?php
+	if(isset($this->semid) && isset($this->facid) && isset($this->subid) ){
+	?>
+		
+        $('#IdSemester').val('<?php echo $this->semid; ?>');
+		$('#IdCollege').val('<?php echo $this->facid; ?>');
+		var subject = <?php echo $this->subid; ?>;
+
+		var table = $("#result tbody");
+		
+		$.ajax({
+			url: "/examination/exam-grouping/search-course",
+		    type: "post",
+		    async : false,
+		    data: {'semester_id':<?php echo $this->semid; ?>, 'faculty_id':<?php echo $this->facid; ?>},
+		    dataType: 'json',
+		    success: function(data){
+		    	$('#subject').empty();
+				$('#subject').append('<option value="">Please Select</option>');
+			    	
+			    	$.each(data, function(index) {
+				    	var select = '';
+				    	if(subject==data[index].IdSubject){
+					    	select='selected="selected"';
+				    	}
+			    		$('#subject').append('<option value="'+data[index].IdSubject+'" '+select+'>'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+			    	});
+
+			    	
+		          
+			},
+			error:function(){
+		          alert("failure");
+			},
+			beforeSend: function() {
+				showLoading('subject','subject','loading');
+
+		        $(table).empty();
+			},
+			complete: function() {
+				hideLoading('loading','subject');
+				search_group();
+			}   
+		});
+	<?php
+	}
+	?>
+});
+
+	function search_subject(){
+		
+		var semester_id = $('#IdSemester').val();
+		var faculty_id = $('#IdCollege').val();
+		var table = $("#result tbody");
+		
+		if(semester_id!=0 && faculty_id!=0){
+			$.ajax({
+				url: "/examination/exam-grouping/search-course",
+			    type: "post",
+			    async : false,
+			    data: {'semester_id':semester_id, 'faculty_id':faculty_id},
+			    dataType: 'json',
+			    success: function(data){
+			    	$('#subject').empty();
+					$('#subject').append('<option value="">Please Select</option>');
+				    	
+				    	$.each(data, function(index) {
+				    		$('#subject').append('<option value="'+data[index].IdSubject+'">'+data[index].SubCode+' - '+data[index].SubjectName+'</option>');	
+				    	});
+			          
+				},
+				error:function(){
+			          alert("failure");
+				},
+				beforeSend: function() {
+					showLoading('subject','subject','loading');
+
+			        $(table).empty();
+				},
+				complete: function() {
+					hideLoading('loading','subject');
+				}   
+			});
+		}
+	}
+
+	
+
+	function showLoading(target,target_div,loading_id){
+		$('#'+target).hide();
+		$('#'+target_div).after("<div id='"+loading_id+"'><img src='/images/ajax-loader-bar.gif' /></div>");
+	}
+
+	function hideLoading(loading_id,target){
+		$('#'+loading_id).remove();
+		$('#'+target).show();
+	}
+
+	function view_detail(gid,subjectId,program){
+		window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'exam-grouping','action'=>'group-detail'),'default',true);?>/id/'+gid+'/subject_id/'+subjectId+'/program/'+program;
+	}
+
+	 function EditExamScript(){
+
+		var idscript = $('input[name=radio]:checked').val();
+		if( idscript>0 ){
+			window.location = '<?php echo $this->url(array('module'=>'examination','controller'=>'exam-script','action'=>'script-verify-edit'),'default',true);?>/IdScript/'+idscript;
+		}else{
+			alert('<?php echo $this->translate('Please select exam script that will be edited/verified');?>');
+		}
+	}
+
+	 
+	
+</script>
+
+<style>
+ul.program, ul.program li{
+  margin: 0 0 0 10px;
+  padding: 0;
+}
+</style>
+<body ">
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+	<div class="toolbar-button">
+		  
+	</div>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+<form action="" method="post" >
+	<dl class="zend_form">
+	
+	
+		<dt id="IdSemester-label">
+			<label class="required" for="IdSemester"><?php echo $this->translate("Semester"); ?></label>
+		</dt>
+		<dd id="IdSemester-element">
+			<select id="IdSemester" name="IdSemester" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->semester_list as $semester):
+			    		if ($this->semid==$semester['key']) $status='selected="selected"'; else $status="";
+			    ?>
+			    		<option value="<?php echo $semester["key"];?>" <?php echo $status; ?>><?php echo $semester["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		
+		<dt id="IdCollege-label">
+			<label class="required" for="IdCollege"><?php echo $this->translate("Program"); ?></label>
+		</dt>
+		<dd id="IdCollege-element">
+			<select id="IdCollege" name="IdCollege" onchange="search_subject();">
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->college_list as $college):
+			    		$select ='';
+			    		if( isset($this->default_faculty) && $this->facid== $college["IdProgram"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $college["IdProgram"];?>" <?php echo $select; ?>><?php echo $college["ProgramCode"].' - '.$college["ArabicName"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="IdBranch-label">
+			<label for="IdBranch"><?php echo $this->translate("Branch"); ?></label>
+		</dt>
+		<dd id="IdBranch-element">
+			<select id="IdBranch" name="IdBranch" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->branchlist as $item):
+			    		$select ='';
+			    		if( isset($this->branchid) && $this->branchid== $item["key"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $item["key"];?>" <?php echo $select; ?>><?php echo $item["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="SubjectName-label">
+			<label class="optional" for="SubjectName"><?php echo $this->translate("Subject");?></label>
+		</dt>
+		<dd id="SubjectName-element">
+			<select name="subject" id="subject" >
+				
+			</select>
+		</dd>
+		<dt id="IdCollege-label">
+			<label class="required" for="IdCollege"><?php echo $this->translate("Exam Type"); ?></label>
+		</dt>
+		<dd id="IdExamType">
+			<select id="exam_type" name="exam_type" >
+			    <option value="0"><?php echo $this->translate("Please Select");?></option>
+			    <?php 
+			    	foreach ($this->assessmenttype as $assess):
+			    		$select ='';
+			    		if( isset($this->examtype) && $this->examtype== $assess["key"] ){
+							$select = 'selected="selected"';
+						}
+			    ?>
+			    		<option value="<?php echo $assess["key"];?>" <?php echo $select; ?>><?php echo $assess["value"];?></option>
+			    <?php 
+			    	endforeach;
+			    ?>
+			</select>
+		</dd>
+		<dt id="button-label">
+		</dt>
+		<dd id="submit">
+			 <input type="submit" name="submit" id="submit" value="Cari">
+		</dd>
+		
+			
+	</dl>
+</form>
+
+<table  class="table" >
+	 
+		<tr>
+			 
+			<th><?php echo $this->translate("Exam Script Name"); ?></th>
+			<th><?php echo $this->translate("Sub Code"); ?></th>
+			<th><?php echo $this->translate("Subject Name"); ?></th> 
+			<th><?php echo $this->translate("Duration"); ?></th>
+			<th><?php echo $this->translate("Exam Group List"); ?></th>
+			<th><?php echo $this->translate("Verificator"); ?></th>
+			<th><?php echo $this->translate("Contributor"); ?></th> 
+			<th><?php echo $this->translate("Printed By"); ?></th>
+			 <th><?php echo $this->translate("Download Exam Scripts"); ?></th>
+		</tr>
+	 
+	 
+	<?php if(count($this->examscriptlist)>0) {
+		
+	foreach ($this->examscriptlist as $item) {
+		?>
+	<tr>
+			 <td><?php echo $item['ScriptName']; ?></td>
+			<td><?php echo $item['ShortName'];?></td>
+			<td><?php echo $item['BahasaIndonesia']; ?></td> 
+			<td><?php echo $item['time_in_minute']; ?></td>
+			<td><?php 
+				if (count($item['examgroup'])>0) {
+				?><ul><?php 
+					foreach ($item['examgroup'] as $value) {
+						?>
+						<li><?php echo 'Group Code:'.$value['eg_group_name'].'- Exam Date:'.$value['eg_date'].' '.$value['eg_start_time'].' '.$value['eg_end_time']?></li>
+				<?php 
+					} ?>
+					</ul>
+			<?php  
+				} else echo "No Exam Group";
+			?></td>
+			<td><?php if (isset($item['verificatorname'])) echo $item['verificatorname']; ?></td>
+			<td>
+			<?php 
+				if (count($item['contributor'])>0) {
+				?><ul><?php 
+					foreach ($item['contributor'] as $value) {
+						?>
+						<li><?php echo $value['FullName']?></li>
+				<?php 
+					} ?>
+					</ul>
+			<?php  
+				} else echo 'No Contributor';
+			?>
+			</td> 
+			<td><?php if (isset($item['printedbyname'])) echo $item['printedbyname']; ?></td>
+			<td align="center"> <?php 
+		$pathupload=$item['url'];
+		if($pathupload!=''){
+			$dt = explode("triapp",$pathupload);
+			//echo var_dump($dt);exit;
+			$path = $dt[1];
+			$path ="<a target='_blank' href=http://".APP_HOSTNAME.$path.">" ;
+		
+		 echo $path;?><img src='<?php echo $this->baseUrl();?>/images/document.png' border=0 width='20' height='20' title="Download" ></a>  <?php 
+		} ?>
+		 </td>
+		</tr>
+	<?php }
+	}?>
+	 
+</table>
+</body>

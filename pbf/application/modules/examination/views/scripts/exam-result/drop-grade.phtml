@@ -1,0 +1,111 @@
+<script>
+function getVal(id,element){
+
+	
+	var element_semester = "#idsemesterstatus"+id;
+	
+	var isChecked = $(element).is(':checked');
+
+	if(isChecked==true){		
+		$(element_semester).removeAttr("disabled"); 
+	}else{
+		$(element_semester).attr("disabled", "disabled"); 
+	}
+}
+
+$(function () {
+	 
+	 var str = "";
+	 $('#checkall').click(function () {	
+
+		 var isChecked = $('#checkall').is(':checked');
+
+		 if(isChecked==true){			 
+			 $('.chk').each(function() {
+				    if(this.disabled==false){
+				    	$(this).prop('checked',true);
+				    	$('.chk2').removeAttr("disabled"); 
+				    }
+			 });
+		 }else{
+			 // Un-check
+			 $('.chk').prop('checked', false);
+			 $('.chk2').attr("disabled", "disabled"); 
+		 }
+	 });
+	
+	 
+});
+
+</script>
+
+<div class="message toolbar">
+	<h2><?php echo $this->title; ?></h2>
+</div>
+<br />
+
+<?php if(isset($this->noticeMessage)){?>
+<div class="message notice"><strong><?php echo $this->noticeMessage;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeSuccess)){?>
+<div class="message success"><strong><?php echo $this->noticeSuccess;?></strong>.</div>
+<br />
+<?php }?>
+<?php if(isset($this->noticeError)){?>
+<div class="message error"><strong><?php echo $this->noticeError;?></strong>.</div>
+<br />
+<?php }?>
+
+
+<form name="formStudent" id="formStudent" method='post' action='<?php echo $this->url(array('module'=>'examination','controller'=>'exam-result','action'=>'drop-grade'),'default',true);?>'>
+<input type="hidden" name='IdSemester' value='<?php echo $this->IdSemester;?>'>
+<table class="table" width="100%" cellpadding="5" cellspacing="2" border="0">
+	<tr>
+		<th width="5px"><?php echo $this->translate("No");?>.</th>		
+		<th width="10%"><?php echo $this->translate("Code");?></th>
+		<th width="50%"><?php echo $this->translate("Subject Name");?></th>
+		<th width="10%"><?php echo $this->translate("Credit Hours");?></th>
+		<th width="5%"><?php echo $this->translate("Grade");?></th>
+		<th width="5%"><?php echo $this->translate("Exam Status");?></th>
+		<th>
+		
+		<input type="checkbox" id="checkall"  value="" > <?php echo $this->translate("Take All"); ?>				
+		</th>		
+	</tr>
+	<INPUT type="hidden" name="id" value=<?php echo $this->id;?>>
+	<?php if(count($this->subjects)>0){
+		$counreg=1;
+		$coun=1;
+	foreach($this->subjects as $index=>$category){
+		
+		$subjets = $category['subjects'];
+		?><tr><td colspan="6"><?php echo ($counreg).' '.$category['kategori'];
+		 
+		foreach ($subjets as $key=>$subject) { ?>
+		<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+	    <td></td>
+		<td><?php echo ($coun).'. '.$subject["SubCode"];?></td>
+		<td><?php echo $subject["NamaSubjek"]?></td>
+		<td><?php echo $subject["CreditHours"]?></td>
+		<td><?php echo $subject["grade_name"]?></td>
+		<td><?php echo $subject["exam_status"]?></td>
+		<td>		
+		<input type="hidden" name="subject[<?php echo $subject["IdSubject"];?>]" value="<?php echo $subject["IdSubject"];?>">
+		<?php if ($subject["exam_status"]=="C") { $check="checked";
+		} else { $check="";
+		}?>
+		<input class='chk' type="checkbox" name='IdStudentRegistration[]' id='IdStudentRegistration' value='<?php echo $subject["IdSubject"];?>' <?php echo $check;?>></td>
+	</tr>
+	<?php 
+		$coun++;}
+		$counreg++;} 
+	}?>
+</table>
+<table width="100%" >
+<tr bgcolor="gray" align="right" ><td><INPUT type="submit" name="submit"></td></tr></table>
+</form>
+<?php //} ?>
+</div>
+
+<br>

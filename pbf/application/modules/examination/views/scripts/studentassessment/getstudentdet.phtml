@@ -1,0 +1,18 @@
+<div id="studetail">
+	<table class="table" width="100%">		
+		<tr>
+			<th><b>#</b></th>
+			<th><?php echo $this->translate("Student Id");?></th>
+			<th><?php echo $this->translate("Student Name");?></th>
+		</tr>
+		<?php $i = 1; if(count($this->studdet) > 0){?>
+			<?php foreach($this->studdet as $det){?>
+				<tr>
+					<td><?php echo $i ;?></td>
+					<td><a href="<?php echo $this->url(array('module' => 'examination', 'controller' => 'studentassessment', 'action' => 'studentassessmentdet','id' => $det['Id']), 'default', true); ?>"><?php echo ($det['registrationId']!='') ? $det['registrationId'] : ''; ?></a></td>
+					<td><?php echo ($det['name']!='') ? $det['name'] : ''; ?></td>
+				</tr>
+			<?php $i++;} ?>
+		<?php } ?>
+	</table>
+</div>

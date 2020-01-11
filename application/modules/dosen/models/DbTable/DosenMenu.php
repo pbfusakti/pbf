@@ -30,8 +30,10 @@ public function searchData($filter){
          ->from($this->_name);
      if (isset($filter['kodemk']) && $filter['kodemk']!=null) 
      $select->where('kodemk=?',$filter['kodemk']);
-     if (isset($filter['matakuliah']) && $filter['matakuliah']!=null) 
-     $select->where('matakuliah like "%',$filter['matakuliah'].'%"');
+ 
+     if (isset($filter['kodemk']) && $filter['kodemk']!=null) 
+     $select->where('kodemk like "%',$filter['kodemk'].'%"');
+ 
       $row=$db->fetchRow($select);
      return $row;
      }

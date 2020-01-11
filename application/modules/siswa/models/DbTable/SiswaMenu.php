@@ -28,7 +28,9 @@ public function searchData($filter){
   $db= Zend_Db_Table::getDefaultAdapter();
      $select=$db->select()
          ->from($this->_name);
- if (isset($filter['nim']) && $filter['nim']!=null) 
+ 
+	if (isset($filter['nim']) && $filter['nim']!=null) 
+ 
      $select->where('nim=?',$filter['nim']);
      if (isset($filter['siswa']) && $filter['siswa']!=null) 
      $select->where('siswa "%',$filter['siswa'].'%"');

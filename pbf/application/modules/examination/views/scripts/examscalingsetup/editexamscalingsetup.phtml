@@ -1,0 +1,322 @@
+<script type="text/javascript">
+    var batchArray  = new Array();
+    var rowid = <?php echo count($this->examscaledata);?>+1;
+    <?php foreach($this->examscaledata as $rec){?>
+        batchArray.push('<?php echo $rec['IdCourse'].'_'.$rec['IdComponent']?>');
+        console.log(batchArray);
+        console.log('row no : '+rowid);
+    <?php } ?>    
+    dojo.addOnLoad(function(){
+        dijit.byId('IdComponent').set('value','');
+        dijit.byId('IdComponent').set('placeHolder','Select');
+        dijit.byId('IdSubject').set('value','');
+        dijit.byId('IdSubject').set('placeHolder','Select');
+    });
+
+    function getcourseList(idcomponent){        
+        var idscheme = <?php echo $this->examscaledata[0]['IdScheme'];?>;
+        //if(idscheme == ''){
+        //    dijit.byId('IdScheme').attr('required',"true");
+       //     dijit.byId('IdScheme').focus();
+        //}else{
+            if(idcomponent != ""){
+                var xhrArgs = {
+                    url: "<?php echo $this->baseUrl(); ?>"+"/examination/examscalingsetup/getcourselist/idscheme/"+idscheme+"/idcomponent/"+idcomponent,
+                    handleAs:'json',
+                    load:function(data){
+                        AutoFillNextEditableDropDown("IdSubject",data);
+                    }
+                }
+            }
+            dojo.xhrGet(xhrArgs);
+        //}
+    }
+
+    function clearfields(){
+        dijit.byId('IdScheme').set('value','');
+        dijit.byId('IdScheme').set('placeHolder','Select');
+        dijit.byId('semestercode').set('value','');
+        dijit.byId('semestercode').set('placeHolder','Select');
+        dijit.byId('IdFaculty').set('value','');
+        dijit.byId('IdFaculty').set('placeHolder','Select');
+        dijit.byId('IdComponent').set('value','');
+        dijit.byId('IdComponent').set('placeHolder','Select');
+        dijit.byId('IdSubject').set('value','');
+        dijit.byId('IdSubject').set('placeHolder','Select');
+        dijit.byId('Marks').setValue('');
+        dijit.byId('IdScheme').attr('required',"false");
+    }
+
+    function addfields(){
+        if(validateaddfields()){
+            var IdCourse = dijit.byId('IdSubject').value;
+            var IdCourseName = dijit.byId('IdSubject').displayedValue;
+
+            var IdComponent = dijit.byId('IdComponent').value;
+            var IdComponentName = dijit.byId('IdComponent').displayedValue;
+
+            var Marks = dijit.byId('Marks').value;
+
+            if($('#Active').attr('checked')) {
+                active = 1;
+            }else{
+                active = 0;
+            }
+            var insertval = IdCourse +'_'+ IdComponent;
+            batchArray.push(insertval);
+            if(arrHasDupes(batchArray)){
+                batchArray = batchArray.unique();
+                alert("Duplicate Entry");
+            }else{
+                var trow=document.getElementById('hor').insertRow(rowid);
+                var tcol1=trow.insertCell(0);
+                var tcol2=trow.insertCell(1);
+                var tcol3=trow.insertCell(2);
+                var tcol4=trow.insertCell(3);
+                var tcol5=trow.insertCell(4);
+
+                tcol1.innerHTML="<input type='hidden' value='"+IdCourse+"' name=coursegrid[]>"+IdCourseName;
+                tcol2.innerHTML="<input type='hidden' value='"+IdComponent+"' name=componentgrid[]>"+IdComponentName;
+                tcol3.innerHTML="<input type='hidden' value='"+Marks+"' name=marksgrid[]>"+Marks;                
+                if(active == 1){
+                    tcol4.innerHTML="<input  type='checkbox' value='"+active+"' name='"+parseInt(parseInt(rowid)-1)+"' checked='true'>";
+                }else{
+                    tcol4.innerHTML="<input  type='checkbox' value='"+active+"' name='"+parseInt(parseInt(rowid)-1)+"' >";
+                }
+                tcol5.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl(); ?>/images/delete.png'  border=0 width='16' height='16'></a>";
+                rowid++;
+            }
+        }
+
+    }
+
+    function validateaddfields(){
+        var flag = true;
+
+        var IdComponent = dijit.byId('IdComponent').value;
+        if(IdComponent == ''){
+            dijit.byId('IdComponent').attr('required',"true");
+            dijit.byId('IdComponent').focus();
+            flag = false;
+        }
+
+        var IdSubject = dijit.byId('IdSubject').value;
+        if(IdSubject == ''){
+            dijit.byId('IdSubject').attr('required',"true");
+            dijit.byId('IdSubject').focus();
+            flag = false;
+        }
+
+        var Marks = $('#Marks').val();
+        if(flag){
+            if(Marks == '' ){
+                alert('Marks cannot be blank');
+                dijit.byId('Marks').attr('required',"true");
+                dijit.byId('Marks').focus();
+                return false;
+            }else if(Marks == '0'){
+                alert('Marks cannot be zero');
+                dijit.byId('Marks').attr('required',"true");
+                dijit.byId('Marks').focus();
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
+
+    function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+        var i, j, n;
+        n=A.length;
+        // to ensure the fewest possible comparisons
+        for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+            for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+                if (A[i]==A[j]) return true;
+            }	}
+        return false;
+    }
+
+    Array.prototype.unique = function () {
+        var r = new Array();
+        o:for(var i = 0, n = this.length; i < n; i++)
+        {
+            for(var x = 0, y = r.length; x < y; x++)
+            {
+                if(r[x]==this[i])
+                {
+                    continue o;
+                }
+
+            }
+            r[r.length] = this[i];
+        }
+        return r;
+    }
+
+    function validateForm(){
+        var rowlen = $('#hor').find('tr').length;
+        if(rowlen <= 1){
+            alert('Please add atleast one Exam scale');
+            return false;
+        }
+        return true;
+    }
+
+    function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+        dijit.byId(EditableDropDownId).setValue("");
+        var ddwidget = dijit.byId(EditableDropDownId);
+        ddwidget.setAttribute('disabled', false);
+        var options = {
+            label:"name",
+            identifier:"key",
+            items:JSONText
+        };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+    }
+
+    function deleteRow(r){
+        var ret = confirm('Are you sure you want to delete?');
+        if(ret){
+            rowid--;
+            var i=r.parentNode.parentNode.rowIndex;
+            batchArray.splice(parseInt(i-1),1);
+            document.getElementById('hor').deleteRow(i);
+        }
+    }
+
+
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("Exam Scaling Setup"); ?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm"
+		action="<?php echo $this->baseUrl(); ?>/examination/examscalingsetup/editexamscalingsetup"
+		method="post" name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+            var flag = validateForm();
+            if(!flag){
+            return false;
+            }
+            return true;
+            }else {
+            return false;
+            }
+        </script>
+		<table class="table" width="100%">
+			<?php if ($this->errormsg == '1') {
+				?>
+			<tr>
+				<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Selected combination of semester, scheme is already exist'); ?>
+				</td>
+			</tr>
+			<?php } ?>
+			<tr>
+			
+			
+			<tr>
+				<td><?php echo $this->translate('Scheme'); ?></td>
+				<td><?php echo $this->examscaledata['0']['EnglishDescription']; ?> <?php echo $this->lobjformexamscaling->UpdUser; ?>
+					<?php echo $this->lobjformexamscaling->UpdDate; ?> <?php echo $this->lobjformexamscaling->CreatedDate; ?>
+					<?php echo $this->lobjformexamscaling->CreatedBy; ?> <?php echo $this->lobjformexamscaling->IdExamScaling; ?>
+				</td>
+				<td><?php echo $this->translate('Semester'); ?></td>
+				<td><?php echo $this->examscaledata['0']['semestercode']; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Faculty'); ?></td>
+				<td colspan="3"><?php echo $this->examscaledata['0']['CollegeName']; ?>
+				</td>
+			</tr>
+		</table>
+		<br>
+		<table class="table" width="100%">
+			<tr>
+				<td><?php echo $this->translate('Component'); ?></td>
+				<td><?php echo $this->lobjformexamscaling->IdComponent; ?></td>
+				<td><?php echo $this->translate('Subject'); ?></td>
+				<td><?php echo $this->lobjformexamscaling->IdSubject; ?></td>
+
+
+			</tr>
+			<tr>
+				<td><?php echo $this->translate('Marks'); ?></td>
+				<td><?php echo $this->lobjformexamscaling->Marks; ?></td>
+				<td><?php echo $this->translate('Active'); ?></td>
+				<td><?php echo $this->lobjformexamscaling->Active; ?></td>
+			</tr>
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjformexamscaling->Add; ?>
+					<?php echo $this->lobjformexamscaling->Clear; ?>
+				</td>
+			</tr>
+		</table>
+		<br>
+		<table id="hor" class="table" width="100%">
+			<tr>
+				<th><?php echo $this->translate('Course'); ?></th>
+				<th><?php echo $this->translate('Component'); ?></th>
+				<th><?php echo $this->translate('Marks'); ?></th>
+				<th><?php echo $this->translate('Status'); ?></th>
+				<th><?php echo $this->translate('Delete'); ?></th>
+			</tr>
+			<?php if(isset($this->examscaledata)){
+$i=0;?>
+			<?php foreach($this->examscaledata as $data){?>
+			<tr>
+				<td><input type='hidden' value='<?php echo $data['IdCourse']?>'
+					name=coursegrid[]> <?php echo $data['SubjectName']?></td>
+				<td><input type='hidden' value='<?php echo $data['IdComponent']?>'
+					name=componentgrid[]> <?php echo $data['DefinitionDesc'];?></td>
+				<td><input type='hidden' value='<?php echo $data['Marks']?>'
+					name=marksgrid[]> <?php echo $data['Marks'];?></td>
+				<?php if($data['Active'] == 1) {?>
+				<td><input type='checkbox' value='<?php echo $data['Active'];?>'
+					name='<?php echo $i;?>' checked='checked'></td>
+				<?php  }else{ ?>
+				<td><input type='checkbox' value='<?php echo $data['Active'];?>'
+					name='<?php echo $i;?>'></td>
+				<?php } ?>
+				<td><a href='#' onClick='deleteRow(this); return false;'><img
+						src='<?php echo $this->baseUrl(); ?>/images/delete.png' border=0
+						width='16' height='16'> </a></td>
+			</tr>
+			<?php $i++;
+} ?>
+			<?php } ?>
+		</table>
+		<table class="table" width="100%">
+			<tr>
+				<td align="right" colspan="4"><?php echo $this->lobjformexamscaling->Save; ?>
+					<input type='button' class="NormalBtn" dojotype="dijit.form.Button"
+					label="<?php echo $this->translate('Back') ?>" value='click'
+					onclick="window.location.href='<?php echo $this->url(array('module' => 'examination', 'controller' => 'examscalingsetup', 'action' => 'index'), 'default', true); ?>';" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

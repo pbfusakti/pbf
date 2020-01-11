@@ -1,0 +1,606 @@
+<script type="text/javascript">
+var calmoderow = 1; 
+var calModebatchArray  = new Array();
+<?php $tot = count($this->acadecmisetupDetails); 
+if($tot=='0') { ?>
+var rowid=1;
+<?php } else {   ?>
+var rowid=<?php echo $tot+1;?>;   
+<?php } ?>
+
+<?php $total = count($this->calmodes); 
+if($total=='0') { ?>
+var calmoderow=1;
+<?php } else {   ?>
+var calmoderow=<?php echo $total+1;?>;   
+<?php } ?>
+
+
+<?php if($this->calmodes) {?>
+<?php 
+foreach($this->calmodes as $data) {;?>
+calModebatchArray.push(<?php echo $data['LandscapeType'];?>);  
+<?php } }?>
+
+
+
+dojo.addOnLoad(function(){
+    <?php if(isset($this->acadecmisetup) && $this->acadecmisetup['BasedOn']!='') { ?>
+            checksetupbasedon('<?php echo $this->acadecmisetup['BasedOn'];?>');
+            <?php if($this->acadecmisetup['BasedOn'] == 'Program'){?>
+                 dijit.byId('IdAward').set("readOnly",true);
+                 dijit.byId('IdScheme').set("readOnly",true);
+                 dijit.byId("IdAward").attr('required',false);
+                 dijit.byId("IdScheme").attr('required',false);
+            <?php if($this->acadecmisetup['IdScheme'] == 0){?>
+                dijit.byId('IdScheme').set('value','');
+                dijit.byId('IdScheme').set('placeHolder','Select');
+            <?php } ?>
+            <?php if($this->acadecmisetup['IdAward'] == 0){?>                
+                dijit.byId('IdAward').set('value','');
+                dijit.byId('IdAward').set('placeHolder','Select');
+            <?php } ?>
+            <?php }else if($this->acadecmisetup['BasedOn'] == 'Scheme & Award'){ ?>
+                 dijit.byId('IdProgram').set("readOnly",true);                
+                 dijit.byId("IdProgram").attr('required',false);
+            <?php if($this->acadecmisetup['IdProgram'] == 0){?>
+                dijit.byId('IdProgram').reset();
+                dijit.byId('IdProgram').set('value',null);
+                dijit.byId('IdProgram').set('placeHolder','Select');
+            <?php } ?>
+            <?php } ?>
+    <?php } ?>
+    dijit.byId('LandscapeType').set('value','');
+    dijit.byId('LandscapeType').set('placeHolder','Select');
+    
+
+        
+});
+
+function checksetupbasedon(valuebasedOn){   
+    if(valuebasedOn == 'Scheme & Award'){
+        dijit.byId('IdProgram').reset();
+        dijit.byId('IdProgram').set('value','');
+        dijit.byId('IdProgram').set('placeHolder','Select');
+        dijit.byId('IdProgram').set("readOnly",true);
+        dijit.byId("IdProgram").attr('required',false);
+        dijit.byId("IdProgram").attr('state',"Normal");
+        
+        dijit.byId('IdAward').set("readOnly",false);
+        dijit.byId('IdScheme').set("readOnly",false);
+        dijit.byId("IdAward").attr('required',true);
+        dijit.byId("IdScheme").attr('required',true);
+    }else{
+        
+        dijit.byId('IdAward').reset();
+        dijit.byId('IdAward').set('value','');
+        dijit.byId('IdAward').set('placeHolder','Select');
+        
+        dijit.byId('IdScheme').reset();
+        dijit.byId('IdScheme').set('value','');
+        dijit.byId('IdScheme').set('placeHolder','Select');
+        
+        dijit.byId('IdProgram').set("readOnly",false);
+        dijit.byId("IdProgram").attr('required',true);
+        
+        dijit.byId('IdAward').set("readOnly",true);
+        dijit.byId('IdScheme').set("readOnly",true);
+        dijit.byId("IdAward").attr('required',false);
+        dijit.byId("IdScheme").attr('required',false);
+    }
+}
+
+function validateAcademicSetupForm(){
+    var max = $('#Maximum').val();
+    var min = $('#Minimum').val();
+    var totalminmarks = $('#MinimumTotalMarks').val(); 
+    var totalmaxmarks = $('#MaximumTotalMarks').val();     
+    if(parseInt(max) <= parseInt(min)){
+        alert('Maximum should always be greater than Minimum');
+        return false;
+    }else if(parseInt(totalminmarks) >=parseInt(totalmaxmarks)){
+    	alert('Total minimum marks should always be less than total maximum marks');
+    	return false;
+    }else if(parseInt(totalminmarks) < 0){
+    	alert('Total minimum marks should always be greater than 0');
+    	return false;
+    }else if(parseInt(totalmaxmarks) > 101){
+    	alert('Total maximum marks should always be less than 101');
+    	return false;
+    }
+    return true;
+}
+
+function getprogramList(idscheme){
+    var form = dijit.byId("myForm");
+    var basedOn = form.attr('value').BasedOn;
+    var award = dijit.byId('IdAward').value;
+    if(basedOn == 'Program'){
+        if(idscheme != ""){
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/academicstatus/getprogramlist/idscheme/"+idscheme+"/idaward/"+award,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdProgram",data);
+                }
+            }
+        }
+      dojo.xhrGet(xhrArgs);
+    }
+}
+
+function getprogramListByAward(IdAward){
+    var form = dijit.byId("myForm");
+    var basedOn = form.attr('value').BasedOn;
+    var scheme = dijit.byId('IdScheme').value;
+    if(basedOn == 'Program'){
+        if(IdAward != ""){
+            var xhrArgs = {
+                url: "<?php echo $this->baseUrl(); ?>"+"/examination/academicstatus/getprogramlist/idscheme/"+scheme+"/idaward/"+IdAward,
+                handleAs:'json',
+                load:function(data){
+                    AutoFillNextEditableDropDown("IdProgram",data);
+                }
+            }
+        }
+      dojo.xhrGet(xhrArgs);
+    }
+}
+
+function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+    dijit.byId(EditableDropDownId).setValue("");
+    var ddwidget = dijit.byId(EditableDropDownId);
+    ddwidget.setAttribute('disabled', false);
+    var options = {
+      label:"name",
+      identifier:"key",
+      items:JSONText
+    };
+    ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+  }
+  
+  
+  
+function addAcademicdetails() {
+	var flag = true;
+        var minP =  dijit.byId('Minimum').value;
+        var maxP =  dijit.byId('Maximum').value;               
+        var minPD =  dijit.byId('Minimum').get('displayedValue');
+        var maxPD =  dijit.byId('Maximum').get('displayedValue');
+        
+        //var gradeP =  dijit.byId('AcademicStatus').value;
+        //var gradePD =  dijit.byId('AcademicStatus').get('displayedValue');
+        
+        var StatusEnglishName  = dijit.byId("StatusEnglishName").get('displayedValue');
+        //var StatusArabicName  = dijit.byId("StatusArabicName").get('displayedValue');
+        
+        var intRegex = /^(?:\d*\.\d{1,2}|\d+)$/;
+        //var intRegexRank = /^[0-9]$/; 
+        
+        
+        
+        if (minPD=='' || minPD>999 ||  (!intRegex.test(minPD)) ) { 
+	        //dijit.byId("Minimum").focus();                         
+                dijit.byId("Minimum").set( "state", "Error" );
+                flag = false;
+        }
+        
+        if (maxPD=='' || maxPD>999 ||  (!intRegex.test(maxPD)) ) { 
+	        //dijit.byId("Maximum").focus();                         
+                dijit.byId("Maximum").set( "state", "Error" );
+                flag = false;
+        }
+        
+       
+       if (StatusEnglishName=='') {	                            
+              dijit.byId("StatusEnglishName").set( "state", "Error" );
+              flag = false;
+        }
+       
+       if( minP>maxP ){   
+            var flag = false;
+            alert(' Minimum Point must be less than Maximum Point ');             
+       }
+        
+        if(minPD=='' && maxPD=='' && StatusEnglishName=='' ) {                 
+                var flag = false;        
+        }
+        
+        
+	if(flag == true) {
+		ASdetailsInsert();	
+	}			
+//	return flag;
+}
+
+var batchArray  = new Array();
+var oldContent = "";
+var NoCnt	=	0;
+
+<?php foreach($this->acadecmisetupDetails as $values){    
+?>
+        ASDescUp = <?php echo $values['Minimum'];?>+'_'+<?php echo $values['Maximum'];?>;
+        batchArray.push(ASDescUp);
+<?php } ?>
+    
+    
+    console.log(batchArray);
+function ASdetailsInsert() {
+	
+	var minP =  dijit.byId('Minimum').value;
+        var maxP =  dijit.byId('Maximum').value;               
+        var minPD =  dijit.byId('Minimum').get('displayedValue');
+        var maxPD =  dijit.byId('Maximum').get('displayedValue');        
+             
+        var StatusEnglishName  = dijit.byId("StatusEnglishName").get('displayedValue');
+        var StatusArabicName  = dijit.byId("StatusArabicName").get('displayedValue');
+
+      //  var gradeP =  dijit.byId('Grade').value;
+      //  var gradeval = dijit.byId('Gradevalue').value;
+        
+    ASDesc = minPD+'_'+maxPD;
+        //console.log(ASDesc);
+	batchArray.push(ASDesc);       
+	if(arrHasDupes(batchArray))
+	{
+		batchArray = batchArray.unique();                
+		alert("Duplicate Academic Setup Details. Please try a different.");
+	} 
+	else 
+	{
+
+		var trow = document.getElementById('hor').insertRow(rowid);
+		
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);
+		//var tcol5=trow.insertCell(4);
+		//var tcol6=trow.insertCell(5);
+		var tcol7=trow.insertCell(4);
+		
+		tcol1.innerHTML="<input type='hidden' value='"+minPD+"' name=Minimumgrid[]>"+minPD;
+        tcol2.innerHTML="<input type='hidden' value='"+maxPD+"' name=Maximumgrid[]>"+maxPD;
+		tcol3.innerHTML="<input type='hidden' value='"+StatusEnglishName+"' name=StatusEnglishNamegrid[]>"+StatusEnglishName;
+		tcol4.innerHTML="<input type='hidden' value='"+StatusArabicName+"' name=StatusArabicNamegrid[]>"+StatusArabicName;
+		//tcol5.innerHTML="<input type='hidden' value='"+gradeP+"' name=gradePgrid[]>"+gradeP;
+		//tcol6.innerHTML="<input type='hidden' value='"+gradeval+"' name=gradevalgrid[]>"+gradeval;
+		tcol7.innerHTML='<a href="javascript:void(0);" onClick="deleteRow(this,\''+minPD+'\',\''+maxPD+'\'); return false;"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+		rowid++;
+                
+                clearpageAdd();
+	}
+}
+
+
+function deleteRow(r, minPD, maxPD)
+{      
+	var dStat = confirm("Are you sure to delete the Academic Setup Detail?");
+    if(dStat == true){     
+        rowid--;	
+		var i=r.parentNode.parentNode.rowIndex;
+		batchArray.splice(parseInt(i-1),1);        
+        var makeArr = minPD+'_'+maxPD;
+        batchArray.splice(batchArray.indexOf(makeArr), 1);        
+		document.getElementById('hor').deleteRow(i);
+    }
+	
+}
+
+function clearpageAdd() {      
+        
+        //dijit.byId("AcademicStatus").reset();
+        //dijit.byId("AcademicStatus").set("value",null);
+       // dijit.byId('AcademicStatus').set('placeHolder','select');  
+        
+        dijit.byId("Maximum").reset();	
+		dijit.byId("Maximum").set("value",null);
+        
+        dijit.byId("Minimum").reset();
+        dijit.byId("Minimum").set("value",null);
+        
+        dijit.byId("StatusEnglishName").reset();
+		dijit.byId("StatusEnglishName").set("value",null); 
+        
+        dijit.byId("StatusArabicName").reset();
+		dijit.byId("StatusArabicName").set("value",null); 
+
+		dijit.byId("Grade").reset();
+		dijit.byId("Grade").set("value",null); 
+
+		dijit.byId("Gradevalue").reset();
+		dijit.byId("Gradevalue").set("value",null); 
+}
+function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+		var i, j, n;
+		n=A.length;   						// to ensure the fewest possible comparisons
+		for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+			for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+				if (A[i]==A[j])
+					return true;
+			}
+		}
+		return false;
+	}
+
+	Array.prototype.unique = function () {
+	    var r = new Array();
+	    o:for(var i = 0, n = this.length; i < n; i++) {
+	        for(var x = 0, y = r.length; x < y; x++) {
+	        	if(r[x]==this[i]) {
+	                	continue o;
+	              }
+	        }
+	        r[r.length] = this[i];
+	    }
+	    return r;
+	}
+
+function addcalmode(){
+	var landscapeType =  dijit.byId('LandscapeType').value;          
+    var landscapelabel =  dijit.byId('LandscapeType').get('displayedValue');
+    var level =  dijit.byId('Level').get('displayedValue');  
+    var semester =  dijit.byId('Semester').get('displayedValue'); 
+    
+    calModebatchArray.push(landscapeType);     
+    //console.log(calModebatchArray);  
+	if(arrHasDupes(calModebatchArray)){
+		calModebatchArray = calModebatchArray.unique();                
+		alert("<?php echo $this->translate('Duplicate Landscape Type');?>");
+	} else {
+		var trow = document.getElementById('horcal').insertRow(calmoderow);	
+		var tcol1=trow.insertCell(0);
+		var tcol2=trow.insertCell(1);
+		var tcol3=trow.insertCell(2);
+		var tcol4=trow.insertCell(3);		
+		
+		tcol1.innerHTML="<input type='hidden' value='"+landscapeType+"' name=landscapeTypegrid[]>"+landscapelabel;
+		tcol2.innerHTML="<input type='hidden' value='"+level+"' name=levelgrid[]>"+level;
+		tcol3.innerHTML="<input type='hidden' value='"+semester+"' name=semestergrid[]>"+semester;
+		tcol4.innerHTML='<a href="javascript:void(0);" onClick="deletecalrow(this)"><img src="<?php echo $this->baseUrl();?>/images/delete.png"  border=0 width=16 height=16></a>';
+		calmoderow++;
+	}
+}
+
+function deletecalrow(r){
+	var ret = confirm("Are you sure you want to delete?");
+	if (ret){
+		calmoderow--;			   
+	    var i=r.parentNode.parentNode.rowIndex;
+	    calModebatchArray.splice(parseInt(i-1),1);
+	    document.getElementById('horcal').deleteRow(i);
+	}
+}
+  
+  
+</script>
+<fieldset>
+	<legend>
+		<?php echo $this->translate("GPA/CGPA Setup"); ?>
+	</legend>
+	<form dojoType="dijit.form.Form" id="myForm" action="" method="post"
+		name="myForm">
+		<script type="dojo/method" event="onSubmit">
+            if (this.validate()) {
+                var flag = validateAcademicSetupForm();
+                if(!flag){
+                    return false;
+                }
+                return true;
+            }else {
+                return false;
+            }
+        </script>
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Setup Details"); ?>
+			</legend>
+			<table class="table" width="100%">
+				<?php if($this->msgscheme=='1') { ?>
+				<tr>
+					<td align="center" colspan="4" style="color: red;"><?php echo $this->translate('Selected combination already exist. Please try a different.');?>
+					</td>
+				</tr>
+				<?php } ?>
+				<tr>
+				
+				
+				<tr>
+					<th colspan="4"><?php echo $this->translate("Academic Setup Details"); ?>
+					</th>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate('Setup By');?>
+					</td>
+					<td colspan="3"><?php echo $this->lobjAcademicstatusForm->BasedOn;?>
+						<?php echo $this->lobjAcademicstatusForm->UpdUser;?> <?php echo $this->lobjAcademicstatusForm->UpdDate;?>
+					</td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate('Semester');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->IdSemester;?></td>
+					<td><?php echo $this->translate('Scheme');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->IdScheme;?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate('Award');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->IdAward;?></td>
+					<td><?php echo $this->translate('Program');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->IdProgram;?></td>
+				</tr>
+
+
+				<tr>
+					<td><?php echo $this->translate('Academic Status');?><span>*</span>
+					</td>
+					<td><?php echo $this->lobjAcademicstatusForm->AcademicStatus;?></td>
+					<td><?php echo $this->translate('Active');?></td>
+					<td><?php echo $this->lobjAcademicstatusForm->Active;?></td>
+				</tr>
+			
+
+				<tr>
+					<th colspan="4"><?php echo $this->translate("Academic Setup Details"); ?>
+					</th>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate('Minimum Grade Point');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->Minimum;?></td>
+					<td><?php echo $this->translate('Maximum Grade Point');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->Maximum;?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate('Status Description');?><span>*</span></td>
+					<td><?php echo $this->lobjAcademicstatusForm->StatusEnglishName;?></td>
+					<td><?php echo $this->translate("Status in $this->defaultlanguage");?></td>
+					<td><?php echo $this->lobjAcademicstatusForm->StatusArabicName;?></td>
+				</tr>
+				<!--<tr>
+					<td><?php echo $this->translate('Grade Point'); ?></td>
+					<td><?php echo $this->lobjAcademicstatusForm->Grade;?></td>
+					<td><?php echo $this->translate('Grade Value'); ?></td>
+					<td><?php echo $this->lobjAcademicstatusForm->Gradevalue;?></td>
+				</tr>
+				--><tr>
+					<td align="right" colspan="4"><?php echo $this->lobjAcademicstatusForm->Add;?>
+						<?php echo $this->lobjAcademicstatusForm->Clear;?>
+					</td>
+				</tr>
+			</table>
+
+
+			<table class="table" width="100%" id="hor">
+				<tr>
+					<th><?php echo $this->translate("Total Minimum Marks");?></th>
+					<th><?php echo $this->translate("Total Maximum Marks");?></th>
+					<th><?php echo $this->translate("Status Description");?></th>
+					<th><?php echo $this->translate("Status in $this->defaultlanguage");?></th>
+					<!--<th><?php echo $this->translate("Grade Point");?></th>
+					<th><?php echo $this->translate("Grade Value");?></th>
+					--><th><?php echo $this->translate("Delete")?></th>
+				</tr>
+
+				<?php if($this->acadecmisetupDetails) {?>
+				<?php 
+      	foreach($this->acadecmisetupDetails as $gradesetup) {?>
+				<tr>
+					<td><?php echo $this->escape($gradesetup['Minimum']);?> <input
+						type="hidden" name="Minimumgrid[]"
+						value="<?php echo $this->escape($gradesetup['Minimum']);?>">
+					</td>
+
+					<td><?php echo $this->escape($gradesetup['Maximum']);?> <input
+						type="hidden" name="Maximumgrid[]"
+						value="<?php echo $this->escape($gradesetup['Maximum']);?>">
+					</td>
+
+					<td><?php echo $this->escape($gradesetup['StatusEnglishName']);?> <input
+						type="hidden" name="StatusEnglishNamegrid[]"
+						value="<?php echo $this->escape($gradesetup['StatusEnglishName']);?>">
+					</td>
+
+					<td><?php echo $this->escape($gradesetup['StatusArabicName']);?> <input
+						type="hidden" name="StatusArabicNamegrid[]"
+						value="<?php echo $this->escape($gradesetup['StatusArabicName']);?>">
+					</td><!--
+					
+					<td><?php echo $this->escape($gradesetup['Gradepoint']);?> <input
+						type="hidden" name="gradePgrid[]"
+						value="<?php echo $this->escape($gradesetup['Gradepoint']);?>">
+					</td>
+					
+					<td><?php echo $this->escape($gradesetup['Gradevalue']);?> <input
+						type="hidden" name="gradevalgrid[]"
+						value="<?php echo $this->escape($gradesetup['Gradevalue']);?>">
+					</td>
+
+					--><td><a href="javascript:void(0);"
+						onClick="deleteRow(this,'<?php echo $this->escape($gradesetup['Minimum']);?>','<?php echo $this->escape($gradesetup['Maximum']);?>');return false;"><img
+							src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+							width='16' height='16'> </a></td>
+
+				</tr>
+
+				<?php } 
+} ?>
+
+			</table>
+
+
+		</fieldset>
+		</br>
+		<fieldset>
+			<legend>
+				<?php echo $this->translate("Calculation Mode"); ?>
+			</legend>
+			<table class="table" width="100%">
+				<tr>
+					<td><?php echo $this->translate('Landscape Type'); ?></td>
+					<td colspan='3'><?php echo $this->lobjAcademicstatusForm->LandscapeType;?></td>					
+				</tr>				
+				<tr>
+					<th colspan="4"><?php echo $this->translate("Start Calculation"); ?></th>
+				</tr>
+				<tr>
+					<td><?php echo  $this->translate("Year / Level");?></td>
+					<td><?php echo  $this->lobjAcademicstatusForm->Level;?></td>
+					<td><?php echo  $this->translate("Semester");?></td>
+					<td><?php echo  $this->lobjAcademicstatusForm->Semester;?></td>
+				</tr>
+				<tr>
+					<td colspan="4" align="right"><?php echo $this->lobjAcademicstatusForm->AddCalMode;?></td>
+				</tr>
+			</table>
+			<table class="table" width="100%" id="horcal">
+				<tr>
+					<th><?php echo $this->translate("Landscape Type");?></th>
+					<th><?php echo $this->translate("Year / Level");?></th>
+					<th><?php echo $this->translate("Semester");?></th>					
+					<th><?php echo $this->translate("Delete")?></th>
+				</tr>
+
+		<?php if($this->calmodes) {?>
+				<?php 
+      	foreach($this->calmodes as $dat) {;?>
+      			
+				<tr>
+					<td><?php echo $this->escape($dat['landscapetype']);?> <input
+						type="hidden" name="landscapeTypegrid[]"
+						value="<?php echo $this->escape($dat['LandscapeType']);?>">
+					</td>
+
+					<td><?php echo $this->escape($dat['Level']);?> <input
+						type="hidden" name="levelgrid[]"
+						value="<?php echo $this->escape($dat['Level']);?>">
+					</td>
+
+					<td><?php echo $this->escape($dat['Semester']);?> <input
+						type="hidden" name="semestergrid[]"
+						value="<?php echo $this->escape($dat['Semester']);?>">
+					</td>
+					<td><a href="javascript:void(0);"
+						onClick="deletecalrow(this);return false;"><img
+							src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+							width='16' height='16'> </a></td>
+				</tr>
+
+				<?php } 
+} ?>
+
+			</table>
+			<table class='table' width="100%">
+				<tr>
+					<td align="right" colspan="6"><?php echo $this->lobjAcademicstatusForm->Save;?>
+						<input type='button' class="NormalBtn"
+						dojotype="dijit.form.Button"
+						label="<?php echo $this->translate('Back')?>" value='click'
+						onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'academicstatus', 'action'=>'index'),'default',true);?>';" />
+					</td>
+				</tr>
+			</table>
+	</form>
+</fieldset>
+
+
+
+

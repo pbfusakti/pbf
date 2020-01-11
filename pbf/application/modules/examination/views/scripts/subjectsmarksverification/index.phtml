@@ -1,0 +1,173 @@
+<head>
+<script>
+dojo.addOnLoad(function(){
+
+	dijit.byId('field8').set('value','');
+	dijit.byId('field8').set('placeHolder','Select');
+
+	dijit.byId('field1').set('value','');
+	dijit.byId('field1').set('placeHolder','Select');
+	});
+</script>
+</head>
+<body class="claro">
+	<fieldset>
+		<legend>
+			<?php echo $this->translate("Student").' '.$this->translate("$this->Subject").' '.$this->translate("Marks").' '.$this->translate("Search");?>
+		</legend>
+		<form
+			action="<?php echo $this->baseUrl();?>/examination/subjectsmarksverification/index"
+			method="POST">
+			<table width="100%">
+				<tr>
+					<td><?php echo $this->translate("Student").' '.$this->translate("Name");?>
+					</td>
+					<td><?php echo $this->lobjform->field4;?></td>
+					<td><?php echo $this->translate("$this->Program");?></td>
+					<td><?php echo $this->lobjform->field8;?></td>
+				</tr>
+				<tr>
+					<td><?php echo $this->translate("Subject Name");?></td>
+					<td><?php echo $this->lobjform->field1;?></td>
+					<td><?php echo $this->translate("Semester");?></td>
+					<td><?php echo $this->lobjform->field2;?></td>
+				</tr>
+
+				<tr>
+					<td align="center" colspan="4"><?php echo $this->lobjform->Search;?>
+						<?php echo $this->lobjform->Clear;?>
+					</td>
+
+				</tr>
+			</table>
+		</form>
+	</fieldset>
+	<br />
+
+	<?php if(count($this->results) > 0) { ?>
+	<form name="studentsubjectmarks" method="POST">
+		<fieldset>
+			<?php $studarray = array();?>
+			<table class="table" width="100%" cellpadding="5" cellspacing="1">
+				<tr>
+					<th><?php echo $this->translate("Student").' '.$this->translate("Name");?>
+					</th>
+					<th><?php echo $this->translate("Registration ID").' '.$this->translate("No.");?>
+					</th>
+					<th><?php echo $this->translate("Staff").' '.$this->translate("Name");?>
+					</th>
+					<th><?php echo $this->translate("Program");?></th>
+					<th><?php echo $this->translate("Semester");?></th>
+					<th><?php echo $this->translate("Subject").' '.$this->translate("Name");?>
+					</th>
+					<th><?php echo $this->translate("Subject").' '.$this->translate("Distribution");?>
+					</th>
+					<th><?php echo $this->translate("Subject").' '.$this->translate("Components");?>
+					</th>
+					<th><?php echo $this->translate("Marks");?></th>
+					<th><?php echo $this->translate("Verifier Name");?></th>
+					<th><?php echo $this->translate("Rank");?></th>
+					<th><?php echo $this->translate("Verifier Marks");?></th>
+				</tr>
+
+				<?php $mm =0; ?>
+				<?php foreach ($this->results as $lobjstudents): ?>
+				<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+					<td><?php if(!in_array($lobjstudents['IdApplication'],$studarray)){
+						$studarrays[$lobjstudents['IdApplication']] = array();
+							echo $this->escape($lobjstudents['FName'].' '.$lobjstudents['MName'].' '.$lobjstudents['LName']);?>
+						<input type="Hidden" name="idStudentApplication"
+						value="<?php echo $this->escape($lobjstudents['IdApplication']);?>"
+						id="idStudentApplication<?php echo $mm;?>" /> <?php	}?>
+					</td>
+					<td><?php if(!in_array($lobjstudents['IdApplication'],$studarray)){
+						$studarray[] = $lobjstudents['IdApplication'];
+						echo $this->escape($lobjstudents['registrationId']);
+						?> <input type="Hidden" name="idStudentregistration[]"
+						value="<?php echo $this->escape($lobjstudents['IdStudentRegistration']);?>"
+						id="idStudentregistration<?php echo $mm;?>" /> <?php }?>
+					</td>
+					<td><?php if(!in_array($lobjstudents['stafffname'].' '.$lobjstudents['staffsecondname'],$studarrays[$lobjstudents['IdApplication']])){
+						$studarrays[$lobjstudents['IdApplication']][] = $lobjstudents['stafffname'].' '.$lobjstudents['staffsecondname'];
+						echo $this->escape($lobjstudents['stafffname'].' '.$lobjstudents['staffsecondname']);
+					}?></td>
+					<td><?php if(!in_array($lobjstudents['ProgramName'],$studarrays[$lobjstudents['IdApplication']])){
+						$studarrays[$lobjstudents['IdApplication']][] = $lobjstudents['ProgramName'];
+						echo $this->escape($lobjstudents['ProgramName']);
+					}?></td>
+					<td><?php if(!in_array($lobjstudents['IdSemester'],$studarrays[$lobjstudents['IdApplication']])){
+						$studarrays[$lobjstudents['IdApplication']][] = $lobjstudents['IdSemester'];
+						$studarrayss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']] = array();;
+						echo $this->escape($lobjstudents['IdSemester']);
+					}?> <input type="Hidden" name="idSubjectMarksEntry[]"
+						value="<?php echo $this->escape($lobjstudents['idSubjectMarksEntry']);?>"
+						id="idSubjectMarksEntry<?php echo $mm;?>" /> <input type="Hidden"
+						name="idverifier[]"
+						value="<?php echo $this->escape($lobjstudents['verifierstaffid']);?>"
+						id="idverifier<?php echo $mm;?>" /> <input type="Hidden"
+						name="Rank[]"
+						value="<?php echo $this->escape($lobjstudents['Rank']);?>"
+						id="Rank<?php echo $mm;?>" /> <input type="Hidden"
+						name="idVerifierMarks[]"
+						value="<?php echo $this->escape($lobjstudents['idVerifierMarks']);?>"
+						id="idVerifierMarks<?php echo $mm;?>" /> <!--     		
+	        		<input type="Hidden"  name ="idVerifierMarks[]" value="<?php echo $this->escape($lobjstudents['idVerifierMarks']);?>" id="idVerifierMarks<?php echo $mm;?>" />
+	        		<input type="Hidden"  name ="idVerifierMarks[]" value="<?php echo $this->escape($lobjstudents['idVerifierMarks']);?>" id="idVerifierMarks<?php echo $mm;?>" />
+	        		<input type="Hidden"  name ="idVerifierMarks[]" value="<?php echo $this->escape($lobjstudents['idVerifierMarks']);?>" id="idVerifierMarks<?php echo $mm;?>" />
+		 -->
+					</td>
+					<td><?php if(!in_array($lobjstudents['SubjectName'],$studarrayss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']])){
+						$studarrayss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][] = $lobjstudents['SubjectName'];
+						$studarraysss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']] = array();;
+						echo $this->escape($lobjstudents['SubjectName']);
+						?> <input type="Hidden"
+						name="idSubject[<?php echo $this->escape($lobjstudents['IdStudentRegistration']);?>][]"
+						value="<?php echo $this->escape($lobjstudents['IdSubject']);?>"
+						id="idSubject<?php echo $mm;?>" /> <?php }?>
+					</td>
+					<td><?php if(!in_array($lobjstudents['Name'],$studarraysss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']])){
+						$studarraysss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']][] = $lobjstudents['Name'];
+						$studarrayssss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']][$lobjstudents['Name']] = array();;
+						echo $this->escape($lobjstudents['Name']);
+						}?>
+					
+					<td><?php if(!in_array($lobjstudents['ComponentName'],$studarrayssss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']][$lobjstudents['Name']])){
+						$studarrayssss[$lobjstudents['IdApplication']][$lobjstudents['IdStaff']][$lobjstudents['IdProgram']][$lobjstudents['IdSemester']][$lobjstudents['IdSubject']][$lobjstudents['Name']][] = $lobjstudents['ComponentName'];
+						echo $this->escape($lobjstudents['ComponentName']);
+					}?></td>
+					<td><?php echo $this->escape($lobjstudents['subjectmarks']);?></td>
+					<td><?php print_r($this->escape($lobjstudents['verifierstafffname'].' '.$lobjstudents['verifierstaffsecondname']));?>
+					</td>
+					<td><?php echo $this->escape($lobjstudents['Rank']);?></td>
+
+					<?php if($lobjstudents['verifierstaffid'] == "") {?>
+					<td><input type="Text" name="verifiresubjectmarks[]"
+						readonly="true" dojoType="dijit.form.NumberTextBox"
+						value="<?php echo $this->escape($lobjstudents['subjectmarks']);?>"
+						id="verifiresubjectmarks<?php echo $mm;?>" /></td>
+					<?php } else { ?>
+					<td><input type="Text" name="verifiresubjectmarks[]"
+						dojoType="dijit.form.NumberTextBox"
+						value="<?php echo $this->escape($lobjstudents['verifiresubjectmarks']);?>"
+						id="verifiresubjectmarks<?php echo $mm;?>" /></td>
+					<?php } ?>
+
+				</tr>
+				<?php $mm++;  endforeach; ?>
+			</table>
+
+			<table class="table" width="100%" cellpadding="5" cellspacing="1">
+				<tr>
+					<td align="right"><?php echo $this->lobjStudentRegForm->Save;?> <input
+						type="button" class="NormalBtn" dojotype="dijit.form.Button"
+						label="<?php echo $this->translate("Clear"); ?>"
+						onclick="window.location.href='<?php echo $this->url(array('module'=>'examination','controller'=>'subjectsmarksverification', 'action'=>'index'),'default',true);?>';" />
+					</td>
+
+				</tr>
+			</table>
+		</fieldset>
+	</form>
+	<?php }?>
+</body>
+</html>

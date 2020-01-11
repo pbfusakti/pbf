@@ -1,0 +1,156 @@
+<script>
+
+function validate(status){
+	if(validate_all_numeric()==true){		
+		$("#verify_status").val(status);
+		$("#formMarkAppeal").submit(); 
+	}else{
+		alert("Please enter numeric value.");
+	}
+}
+
+function validate_numeric(element,entrymark,fullmark,percent,no=''){	
+	 var entrymark = parseFloat(entrymark);
+	 var fullmark = parseFloat(fullmark);
+	 
+	if(entrymark != ''){
+		if($.isNumeric( entrymark )==false){ 
+			alert("Please enter numeric value.");
+		}else{
+			
+			if( entrymark > fullmark){
+				alert('Mark that you have entered exceeded the Total Mark');
+				$(element).val('');			
+			}else{
+				//calculate
+				finalmark = (entrymark.toFixed(2)/fullmark.toFixed(2))*percent;				
+				elementfinalmark = "#finalmark"+no;				
+				$(elementfinalmark).val(finalmark.toFixed(2));
+			}
+		}
+	}	
+}
+
+function validate_all_numeric(){
+	var valid = true;	
+	var no=1;
+	$('input[class="entry"]').each(function(){	
+		entrymark = $(this).val();
+		elementfullmark = "#fullmark"+no;
+		fullmark = $(elementfullmark).val();
+		
+		if(entrymark != ''){
+			if($.isNumeric( entrymark )==false){ 
+				return valid = false;
+			}
+
+			if( entrymark > fullmark){
+				alert('Mark that you have entered exceeded the Total Mark');
+				$(element).val('');			
+			}
+		}
+		
+		no=no+1;
+	});
+	return valid;	
+}
+</script>
+<?php setlocale(LC_TIME, 'id_ID') ;?>
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+		<th><?php echo $this->translate("Subject");?></th>
+		<td><?php echo $this->subject["BahasaIndonesia"];?> ( <?php echo $this->subject["SubCode"];?> )</td>
+			
+	</tr>
+	<tr>
+		
+		<th><?php echo $this->translate("Semester");?></th>
+		<td><?php echo $this->semester["SemesterMainName"]?></td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Component Coursework");?></th>
+		<td><?php echo $this->component["component_name"]; ?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Application Status");?></th>
+		<td>
+		<?php 
+		if($this->appeal['sa_status']==1) echo $this->translate("Apply");
+		if($this->appeal['sa_status']==2) { echo $this->translate("Approved").', '.date("d-m-Y",strtotime($this->appeal['sa_approvedDate'])); }
+		if($this->appeal['sa_status']==3) { echo $this->translate("Rejected").', '.date("d-m-Y",strtotime($this->appeal['sa_approvedDate'])); }?>
+		
+		</td>
+		
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Dosen Penilai");?></th>
+		<td><?php echo ($this->appeal["dosen_penilai"]!='') ? $this->appeal["dosen_penilai"]:'-';?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Tanggal Pertemuan");?></th>
+		<td><?php echo ($this->appeal["sa_meeting_date"]!='') ? date("d-m-Y",strtotime($this->appeal["sa_meeting_date"])).', '.strftime("%I:%M %P",strtotime($this->appeal["sa_meeting_time"])):'-';?></td>
+	</tr>
+	<tr>
+		<th><?php echo $this->translate("Ruang");?></th>
+		<td><?php echo $this->appeal["sa_location"]; ?></td>
+	</tr>
+</table>
+
+<form id="formMarkAppeal" method="post" action="<?php echo $this->url(array('module'=>'examination','controller'=>'appeal','action'=>'update-mark'), 'default', true);?>">
+<h2><?php echo $this->translate("Student Mark");?></h2>
+<input type="hidden" name="sa_id" value="<?php echo $this->id; ?>">
+<input type="hidden" name="id_component" size="5" value="<?php echo $this->component["IdMarksDistributionMaster"]?>">
+<input type="hidden" name="verify_status" id="verify_status" size="5" value="">
+<input type="hidden" name="idStudentRegistration" id="idStudentRegistration" size="5" value="<?php echo $this->appeal["sa_idStudentRegistration"]?>">
+<input type="hidden" name="idSubject" id="idSubject" size="5" value="<?php echo $this->appeal["sa_idSubject"]?>">
+<input type="hidden" name="idSemester" id="idSemester" size="5" value="<?php echo $this->appeal["sa_idSemester"]?>">
+
+<table class="table" width="100%" cellpadding="5" cellspacing="1" border="0">
+	<tr>
+	    <th><?php echo $this->translate("Coursework");?></th>
+	    <?php 
+			if(count($this->component["item"])>0){ ?>
+		<th><?php echo $this->translate("Item");?></th>
+		<?php } ?>
+		<th><?php echo $this->translate("New Mark");?></th>	
+				
+	</tr>
+	
+<?php 
+if(count($this->component["item"])>0){
+	$item_no=1;
+	foreach($this->component["item"] as $item){?>
+	<tr>
+	    <td><?php echo $this->component["component_name"];?></td>
+		<td><?php echo $item["ComponentName"];?></td>
+		<td align="center">
+		<input type="hidden" name="id_component_item[<?php echo $item_no;?>]" size="5" value="<?php echo $item["IdMarksDistributionDetails"]?>">
+		<input type="hidden" name="sam_id[<?php echo $item_no;?>]" size="5" value="<?php echo $item["sam_id"]?>">
+		(<input type="text" class="entry" name="new_mark[<?php echo $item_no;?>]" id="newmark<?php echo $item_no;?>" size="5" value="<?php echo $item["mark"]; ?>" onblur="validate_numeric(this,this.value,'<?php echo $item["Weightage"]; ?>','<?php echo $item["Percentage"]; ?>','<?php echo $item_no; ?>')"> /
+		<input type="text"  style="background-color:#FCF5D8;"  id="fullmark<?php echo $item_no; ?>" size="5" value="<?php echo $item["Weightage"]; ?>" readonly>) *
+		<input type="text"  style="background-color:#FCF5D8;"  id="percentage<?php echo $item_no; ?>" size="5" value="<?php echo $item["Percentage"]; ?>" readonly>% = 
+		<input type="text"  style="background-color:#FCF5D8;"  name="finalmark[<?php echo $item_no;?>]" id="finalmark<?php echo $item_no; ?>" size="5" value="<?php echo $item["finalmark"]; ?>" readonly>
+		</td>
+	
+	</tr>
+<?php $item_no++;} 
+}else{ ?>
+	<tr>
+	    <td><?php echo $this->component["component_name"];?></td>			
+		<td>
+		<input type="hidden" name="sam_id" size="5" value="<?php echo $this->component["sam_id"]; ?>">
+		(<input type="text" size="5" name="new_mark" value="<?php echo $this->component["mark"]; ?>" onblur="validate_numeric(this,this.value,'<?php echo $this->component["Marks"]; ?>','<?php echo $this->component["Percentage"]; ?>')"> *
+		<input type="text"  style="background-color:#FCF5D8;"  id="fullmark" size="5" value="<?php echo $this->component["Marks"]; ?>" readonly>) /
+		<input type="text"  style="background-color:#FCF5D8;"  id="percentage" size="5" value="<?php echo $this->component["Percentage"]; ?>" readonly>% = 
+		<input type="text"  style="background-color:#FCF5D8;"  name="finalmark" id="finalmark" size="5" value="<?php echo $this->component["finalmark"]; ?>" readonly>
+		</td>
+	</tr>
+<?php } ?>
+</table>
+<br>
+<table width="100%" >
+	<tr><td bgcolor="grey" align="center"><input type="button" value="Save as Entry" onclick="validate(0);">&nbsp;<input type="button" value="Save as Verified" onclick="validate(1)"></td></tr>
+</table>
+
+</form>

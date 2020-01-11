@@ -1,9 +1,14 @@
 <?php 
 
-class Mahasiswa_MahasiswaController extends Zend_Controller_Action{
- public function viewAction(){
+ 
  
   $dbRef = new Mahasiswa_Model_DbTable_MahasiswaMenu();
+ 
+class Penjadwalan_PenjadwalanController extends Zend_Controller_Action{
+ public function viewAction(){
+ 
+  $dbMhs = new Penjadwalan_Model_DbTable_BiodataPenjadwalan();
+ 
   if($this->getRequest()->isPost())
   {
    $formData = $this->getRequest()->getPost();
@@ -11,31 +16,41 @@ class Mahasiswa_MahasiswaController extends Zend_Controller_Action{
    {
     unset($formData['save']);
     //echo var_dump($formData);exit;
-    $dbRef->saveData($formData);
+ 
+    $dbMhs->saveData($formData);
+ 
    }
    
    else if(isset($formData['delete']))
    {
     //echo $formData['id'];exit;
-     $dbRef->deleteData($formData['id']);
+ 
+     $dbMhs->deleteData($formData['id']);
+ 
    }
    
   else if(isset($formData['search']))
    {
-    $row=$dbRef->searchData(array('kodemk'=>$formData['kodemk']));
-     $this->view->dosen=$row;
+ 
+    $row=$dbMhs->searchData(array('nim'=>$formData['nim']));
+     $this->view->Mahasiswa=$row;
+ 
    }
    
   else if(isset($formData['update']))
    {
     unset($formData['update']);
-     $dbRef->updateData($formData, 'matakuliah="'.$formData['matakuliah'].'"');
+ 
+     $dbMhs->updateData($formData, 'name="'.$formData['name'].'"');
+ 
  
     
    }
   }
-  $data=$dbRef->getData(); 
-   $this->view->refmhs
+ 
+  $data=$dbMhs->getData(); 
+   $this->view->datamhs
+ 
    =$data;
  }
 

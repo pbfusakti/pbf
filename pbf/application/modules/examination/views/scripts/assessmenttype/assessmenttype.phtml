@@ -1,0 +1,216 @@
+<?php
+if(isset($this->assessmenttypeList)){
+	$listarray = $this->assessmenttypeList;
+}
+?>
+<script type="text/javascript">
+    var batchArray  = new Array();
+    var rowid = <?php echo count($this->assessmenttypeList) + 1; ?>;
+    dojo.addOnLoad(function() {
+       <?php if(isset($listarray)){?>
+       <?php foreach($listarray as $list) {  ?>
+            batchArray.push('<?php echo $list['IdDescription']; ?>');
+        <?php }} ?>
+    });
+
+    function clearType(){
+        //alert('kkk');
+        dijit.byId('IdDescription').reset();
+        dijit.byId('IdDescription').set('value',null);
+        
+        dijit.byId('Description').reset();
+        dijit.byId('Description').set('value', null);
+        
+        dijit.byId('DescriptionDefaultlang').reset();
+        dijit.byId('DescriptionDefaultlang').set('value', null);
+    }
+
+    function AutoFillNextEditableDropDown(EditableDropDownId,JSONText){
+        dijit.byId(EditableDropDownId).setValue("");
+        var ddwidget = dijit.byId(EditableDropDownId);
+        ddwidget.setAttribute('disabled', false);
+        var options = {
+            label:"name",
+            identifier:"key",
+            items:JSONText
+        };
+        ddwidget.store = new dojo.data.ItemFileReadStore( { data: options } );
+    }
+
+    function arrHasDupes( A ) {              // finds any duplicate array elements using the fewest possible comparison
+        var i, j, n;
+        n=A.length;                                         // to ensure the fewest possible comparisons
+        for (i=0; i<n; i++) {                // outer loop uses each item i at 0 through n
+            for (j=i+1; j<n; j++) {          // inner loop only compares items j at i+1 to n
+                if (A[i]==A[j]) return true;
+            }	}
+        return false;
+    }
+
+    Array.prototype.unique = function () {
+        var r = new Array();
+        o:for(var i = 0, n = this.length; i < n; i++)
+        {
+            for(var x = 0, y = r.length; x < y; x++)
+            {
+                if(r[x]==this[i])
+                {
+                    continue o;
+                }
+
+            }
+            r[r.length] = this[i];
+        }
+        return r;
+    }
+
+    function adddescType(){
+        var flag = true;
+
+        if(dijit.byId("IdDescription").value==''){
+            dijit.byId("IdDescription").focus();
+            flag = false;
+        }
+
+        if(dijit.byId("Description").value==''){
+            alert('Please Insert Description');
+            dijit.byId("Description").attr('required','true');
+            dijit.byId("Description").focus();
+            flag = false;
+        }
+        
+        if(flag){
+            insertconfigDetails();
+        }
+    }
+
+    function insertconfigDetails() {
+
+        var IdDescription = dijit.byId("IdDescription").value;
+        var Description = dijit.byId("Description").value;
+        var DescriptionDefaultlang = dijit.byId("DescriptionDefaultlang").value;
+        
+        batchArray.push(IdDescription);
+        
+        if(arrHasDupes(batchArray)){
+            batchArray = batchArray.unique();
+            alert("Duplicate Entry");
+        }else{            
+            var trow=document.getElementById('hor').insertRow(rowid);
+            var tcol1=trow.insertCell(0);
+            var tcol2=trow.insertCell(1);
+            var tcol3=trow.insertCell(2);
+            var tcol4=trow.insertCell(3);
+
+            tcol1.innerHTML="<input type='hidden' name='IdExaminationAssessmentType[]' value=''><input type='hidden' value='"+IdDescription+"' name=IdDescriptionGrid[]>"+IdDescription;
+            tcol2.innerHTML="<input type='hidden' value='"+Description+"' name=DescriptionGrid[]>"+Description;
+            tcol3.innerHTML="<input type='hidden' value='"+DescriptionDefaultlang+"' name=DescriptionDefaultlangGrid[]>"+DescriptionDefaultlang;
+            tcol4.innerHTML="<a href='#' onClick='deleteRow(this); return false;'><img src='<?php echo $this->baseUrl(); ?>/images/delete.png'  border=0 width='16' height='16'></a>";
+            rowid++;
+        }
+    }
+
+    function deleteRow(r){
+        var ret = confirm("Are you sure you want to delete?");
+        if(ret){
+            rowid--;
+            var i=r.parentNode.parentNode.rowIndex;
+            batchArray.splice(parseInt(i-1),1);
+            document.getElementById('hor').deleteRow(i);
+        }
+    }
+    
+    function deleteRowData(r,idType){
+        var ret = confirm("Are you sure you want to delete?");
+        if(ret){
+            rowid--;
+            var i=r.parentNode.parentNode.rowIndex;
+            batchArray.splice(parseInt(i-1),1);
+            document.getElementById('hor').deleteRow(i);
+            
+           deleted = $("#deleted_id").val();
+           if(deleted != '')
+           {
+            new_deleted =  deleted + ',' + idType;
+           }
+           else
+           {
+            new_deleted = idType;
+           }
+            
+            $("#deleted_id").val(new_deleted);
+        }
+    }
+</script>
+<div dojoType="dijit.layout.ContentPane" id="tab-one"
+	title="<?php echo $this->translate("Assessment Type Setup"); ?>"
+	style="height: 90%; width: 99%; overflow: auto">
+	<table class="table" width="100%">
+		<tr>
+			<th colspan="4"><?php echo $this->translate("Asseemnet Type Detail"); ?>
+			</th>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate("Id"); ?><span class="reqMark">*</span>
+			</td>
+			<td><?php echo $this->lobjassessmentForm->IdDescription; ?></td>
+			<td><?php echo $this->translate("Description"); ?><span
+				class="reqMark">*</span></td>
+			<td><?php echo $this->lobjassessmentForm->Description; ?></td>
+		</tr>
+		<tr>
+			<td><?php echo $this->translate("Description in") . " " . (isset($this->defaultlanguage) ? $this->defaultlanguage : ''); ?>
+			</td>
+			<td><?php echo $this->lobjassessmentForm->DescriptionDefaultlang ?></td>
+		</tr>
+		<tr>
+			<td colspan="4" align="right"><input type="button" class="NormalBtn"
+				dojotype="dijit.form.Button"
+				label="<?php echo $this->translate("Add"); ?>"
+				onclick="adddescType()" /> <?php echo $this->lobjassessmentForm->Clear; ?>
+
+			</td>
+		</tr>
+	</table>
+	<form dojoType="dijit.form.Form" id="myForm1" action="" method="post"
+		name="myForm">
+		<table class="table" width="100%" id="hor">
+			<tr>
+				<th><?php echo $this->translate("Id"); ?></th>
+				<th><?php echo $this->translate("Description"); ?></th>
+				<th><?php echo $this->translate("Description in") . " " . (isset($this->defaultlanguage) ? $this->defaultlanguage : ''); ?>
+				</th>
+				<th><?php echo $this->translate("Delete"); ?></th>
+			</tr>
+			<?php if(isset($listarray)){?>
+			<?php foreach($listarray as $list) { ?>
+			<tr style="background-color:<?php echo $this->cycle(array("#F0F0F0","#FFFFFF"))->next()?>">
+				<td>
+                <input type="hidden" name="IdExaminationAssessmentType[]" value="<?php echo $list['IdExaminationAssessmentType'];?>" />
+                <?php echo $list['IdDescription'] ?><input type="hidden"
+					value="<?php echo $list['IdDescription'] ?>"
+					name="IdDescriptionGrid[]" /></td>
+				<td><?php echo $list['Description'] ?><input type="hidden"
+					value="<?php echo $list['Description'] ?>" name="DescriptionGrid[]" />
+				</td>
+				<td><?php echo $list['DescriptionDefaultlang'] ?><input
+					type="hidden" value="<?php echo $list['DescriptionDefaultlang'] ?>"
+					name="DescriptionDefaultlangGrid[]" /></td>
+				<td><a href="#" onClick="deleteRowData(this,'<?php echo $list['IdExaminationAssessmentType'];?>'); return false;"> <img
+						src='<?php echo $this->baseUrl();?>/images/delete.png' border=0
+						width='16' height='16'>
+				</a></td>
+			</tr>
+			<?php } ?>
+            
+<?php } ?>
+		</table>
+        <input type="hidden" name="deleted_id" id="deleted_id" />
+		<table class="table" width="100%">
+			<tr>
+				<td align="right"><?php echo $this->lobjassessmentForm->Save; ?>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
